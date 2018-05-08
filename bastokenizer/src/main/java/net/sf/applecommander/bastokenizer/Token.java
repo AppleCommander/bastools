@@ -1,6 +1,9 @@
 package net.sf.applecommander.bastokenizer;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Optional;
 
 public class Token {
 	public final int line;
@@ -53,6 +56,44 @@ public class Token {
 				ps.print(number.intValue());
 			} else {
 				ps.print(number);
+			}
+			break;
+		}
+	}
+
+	public void toBytes(ByteArrayOutputStream os) throws IOException {
+		switch (type) {
+		case COMMENT:
+			os.write(ApplesoftKeyword.REM.code);
+			os.write(text.getBytes());
+			break;
+		case EOL:
+			os.write(0x00);
+			break;
+		case IDENT:
+			os.write(text.getBytes());
+			break;
+		case KEYWORD:
+			os.write(keyword.code);
+			break;
+		case NUMBER:
+			if (Math.rint(number) == number) {
+				os.write(Integer.toString(number.intValue()).getBytes());
+			} else {
+				os.write(Double.toString(number).getBytes());
+			}
+			break;
+		case STRING:
+			os.write('"');
+			os.write(text.getBytes());
+			os.write('"');
+			break;
+		case SYNTAX:
+			Optional<ApplesoftKeyword> opt = ApplesoftKeyword.find(text);
+			if (opt.isPresent()) {
+				os.write(opt.get().code);
+			} else {
+				os.write(text.getBytes());
 			}
 			break;
 		}

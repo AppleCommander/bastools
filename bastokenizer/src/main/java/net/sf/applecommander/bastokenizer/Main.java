@@ -16,5 +16,42 @@ public class Main {
 		Parser parser = new Parser(tokens);
 		Program program = parser.parse();
 		program.prettyPrint(System.out);
+		
+		int address = 0x801;
+		byte[] data = program.toBytes(address);
+		print(address, data, false);
+		print(address, data, true);
+	}
+	
+	public static void print(int address, byte[] data, boolean forApple) {
+		final int line = 16;
+		int offset = 0;
+		while (offset < data.length) {
+			System.out.printf("%04x: ", address);
+			for (int i=0; i<line; i++) {
+				if (offset < data.length) {
+					System.out.printf("%02x ", data[offset]);
+				} else if (!forApple) {
+					System.out.printf(".. ");
+				}
+				offset++;
+			}
+			System.out.print(" ");
+			if (!forApple) {
+				offset -= line;
+				for (int i=0; i<line; i++) {
+					char ch = ' ';
+					if (offset < data.length) {
+						byte b = data[offset];
+						ch = (b >= ' ') ? (char)b : '.';
+					}
+					System.out.printf("%c", ch);
+					offset++;
+				}
+			}
+			System.out.printf("\n");
+			address += line;
+		}
+
 	}
 }

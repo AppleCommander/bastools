@@ -1,5 +1,7 @@
 package net.sf.applecommander.bastokenizer;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,5 +26,22 @@ public class Line {
 			statement.prettyPrint(ps);
 			ps.println();
 		}
+	}
+
+	public int toBytes(int address, ByteArrayOutputStream os) throws IOException {
+		ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+		for (Statement stmt : statements) {
+			if (tmp.size() > 0) tmp.write(':');
+			stmt.toBytes(tmp);
+		}
+		
+		int nextAddress = address + tmp.size() + 5;
+		os.write(nextAddress);
+		os.write(nextAddress >> 8);
+		os.write(lineNumber);
+		os.write(lineNumber >> 8);
+		tmp.writeTo(os);
+		os.write(0x00);
+		return nextAddress;
 	}
 }
