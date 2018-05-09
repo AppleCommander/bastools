@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Queue;
 
+/** A simple driver for the tokenizer for a sample and rudimentary test. */
 public class Main {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		if (args.length != 1) {

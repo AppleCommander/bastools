@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/** All elements of AppleSoft that are tokenized in some manner.  "Keyword" was picked as it is not the word token. ;-) */
 public enum ApplesoftKeyword {
     END(0x80, "END"), 
     FOR(0x81, "FOR"), 

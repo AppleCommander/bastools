@@ -9,6 +9,12 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
 
+/**
+ * The TokenReader, given a text file, generates a series of Tokens (in the compiler sense, 
+ * not AppleSoft) for the AppleSoft program.
+ *  
+ * @author rob
+ */
 public class TokenReader {
 	private boolean hasMore = true;
 	// Internal flag just in case we consume the EOL (see REM for instance)s
@@ -16,6 +22,7 @@ public class TokenReader {
 	private Reader reader;
 	private StreamTokenizer tokenizer;
 
+	/** A handy method to generate a list of Tokens from a file. */
 	public static Queue<Token> tokenize(String filename) throws FileNotFoundException, IOException {
 		try (FileReader fileReader = new FileReader(filename)) {
 			TokenReader tokenReader = new TokenReader(fileReader);

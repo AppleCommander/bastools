@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/** A Statement is simply a series of Tokens. */
 public class Statement {
 	public final List<Token> tokens = new ArrayList<>();
 	

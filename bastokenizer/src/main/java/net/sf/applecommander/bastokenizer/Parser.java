@@ -5,6 +5,10 @@ import java.util.Queue;
 
 import net.sf.applecommander.bastokenizer.Token.Type;
 
+/** 
+ * The Parser will read a series of Tokens and build a Program.
+ * Note that this is not a compiler and does not "understand" the program. 
+ */
 public class Parser {
 	private final Queue<Token> tokens;
 	

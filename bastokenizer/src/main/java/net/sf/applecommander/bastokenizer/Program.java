@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/** A Program is a series of lines. */
 public class Program {
 	public final List<Line> lines = new ArrayList<>();
 	

@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Optional;
 
+/**
+ * A Token in the classic compiler sense, in that this represents a component of the application.
+ * 
+ * @author rob
+ */
 public class Token {
 	public final int line;
 	public final Type type;

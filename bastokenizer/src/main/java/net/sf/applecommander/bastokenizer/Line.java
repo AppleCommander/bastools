@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/** An AppleSoft BASIC Line representation. */
 public class Line {
 	public final int lineNumber;
 	public final List<Statement> statements = new ArrayList<>();
