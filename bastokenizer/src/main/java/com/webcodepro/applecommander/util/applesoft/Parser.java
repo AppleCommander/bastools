@@ -1,9 +1,9 @@
-package net.sf.applecommander.bastokenizer;
+package com.webcodepro.applecommander.util.applesoft;
 
 import java.util.Objects;
 import java.util.Queue;
 
-import net.sf.applecommander.bastokenizer.Token.Type;
+import com.webcodepro.applecommander.util.applesoft.Token.Type;
 
 /** 
  * The Parser will read a series of Tokens and build a Program.

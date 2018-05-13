@@ -1,4 +1,4 @@
-package net.sf.applecommander.bastokenizer;
+package com.webcodepro.applecommander.util.applesoft;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

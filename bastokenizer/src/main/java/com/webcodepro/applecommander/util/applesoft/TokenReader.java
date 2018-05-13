@@ -1,4 +1,4 @@
-package net.sf.applecommander.bastokenizer;
+package com.webcodepro.applecommander.util.applesoft;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

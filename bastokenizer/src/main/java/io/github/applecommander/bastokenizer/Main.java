@@ -1,8 +1,13 @@
-package net.sf.applecommander.bastokenizer;
+package io.github.applecommander.bastokenizer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Queue;
+
+import com.webcodepro.applecommander.util.applesoft.Parser;
+import com.webcodepro.applecommander.util.applesoft.Program;
+import com.webcodepro.applecommander.util.applesoft.Token;
+import com.webcodepro.applecommander.util.applesoft.TokenReader;
 
 /** A simple driver for the tokenizer for a sample and rudimentary test. */
 public class Main {
