@@ -3,6 +3,8 @@ package com.webcodepro.applecommander.util.applesoft;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.LinkedList;
@@ -25,15 +27,24 @@ public class TokenReader {
 	/** A handy method to generate a list of Tokens from a file. */
 	public static Queue<Token> tokenize(String filename) throws FileNotFoundException, IOException {
 		try (FileReader fileReader = new FileReader(filename)) {
-			TokenReader tokenReader = new TokenReader(fileReader);
-			LinkedList<Token> tokens = new LinkedList<>();
-			while (tokenReader.hasMore()) {
-				// Magic number: maximum number of pieces from the StreamTokenizer that may be combined.
-				tokenReader.next(2)
-						   .ifPresent(tokens::add);
-			}
-			return tokens;
+			return tokenize(fileReader);
 		}
+	}
+	/** A handy method to generate a list of Tokens from an InputStream. */
+	public static Queue<Token> tokenize(InputStream inputStream) throws IOException {
+		try (InputStreamReader streamReader = new InputStreamReader(inputStream)) {
+			return tokenize(streamReader);
+		}
+	}
+	private static Queue<Token> tokenize(Reader reader) throws IOException {
+		TokenReader tokenReader = new TokenReader(reader);
+		LinkedList<Token> tokens = new LinkedList<>();
+		while (tokenReader.hasMore()) {
+			// Magic number: maximum number of pieces from the StreamTokenizer that may be combined.
+			tokenReader.next(2)
+					   .ifPresent(tokens::add);
+		}
+		return tokens;
 	}
 
 	public TokenReader(Reader reader) {
