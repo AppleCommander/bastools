@@ -4,6 +4,7 @@ import com.webcodepro.applecommander.util.applesoft.Line;
 import com.webcodepro.applecommander.util.applesoft.Program;
 import com.webcodepro.applecommander.util.applesoft.Statement;
 import com.webcodepro.applecommander.util.applesoft.Token;
+import com.webcodepro.applecommander.util.applesoft.Token.Type;
 import com.webcodepro.applecommander.util.applesoft.Visitor;
 
 import picocli.CommandLine.ITypeConverter;
@@ -13,6 +14,12 @@ public enum Optimization {
 		@Override
 		public Statement visit(Statement statement) {
 			return statement.tokens.isEmpty() ? null : statement;
+		}
+	}),
+	REMOVE_REM_STATEMENTS(new BaseVisitor() {
+		@Override
+		public Statement visit(Statement statement) {
+			return statement.tokens.get(0).type == Type.COMMENT ? null : statement;
 		}
 	})
 	;
@@ -47,7 +54,7 @@ public enum Optimization {
 			Program newProgram = new Program();
 			program.lines.forEach(l -> {
 				Line line = l.accept(this);
-				if (line != null) newProgram.lines.add(line);
+				if (line != null && !line.statements.isEmpty()) newProgram.lines.add(line);
 			});
 			return newProgram;
 		}
