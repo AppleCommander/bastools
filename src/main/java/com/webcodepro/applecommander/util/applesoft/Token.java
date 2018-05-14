@@ -1,13 +1,11 @@
 package com.webcodepro.applecommander.util.applesoft;
 
-import java.util.function.Consumer;
-
 /**
  * A Token in the classic compiler sense, in that this represents a component of the application.
  * 
  * @author rob
  */
-public class Token implements Consumer<Visitor> {
+public class Token {
 	public final int line;
 	public final Type type;
 	public final ApplesoftKeyword keyword;
@@ -21,9 +19,8 @@ public class Token implements Consumer<Visitor> {
 		this.number = number;
 		this.text = text;
 	}
-	@Override
-	public void accept(Visitor t) {
-		t.visit(this);
+	public Token accept(Visitor t) {
+		return t.visit(this);
 	}
 	@Override
 	public String toString() {

@@ -8,14 +8,19 @@ package com.webcodepro.applecommander.util.applesoft;
  * @see Visitors
  */
 public interface Visitor {
-	default public void visit(Program program) {
+	default public Program visit(Program program) {
 		program.lines.forEach(l -> l.accept(this));
+		return program;
 	}
-	default public void visit(Line line) {
+	default public Line visit(Line line) {
 		line.statements.forEach(s -> s.accept(this));
+		return line;
 	}
-	default public void visit(Statement statement) {
+	default public Statement visit(Statement statement) {
 		statement.tokens.forEach(t -> t.accept(this));
+		return statement;
 	}
-	public void visit(Token token);
+	default public Token visit(Token token) {
+		return token;
+	};
 }

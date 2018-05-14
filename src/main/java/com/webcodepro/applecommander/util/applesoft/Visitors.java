@@ -58,7 +58,7 @@ public class Visitors {
 		}
 		
 		@Override
-		public void visit(Line line) {
+		public Line visit(Line line) {
 			boolean first = true;
 			for (Statement statement : line.statements) {
 				if (first) {
@@ -70,9 +70,10 @@ public class Visitors {
 				statement.accept(this);
 				printStream.println();
 			}
+			return line;
 		}
 		@Override
-		public void visit(Token token) {
+		public Token visit(Token token) {
 			switch (token.type) {
 			case EOL:
 				printStream.print("<EOL>");
@@ -98,6 +99,7 @@ public class Visitors {
 				}
 				break;
 			}
+			return token;
 		}
 	}
 	
@@ -109,7 +111,7 @@ public class Visitors {
 		}
 		
 		@Override
-		public void visit(Line line) {
+		public Line visit(Line line) {
 			printStream.printf("%d ", line.lineNumber);
 			boolean first = true;
 			for (Statement statement : line.statements) {
@@ -121,9 +123,10 @@ public class Visitors {
 				statement.accept(this);
 			}
 			printStream.println();
+			return line;
 		}
 		@Override
-		public void visit(Token token) {
+		public Token visit(Token token) {
 			switch (token.type) {
 			case EOL:
 				printStream.print("<EOL>");
@@ -149,6 +152,7 @@ public class Visitors {
 				}
 				break;
 			}
+			return token;
 		}
 	}
 	
@@ -175,7 +179,7 @@ public class Visitors {
 		}
 		
 		@Override
-		public void visit(Program program) {
+		public Program visit(Program program) {
 			if (stack.size() != 0) {
 				throw new RuntimeException("Please do not reuse this ByteVisitor as that is an unsafe operation.");
 			}
@@ -184,17 +188,19 @@ public class Visitors {
 			ByteArrayOutputStream os = stack.peek();
 			os.write(0x00);
 			os.write(0x00);
+			return program;
 		}
 		
 		@Override
-		public void visit(Line line) {
+		public Line visit(Line line) {
 			try {
 				stack.push(new ByteArrayOutputStream());
 				boolean first = true;
 				for (Statement statement : line.statements) {
 					if (!first) {
-						first = false;
 						stack.peek().write(':');
+					} else {
+						first = false;
 					}
 					statement.accept(this);
 				}
@@ -209,6 +215,7 @@ public class Visitors {
 				os.write(content);
 				os.write(0x00);
 				this.address = nextAddress;
+				return line;
 			} catch (IOException ex) {
 				// Hiding the IOException as ByteArrayOutputStream does not throw it
 				throw new RuntimeException(ex);
@@ -216,7 +223,7 @@ public class Visitors {
 		}
 
 		@Override
-		public void visit(Token token) {
+		public Token visit(Token token) {
 			try {
 				ByteArrayOutputStream os = stack.peek();
 				switch (token.type) {
@@ -254,6 +261,7 @@ public class Visitors {
 					}
 					break;
 				}
+				return token;
 			} catch (IOException ex) {
 				// Hiding the IOException as ByteArrayOutputStream does not throw it
 				throw new RuntimeException(ex);

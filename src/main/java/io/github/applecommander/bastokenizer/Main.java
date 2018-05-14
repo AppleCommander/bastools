@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 
@@ -49,6 +51,9 @@ public class Main implements Callable<Void> {
 
 	@Option(names = "--tokens", description = "Dump token list to stdout for debugging.")
 	private boolean showTokens;
+	
+	@Option(names = "-O", description = "Enable optimizations.", converter = Optimization.TypeConverter.class, split = ",")
+	private List<Optimization> optimizations = new ArrayList<>();
 
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
 	private File sourceFile;
@@ -86,6 +91,11 @@ public class Main implements Callable<Void> {
 		}
 		Parser parser = new Parser(tokens);
 		Program program = parser.parse();
+		
+		for (Optimization optimization : optimizations) {
+			program = program.accept(optimization.visitor);
+		}
+
 		if (prettyPrint || listPrint) {
 			program.accept(Visitors.printBuilder().prettyPrint(prettyPrint).build());
 		}
