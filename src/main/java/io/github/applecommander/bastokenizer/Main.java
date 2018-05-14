@@ -52,7 +52,11 @@ public class Main implements Callable<Void> {
 	@Option(names = "--tokens", description = "Dump token list to stdout for debugging.")
 	private boolean showTokens;
 	
-	@Option(names = "-O", description = "Enable optimizations.", converter = Optimization.TypeConverter.class, split = ",")
+	@Option(names = "-f", converter = Optimization.TypeConverter.class, split = ",", description = {
+			"Enable specific optimizations.",
+			"* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
+			"* @|yellow remove-rem-statements|@ - Remove all REM statements."
+	})
 	private List<Optimization> optimizations = new ArrayList<>();
 
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
