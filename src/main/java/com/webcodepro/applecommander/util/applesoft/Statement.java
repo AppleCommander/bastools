@@ -1,22 +1,15 @@
 package com.webcodepro.applecommander.util.applesoft;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /** A Statement is simply a series of Tokens. */
-public class Statement {
+public class Statement implements Consumer<Visitor> {
 	public final List<Token> tokens = new ArrayList<>();
 	
-	public void prettyPrint(PrintStream ps) {
-		for (Token token : tokens) {
-			token.prettyPrint(ps);
-		}
-	}
-
-	public void toBytes(ByteArrayOutputStream os) throws IOException {
-		for (Token t : tokens) t.toBytes(os);
+	@Override
+	public void accept(Visitor t) {
+		t.visit(this);
 	}
 }

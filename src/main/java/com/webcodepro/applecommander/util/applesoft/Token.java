@@ -1,16 +1,13 @@
 package com.webcodepro.applecommander.util.applesoft;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * A Token in the classic compiler sense, in that this represents a component of the application.
  * 
  * @author rob
  */
-public class Token {
+public class Token implements Consumer<Visitor> {
 	public final int line;
 	public final Type type;
 	public final ApplesoftKeyword keyword;
@@ -25,6 +22,10 @@ public class Token {
 		this.text = text;
 	}
 	@Override
+	public void accept(Visitor t) {
+		t.visit(this);
+	}
+	@Override
 	public String toString() {
 		switch (type) {
 		case EOL:
@@ -35,72 +36,6 @@ public class Token {
 			return String.format("%s(%f)", type, number);
 		default:
 			return String.format("%s(%s)", type, text);
-		}
-	}
-	
-	public void prettyPrint(PrintStream ps) {
-		switch (type) {
-		case EOL:
-			ps.print("<EOL>");
-			break;
-		case COMMENT:
-			ps.printf(" REM %s", text);
-			break;
-		case STRING:
-			ps.printf("\"%s\"", text);
-			break;
-		case KEYWORD:
-			ps.printf(" %s ", keyword.text);
-			break;
-		case IDENT:
-		case SYNTAX:
-			ps.print(text);
-			break;
-		case NUMBER:
-			if (Math.rint(number) == number) {
-				ps.print(number.intValue());
-			} else {
-				ps.print(number);
-			}
-			break;
-		}
-	}
-
-	public void toBytes(ByteArrayOutputStream os) throws IOException {
-		switch (type) {
-		case COMMENT:
-			os.write(ApplesoftKeyword.REM.code);
-			os.write(text.getBytes());
-			break;
-		case EOL:
-			os.write(0x00);
-			break;
-		case IDENT:
-			os.write(text.getBytes());
-			break;
-		case KEYWORD:
-			os.write(keyword.code);
-			break;
-		case NUMBER:
-			if (Math.rint(number) == number) {
-				os.write(Integer.toString(number.intValue()).getBytes());
-			} else {
-				os.write(Double.toString(number).getBytes());
-			}
-			break;
-		case STRING:
-			os.write('"');
-			os.write(text.getBytes());
-			os.write('"');
-			break;
-		case SYNTAX:
-			Optional<ApplesoftKeyword> opt = ApplesoftKeyword.find(text);
-			if (opt.isPresent()) {
-				os.write(opt.get().code);
-			} else {
-				os.write(text.getBytes());
-			}
-			break;
 		}
 	}
 	

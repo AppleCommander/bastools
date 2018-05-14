@@ -11,6 +11,7 @@ import com.webcodepro.applecommander.util.applesoft.Parser;
 import com.webcodepro.applecommander.util.applesoft.Program;
 import com.webcodepro.applecommander.util.applesoft.Token;
 import com.webcodepro.applecommander.util.applesoft.TokenReader;
+import com.webcodepro.applecommander.util.applesoft.Visitors;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -43,6 +44,9 @@ public class Main implements Callable<Void> {
 	@Option(names = "--pretty", description = "Pretty print structure as bastokenizer understands it.")
 	private boolean prettyPrint;
 
+	@Option(names = "--list", description = "List structure as bastokenizer understands it.")
+	private boolean listPrint;
+
 	@Option(names = "--tokens", description = "Dump token list to stdout for debugging.")
 	private boolean showTokens;
 
@@ -64,10 +68,10 @@ public class Main implements Callable<Void> {
 	
 	/** A basic test to ensure parameters are somewhat sane. */
 	public boolean checkParameters() {
-		if (pipeOutput && (hexFormat || copyFormat || prettyPrint || showTokens)) {
+		if (pipeOutput && (hexFormat || copyFormat || prettyPrint || listPrint || showTokens)) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
-		} else if (!(pipeOutput || hexFormat || copyFormat || prettyPrint || showTokens || outputFile != null)) {
+		} else if (!(pipeOutput || hexFormat || copyFormat || prettyPrint || listPrint || showTokens || outputFile != null)) {
 			System.err.println("What do you want to do?");
 			return false;
 		}
@@ -82,11 +86,11 @@ public class Main implements Callable<Void> {
 		}
 		Parser parser = new Parser(tokens);
 		Program program = parser.parse();
-		if (prettyPrint) {
-			program.prettyPrint(System.out);
+		if (prettyPrint || listPrint) {
+			program.accept(Visitors.printBuilder().prettyPrint(prettyPrint).build());
 		}
-		
-		byte[] data = program.toBytes(address);
+
+		byte[] data = Visitors.byteVisitor(address).dump(program);
 		if (hexFormat) {
 			hexDump(address, data, false);
 		}
