@@ -1,11 +1,15 @@
 package io.github.applecommander.bastokenizer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.webcodepro.applecommander.util.applesoft.Line;
 import com.webcodepro.applecommander.util.applesoft.Program;
 import com.webcodepro.applecommander.util.applesoft.Statement;
 import com.webcodepro.applecommander.util.applesoft.Token;
 import com.webcodepro.applecommander.util.applesoft.Token.Type;
 import com.webcodepro.applecommander.util.applesoft.Visitor;
+import com.webcodepro.applecommander.util.applesoft.Visitors;
 
 import picocli.CommandLine.ITypeConverter;
 
@@ -51,12 +55,25 @@ public enum Optimization {
 	private static class BaseVisitor implements Visitor {
 		@Override
 		public Program visit(Program program) {
-			Program newProgram = new Program();
+			final Program newProgram = new Program();
+			Map<Integer,Integer> reassignments = new HashMap<>();
 			program.lines.forEach(l -> {
 				Line line = l.accept(this);
-				if (line != null && !line.statements.isEmpty()) newProgram.lines.add(line);
+				boolean lineKept = line != null && !line.statements.isEmpty();
+				if (lineKept) {
+					newProgram.lines.add(line);
+					reassignments.replaceAll((k,v) -> v == null ? l.lineNumber : v);
+				} else {
+					// Make a place-holder for the reassignment; we'll patch it in once we find a line that sticks around.
+					reassignments.put(l.lineNumber, null);
+				}
 			});
-			return newProgram;
+			if (!reassignments.isEmpty()) {
+				// Now, renumber based on our findings!
+				return newProgram.accept(Visitors.reassignVisitor(reassignments));
+			} else {
+				return newProgram;
+			}
 		}
 		@Override
 		public Line visit(Line line) {

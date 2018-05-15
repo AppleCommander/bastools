@@ -3,10 +3,13 @@ package com.webcodepro.applecommander.util.applesoft;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Function;
+
+import com.webcodepro.applecommander.util.applesoft.Token.Type;
 
 /**
  * This class presents all of the common Visitor implementations via builder patterns.
@@ -48,6 +51,11 @@ public class Visitors {
 	
 	public static ByteVisitor byteVisitor(int address) {
 		return new ByteVisitor(address);
+	}
+	
+	/** Rewrite the Program tree with the line number reassignments given. */
+	public static ReassignmentVisitor reassignVisitor(Map<Integer,Integer> reassignments) {
+		return new ReassignmentVisitor(reassignments);
 	}
 
 	private static class PrettyPrintVisitor implements Visitor {
@@ -266,6 +274,66 @@ public class Visitors {
 				// Hiding the IOException as ByteArrayOutputStream does not throw it
 				throw new RuntimeException(ex);
 			}
+		}
+	}
+
+	/** This is a mildly rewritable Visitor. */
+	private static class ReassignmentVisitor implements Visitor {
+		private Map<Integer,Integer> reassignments;
+		
+		private ReassignmentVisitor(Map<Integer,Integer> reassignments) {
+			this.reassignments = reassignments;
+		}
+		
+		@Override
+		public Program visit(Program program) {
+			Program newProgram = new Program();
+			program.lines.forEach(l -> {
+				Line line = l.accept(this);
+				newProgram.lines.add(line);
+			});
+			return newProgram;
+		}
+		@Override
+		public Line visit(Line line) {
+			Line newLine = new Line(line.lineNumber);
+			line.statements.forEach(s -> {
+				Statement statement = s.accept(this);
+				newLine.statements.add(statement);
+			});
+			return newLine;
+		}
+		/**
+		 * We saw a trigger, reassign any numbers that follow.
+		 * 
+		 * Trigger cases:
+		 * - GOSUB n
+		 * - GOTO n
+		 * - IF ... THEN n
+		 * - LIST n [ ,m ]
+		 * - ON x GOTO n, m, ...
+		 * - ON x GOSUB n, m, ...
+		 * - ONERR GOTO n
+		 * - RUN n
+		 */
+		@Override
+		public Statement visit(Statement statement) {
+			boolean next = false;
+			Statement newStatement = new Statement();
+			for (Token t : statement.tokens) {
+				Token newToken = t;
+				if (next) {
+					if (t.type == Type.NUMBER && reassignments.containsKey(t.number.intValue())) {
+						newToken = Token.number(t.line, reassignments.get(t.number.intValue()).doubleValue());
+					}
+				} else {
+					next = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
+						|| t.keyword == ApplesoftKeyword.THEN || t.keyword == ApplesoftKeyword.RUN
+						|| t.keyword == ApplesoftKeyword.LIST;
+				}
+				newStatement.tokens.add(newToken);
+			}
+			return newStatement;
 		}
 	}
 }
