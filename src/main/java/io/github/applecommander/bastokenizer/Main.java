@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Callable;
@@ -59,6 +60,9 @@ public class Main implements Callable<Void> {
 	})
 	private List<Optimization> optimizations = new ArrayList<>();
 
+	@Option(names = "-O", description = "Apply all optimizations.")
+	private boolean allOptimizations;
+	
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
 	private File sourceFile;
 	
@@ -77,6 +81,10 @@ public class Main implements Callable<Void> {
 	
 	/** A basic test to ensure parameters are somewhat sane. */
 	public boolean checkParameters() {
+		if (allOptimizations) {
+			optimizations.clear();
+			optimizations.addAll(Arrays.asList(Optimization.values()));
+		}
 		if (pipeOutput && (hexFormat || copyFormat || prettyPrint || listPrint || showTokens)) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
