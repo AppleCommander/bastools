@@ -3,12 +3,14 @@ package io.github.applecommander.bastokenizer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
 
 import com.webcodepro.applecommander.util.applesoft.Parser;
 import com.webcodepro.applecommander.util.applesoft.Program;
@@ -114,10 +116,10 @@ public class Main implements Callable<Void> {
 
 		byte[] data = Visitors.byteVisitor(address).dump(program);
 		if (hexFormat) {
-			hexDump(address, data, false);
+			HexDumper.standard().dump(address, data);
 		}
 		if (copyFormat) {
-			hexDump(address, data, true);
+			HexDumper.apple2().dump(address, data);
 		}
 		if (outputFile != null) {
 			Files.write(outputFile.toPath(), data);
@@ -127,40 +129,69 @@ public class Main implements Callable<Void> {
 		}
 	}
 	
-	/** Dump data to stdout in various formats. */
-	public void hexDump(int address, byte[] data, boolean forApple) {
-		final int line = 16;
-		int offset = 0;
-		if (forApple) {
-			int end = address + data.length;
-			System.out.printf("0067: %02x %02x %02x %02x\n", address&0xff, address>>8, end&0xff, end>>8);
-			System.out.printf("%04x: 00\n", address-1);
+	/** A slightly-configurable reusable hex dumping mechanism. */
+	public static class HexDumper {
+		private PrintStream ps = System.out;
+		private int lineWidth = 16;
+		private BiConsumer<Integer,Integer> printHeader;
+		private BiConsumer<Integer,byte[]> printLine;
+		
+		public static HexDumper standard() {
+			HexDumper hd = new HexDumper();
+			hd.printHeader = hd::emptyHeader;
+			hd.printLine = hd::standardLine;
+			return hd;
 		}
-		while (offset < data.length) {
-			System.out.printf("%04x: ", address);
-			for (int i=0; i<line; i++) {
-				if (offset < data.length) {
-					System.out.printf("%02x ", data[offset]);
-				} else if (!forApple) {
-					System.out.printf(".. ");
-				}
-				offset++;
+		public static HexDumper apple2() {
+			HexDumper hd = new HexDumper();
+			hd.printHeader = hd::apple2Header;
+			hd.printLine = hd::apple2Line;
+			return hd;
+		}
+		
+		public void dump(int address, byte[] data) {
+			printHeader.accept(address, data.length);
+			int offset = 0;
+			while (offset < data.length) {
+				byte[] line = Arrays.copyOfRange(data, offset, Math.min(offset+lineWidth,data.length));
+				printLine.accept(address+offset, line);
+				offset += line.length;
 			}
-			System.out.print(" ");
-			if (!forApple) {
-				offset -= line;
-				for (int i=0; i<line; i++) {
-					char ch = ' ';
-					if (offset < data.length) {
-						byte b = data[offset];
-						ch = (b >= ' ') ? (char)b : '.';
-					}
-					System.out.printf("%c", ch);
-					offset++;
+		}
+		
+		public void emptyHeader(int address, int length) {
+			// Do Nothing
+		}
+		public void apple2Header(int address, int length) {
+			int end = address + length;
+			printLine.accept(0x67, new byte[] { (byte)(address&0xff), (byte)(address>>8), (byte)(end&0xff), (byte)(end>>8) });
+			printLine.accept(address-1, new byte[] { 0x00 });
+		}
+		
+		public void standardLine(int address, byte[] data) {
+			ps.printf("%04x: ", address);
+			for (int i=0; i<lineWidth; i++) {
+				if (i < data.length) {
+					ps.printf("%02x ", data[i]);
+				} else {
+					ps.printf(".. ");
 				}
 			}
-			System.out.printf("\n");
-			address += line;
+			ps.print(" ");
+			for (int i=0; i<lineWidth; i++) {
+				char ch = ' ';
+				if (i < data.length) {
+					byte b = data[i];
+					ch = (b >= ' ') ? (char)b : '.';
+				}
+				ps.printf("%c", ch);
+			}
+			ps.printf("\n");
+		}
+		public void apple2Line(int address, byte[] data) {
+			ps.printf("%04X:", address);
+			for (byte b : data) ps.printf("%02X ", b);
+			ps.printf("\n");
 		}
 	}
 
