@@ -43,7 +43,7 @@ public class Token {
 		return new Token(line, Type.NUMBER, null, number, null);
 	}
 	public static Token ident(int line, String text) {
-		return new Token(line, Type.IDENT, null, null, text);
+		return new Token(line, Type.IDENT, null, null, text.toUpperCase());
 	}
 	public static Token comment(int line, String text) {
 		return new Token(line, Type.COMMENT, null, null, text);
