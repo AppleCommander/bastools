@@ -58,7 +58,8 @@ public class Main implements Callable<Void> {
 	@Option(names = "-f", converter = Optimization.TypeConverter.class, split = ",", description = {
 			"Enable specific optimizations.",
 			"* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
-			"* @|yellow remove-rem-statements|@ - Remove all REM statements."
+			"* @|green remove-rem-statements|@ - Remove all REM statements.",
+			"* @|green renumber|@ - Renumber program."
 	})
 	private List<Optimization> optimizations = new ArrayList<>();
 

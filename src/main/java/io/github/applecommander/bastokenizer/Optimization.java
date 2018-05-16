@@ -25,6 +25,17 @@ public enum Optimization {
 		public Statement visit(Statement statement) {
 			return statement.tokens.get(0).type == Type.COMMENT ? null : statement;
 		}
+	}),
+	RENUMBER(new BaseVisitor() {
+		protected int lineNumber = 0;
+		@Override
+		public Line visit(Line line) {
+			Line newLine = new Line(lineNumber++);
+			newLine.statements.addAll(line.statements);
+			// Track what went where so lines can get renumbered automatically
+			reassignments.put(line.lineNumber, newLine.lineNumber);
+			return newLine;
+		}
 	})
 	;
 	
@@ -53,10 +64,10 @@ public enum Optimization {
 	}
 	/** Common base class for optimization visitors that allow the program tree to be rewritten. */
 	private static class BaseVisitor implements Visitor {
+		protected Map<Integer,Integer> reassignments = new HashMap<>();
 		@Override
 		public Program visit(Program program) {
 			final Program newProgram = new Program();
-			Map<Integer,Integer> reassignments = new HashMap<>();
 			program.lines.forEach(l -> {
 				Line line = l.accept(this);
 				boolean lineKept = line != null && !line.statements.isEmpty();
