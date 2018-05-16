@@ -102,6 +102,7 @@ public class TokenReader {
 						next(depth-1)
 							.filter(t -> opt.get().parts.get(1).equals(t.text))
 						    .orElseThrow(() -> new IOException("Expecting: " + opt.get().parts));
+						return Optional.of(Token.keyword(line, opt.get()));
 					}
 					return Optional.of(opt
 							.map(kw -> Token.keyword(line, kw))
