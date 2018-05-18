@@ -96,17 +96,25 @@ public class TokenReader {
 						}
 						return Optional.of(Token.comment(line, sb.toString()));
 					}
-					// Optional and exceptions don't play well. :-/
-					if (opt.isPresent() && opt.get().parts.size() > 1) {
-						// Pull next token and see if it is the 2nd part ("MID$" == "MID", "$"; checking for the "$")
-						next(depth-1)
-							.filter(t -> opt.get().parts.get(1).equals(t.text))
-						    .orElseThrow(() -> new IOException("Expecting: " + opt.get().parts));
+					// If we found an Applesoft token, handle it special
+					if (opt.isPresent()) {
+						if (opt.get().parts.size() > 1) {
+							// Pull next token and see if it is the 2nd part ("MID$" == "MID", "$"; checking for the "$")
+							next(depth-1)
+								.filter(t -> opt.get().parts.get(1).equals(t.text))
+							    .orElseThrow(() -> new IOException("Expecting: " + opt.get().parts));
+						}
 						return Optional.of(Token.keyword(line, opt.get()));
+					} else {
+						// Found an identifier.  Need to find X, X%, X$, X(, X$(, X%( patterns.
+						String sval = tokenizer.sval;
+						tokenizer.nextToken();
+						if (tokenizer.ttype == '%' || tokenizer.ttype == '$') {
+							sval += (char)tokenizer.ttype;
+						}
+						tokenizer.pushBack();
+						return Optional.of(Token.ident(line, sval));
 					}
-					return Optional.of(opt
-							.map(kw -> Token.keyword(line, kw))
-							.orElse(Token.ident(line, tokenizer.sval)));
 				case '"':
 					return Optional.of(Token.string(line, tokenizer.sval));
 				case '(':

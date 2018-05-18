@@ -3,6 +3,10 @@ package com.webcodepro.applecommander.util.applesoft;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,6 +60,10 @@ public class Visitors {
 	/** Rewrite the Program tree with the line number reassignments given. */
 	public static ReassignmentVisitor reassignVisitor(Map<Integer,Integer> reassignments) {
 		return new ReassignmentVisitor(reassignments);
+	}
+	
+	public static Visitor variableReportVisitor() {
+		return new VariableReportVisitor();
 	}
 
 	private static class PrettyPrintVisitor implements Visitor {
@@ -334,6 +342,48 @@ public class Visitors {
 				newStatement.tokens.add(newToken);
 			}
 			return newStatement;
+		}
+	}
+
+	private static class VariableReportVisitor implements Visitor {
+		private Map<String,List<Integer>> refs = new HashMap<>();
+		private int currentLineNumber = -1;
+		
+		@Override
+		public Program visit(Program program) {
+			Program p = Visitor.super.visit(program);
+			refs.entrySet().stream()
+				.sorted(Map.Entry.comparingByKey())
+				.forEach(this::print);
+			return p;
+		}
+		private void print(Map.Entry<String,List<Integer>> e) {
+			System.out.printf("%-8s  ", e.getKey());
+			int c = 0;
+			for (int i : e.getValue()) {
+				System.out.printf("%d, ", i);
+				if (c++ > 10) {
+					c = 0;
+					System.out.printf("\n          ");
+				}
+			}
+			System.out.println();
+		}
+		
+		@Override
+		public Line visit(Line line) {
+			currentLineNumber = line.lineNumber;
+			return Visitor.super.visit(line);
+		}
+		
+		@Override
+		public Token visit(Token token) {
+			if (token.type == Type.IDENT) {
+				refs.merge(token.text, 
+						new ArrayList<>(Arrays.asList(currentLineNumber)), 
+						(a,b) -> { a.addAll(b); return a; });
+			}
+			return Visitor.super.visit(token);
 		}
 	}
 }

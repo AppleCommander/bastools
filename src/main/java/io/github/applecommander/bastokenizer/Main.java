@@ -43,6 +43,9 @@ public class Main implements Callable<Void> {
 	@Option(names = { "-a", "--address" }, description = "Base address for program", showDefaultValue = Visibility.ALWAYS, converter = IntegerTypeConverter.class)
 	private int address = 0x801;
 	
+	@Option(names = { "--variables" }, description = "Generate a variable report")
+	private boolean showVariableReport;
+	
 	@Option(names = { "-p", "--pipe" }, description = "Pipe binary output to stdout.")
 	private boolean pipeOutput;
 	
@@ -88,10 +91,10 @@ public class Main implements Callable<Void> {
 			optimizations.clear();
 			optimizations.addAll(Arrays.asList(Optimization.values()));
 		}
-		if (pipeOutput && (hexFormat || copyFormat || prettyPrint || listPrint || showTokens)) {
+		if (pipeOutput && (hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport)) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
-		} else if (!(pipeOutput || hexFormat || copyFormat || prettyPrint || listPrint || showTokens || outputFile != null)) {
+		} else if (!(pipeOutput || hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport || outputFile != null)) {
 			System.err.println("What do you want to do?");
 			return false;
 		}
@@ -113,6 +116,9 @@ public class Main implements Callable<Void> {
 
 		if (prettyPrint || listPrint) {
 			program.accept(Visitors.printBuilder().prettyPrint(prettyPrint).build());
+		}
+		if (showVariableReport) {
+			program.accept(Visitors.variableReportVisitor());
 		}
 
 		byte[] data = Visitors.byteVisitor(address).dump(program);
