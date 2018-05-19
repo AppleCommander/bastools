@@ -81,6 +81,7 @@ public class TokenReader {
 					return Optional.of(Token.number(line, tokenizer.nval));
 				case StreamTokenizer.TT_WORD:
 					Optional<ApplesoftKeyword> opt = ApplesoftKeyword.find(tokenizer.sval);
+					// REM is special
 					if (opt.filter(kw -> kw == ApplesoftKeyword.REM).isPresent()) {
 						StringBuilder sb = new StringBuilder();
 						while (true) {
@@ -96,23 +97,24 @@ public class TokenReader {
 						}
 						return Optional.of(Token.comment(line, sb.toString()));
 					}
-					// If we found an Applesoft token, handle it special
+					// If we found an Applesoft token, handle it
 					if (opt.isPresent()) {
 						if (opt.get().parts.size() > 1) {
-							// Pull next token and see if it is the 2nd part ("MID$" == "MID", "$"; checking for the "$")
+							// Pull next token and see if it is the 2nd part ("PR#" == "PR", "#"; checking for the "#")
 							next(depth-1)
 								.filter(t -> opt.get().parts.get(1).equals(t.text))
 							    .orElseThrow(() -> new IOException("Expecting: " + opt.get().parts));
 						}
 						return Optional.of(Token.keyword(line, opt.get()));
 					} else {
-						// Found an identifier.  Need to find X, X%, X$, X(, X$(, X%( patterns.
+						// Found an identifier (A, A$, A%).  Test if it is an array ('A(', 'A$(', 'A%(').
 						String sval = tokenizer.sval;
 						tokenizer.nextToken();
-						if (tokenizer.ttype == '%' || tokenizer.ttype == '$') {
+						if (tokenizer.ttype == '(') {
 							sval += (char)tokenizer.ttype;
+						} else {
+							tokenizer.pushBack();
 						}
-						tokenizer.pushBack();
 						return Optional.of(Token.ident(line, sval));
 					}
 				case '"':

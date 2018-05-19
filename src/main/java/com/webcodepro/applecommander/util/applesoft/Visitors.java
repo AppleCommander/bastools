@@ -3,14 +3,14 @@ package com.webcodepro.applecommander.util.applesoft;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedSet;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import com.webcodepro.applecommander.util.applesoft.Token.Type;
@@ -346,7 +346,7 @@ public class Visitors {
 	}
 
 	private static class VariableReportVisitor implements Visitor {
-		private Map<String,List<Integer>> refs = new HashMap<>();
+		private Map<String,SortedSet<Integer>> refs = new HashMap<>();
 		private int currentLineNumber = -1;
 		
 		@Override
@@ -357,15 +357,14 @@ public class Visitors {
 				.forEach(this::print);
 			return p;
 		}
-		private void print(Map.Entry<String,List<Integer>> e) {
+		private void print(Map.Entry<String,SortedSet<Integer>> e) {
 			System.out.printf("%-8s  ", e.getKey());
 			int c = 0;
 			for (int i : e.getValue()) {
-				System.out.printf("%d, ", i);
-				if (c++ > 10) {
-					c = 0;
-					System.out.printf("\n          ");
-				}
+				if (c > 0) System.out.print(", ");
+				if (c > 0 && c % 10 == 0) System.out.printf("\n          ");
+				System.out.print(i);
+				c += 1;
 			}
 			System.out.println();
 		}
@@ -380,7 +379,7 @@ public class Visitors {
 		public Token visit(Token token) {
 			if (token.type == Type.IDENT) {
 				refs.merge(token.text, 
-						new ArrayList<>(Arrays.asList(currentLineNumber)), 
+						new TreeSet<>(Arrays.asList(currentLineNumber)), 
 						(a,b) -> { a.addAll(b); return a; });
 			}
 			return Visitor.super.visit(token);

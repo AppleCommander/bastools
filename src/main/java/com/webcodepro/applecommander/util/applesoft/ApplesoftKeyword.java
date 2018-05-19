@@ -178,6 +178,8 @@ public enum ApplesoftKeyword {
 		tokenizer.resetSyntax();
 		tokenizer.wordChars('a', 'z');
 		tokenizer.wordChars('A', 'Z');
+		tokenizer.wordChars('$', '$');	// Experiment to pull in string marker
+		tokenizer.wordChars('%', '%');	// Experiment to pull in integer marker
 		tokenizer.wordChars(128 + 32, 255);
 		tokenizer.whitespaceChars(0, ' ');
 		tokenizer.quoteChar('"');
