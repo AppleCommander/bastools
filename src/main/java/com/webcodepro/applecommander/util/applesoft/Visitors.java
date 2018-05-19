@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -60,6 +62,11 @@ public class Visitors {
 	/** Rewrite the Program tree with the line number reassignments given. */
 	public static ReassignmentVisitor reassignVisitor(Map<Integer,Integer> reassignments) {
 		return new ReassignmentVisitor(reassignments);
+	}
+	
+	/** Collect all line numbers that are a target of GOTO, GOSUB, etc. */
+	public static LineNumberTargetCollector lineNumberTargetCollector() {
+		return new LineNumberTargetCollector();
 	}
 	
 	public static Visitor variableReportVisitor() {
@@ -342,6 +349,44 @@ public class Visitors {
 				newStatement.tokens.add(newToken);
 			}
 			return newStatement;
+		}
+	}
+
+	public static class LineNumberTargetCollector implements Visitor {
+		private Set<Integer> targets = new HashSet<>();
+		
+		public Set<Integer> getTargets() {
+			return targets;
+		}
+		
+		/**
+		 * We saw a trigger, collect any numbers that follow.
+		 * 
+		 * Trigger cases:
+		 * - GOSUB n
+		 * - GOTO n
+		 * - IF ... THEN n
+		 * - LIST n [ ,m ]
+		 * - ON x GOTO n, m, ...
+		 * - ON x GOSUB n, m, ...
+		 * - ONERR GOTO n
+		 * - RUN n
+		 */
+		@Override
+		public Statement visit(Statement statement) {
+			boolean next = false;
+			for (Token t : statement.tokens) {
+				if (next) {
+					if (t.type == Type.NUMBER) {
+						targets.add(t.number.intValue());
+					}
+				} else {
+					next = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
+						|| t.keyword == ApplesoftKeyword.THEN || t.keyword == ApplesoftKeyword.RUN
+						|| t.keyword == ApplesoftKeyword.LIST;
+				}
+			}
+			return statement;
 		}
 	}
 

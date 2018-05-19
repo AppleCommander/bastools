@@ -2,7 +2,9 @@ package io.github.applecommander.bastokenizer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import com.webcodepro.applecommander.util.applesoft.ApplesoftKeyword;
 import com.webcodepro.applecommander.util.applesoft.Line;
 import com.webcodepro.applecommander.util.applesoft.Program;
 import com.webcodepro.applecommander.util.applesoft.Statement;
@@ -10,6 +12,7 @@ import com.webcodepro.applecommander.util.applesoft.Token;
 import com.webcodepro.applecommander.util.applesoft.Token.Type;
 import com.webcodepro.applecommander.util.applesoft.Visitor;
 import com.webcodepro.applecommander.util.applesoft.Visitors;
+import com.webcodepro.applecommander.util.applesoft.Visitors.LineNumberTargetCollector;
 
 import picocli.CommandLine.ITypeConverter;
 
@@ -24,6 +27,47 @@ public enum Optimization {
 		@Override
 		public Statement visit(Statement statement) {
 			return statement.tokens.get(0).type == Type.COMMENT ? null : statement;
+		}
+	}),
+	MERGE_LINES(new BaseVisitor() {
+		private Set<Integer> targets;
+		private Line mergeLine;
+		@Override
+		public Program visit(Program program) {
+			LineNumberTargetCollector c = Visitors.lineNumberTargetCollector();
+			program.accept(c);
+			targets = c.getTargets();
+			return super.visit(program);
+		}
+		@Override
+		public Line visit(Line line) {
+			if (mergeLine == null || targets.contains(line.lineNumber)) {
+				// merge may null out mergeLine if the this line has a "terminal".  
+				// Preserve it with newLine so it get added to the program.
+				Line newLine = new Line(line.lineNumber);
+				mergeLine = newLine;
+				merge(line);
+				return newLine;
+			}
+			merge(line);
+			// Do not preserve old line!
+			return null;
+		}
+		private void merge(Line line) {
+			mergeLine.statements.addAll(line.statements);
+			// Terminals are: IF, REM, GOTO, END, ON .. GOTO (GOTO is trigger), RESUME, RETURN, STOP
+			boolean terminal = false;
+			for (Statement s : line.statements) {
+				for (Token t : s.tokens) {
+					terminal |= t.keyword == ApplesoftKeyword.IF || t.type == Type.COMMENT /* REM */
+							|| t.keyword == ApplesoftKeyword.GOTO || t.keyword == ApplesoftKeyword.END
+							|| t.keyword == ApplesoftKeyword.RESUME || t.keyword == ApplesoftKeyword.RETURN
+							|| t.keyword == ApplesoftKeyword.STOP;
+				}
+			}
+			if (terminal) {
+				mergeLine = null;
+			}
 		}
 	}),
 	RENUMBER(new BaseVisitor() {

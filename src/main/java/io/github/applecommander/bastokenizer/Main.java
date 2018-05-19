@@ -62,11 +62,12 @@ public class Main implements Callable<Void> {
 			"Enable specific optimizations.",
 			"* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
 			"* @|green remove-rem-statements|@ - Remove all REM statements.",
+			"* @|green merge-lines|@ - Merge lines.",
 			"* @|green renumber|@ - Renumber program."
 	})
 	private List<Optimization> optimizations = new ArrayList<>();
 
-	@Option(names = "-O", description = "Apply all optimizations.")
+	@Option(names = { "-O", "--optimize" }, description = "Apply all optimizations.")
 	private boolean allOptimizations;
 	
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
