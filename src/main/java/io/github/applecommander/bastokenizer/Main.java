@@ -3,6 +3,7 @@ package io.github.applecommander.bastokenizer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.function.BiConsumer;
 import com.webcodepro.applecommander.util.applesoft.Parser;
 import com.webcodepro.applecommander.util.applesoft.Program;
 import com.webcodepro.applecommander.util.applesoft.Token;
+import com.webcodepro.applecommander.util.applesoft.Token.Type;
 import com.webcodepro.applecommander.util.applesoft.TokenReader;
 import com.webcodepro.applecommander.util.applesoft.Visitors;
 
@@ -32,31 +34,34 @@ import picocli.CommandLine.Parameters;
 		versionProvider = Main.VersionProvider.class)
 public class Main implements Callable<Void> {
 	@Option(names = { "-o", "--output" }, description = "Write binary output to file.")
-	private File outputFile;
+	File outputFile;
 	
 	@Option(names = { "-x", "--hex"}, description = "Generate a binary hex dump for debugging.")
-	private boolean hexFormat;
+	boolean hexFormat;
 
 	@Option(names = { "-c", "--copy"}, description = "Generate a copy/paste form of output for testing in an emulator.")
-	private boolean copyFormat;
+	boolean copyFormat;
 	
 	@Option(names = { "-a", "--address" }, description = "Base address for program", showDefaultValue = Visibility.ALWAYS, converter = IntegerTypeConverter.class)
-	private int address = 0x801;
+	int address = 0x801;
 	
 	@Option(names = { "--variables" }, description = "Generate a variable report")
-	private boolean showVariableReport;
+	boolean showVariableReport;
 	
 	@Option(names = { "-p", "--pipe" }, description = "Pipe binary output to stdout.")
-	private boolean pipeOutput;
+	boolean pipeOutput;
 	
 	@Option(names = "--pretty", description = "Pretty print structure as bastokenizer understands it.")
-	private boolean prettyPrint;
+	boolean prettyPrint;
 
 	@Option(names = "--list", description = "List structure as bastokenizer understands it.")
-	private boolean listPrint;
+	boolean listPrint;
 
 	@Option(names = "--tokens", description = "Dump token list to stdout for debugging.")
-	private boolean showTokens;
+	boolean showTokens;
+	
+	@Option(names = "--max-line-length", description = "Maximum line length for generated lines.", showDefaultValue = Visibility.ALWAYS)
+	int maxLineLength = 255;
 	
 	@Option(names = "-f", converter = Optimization.TypeConverter.class, split = ",", description = {
 			"Enable specific optimizations.",
@@ -65,13 +70,22 @@ public class Main implements Callable<Void> {
 			"* @|green merge-lines|@ - Merge lines.",
 			"* @|green renumber|@ - Renumber program."
 	})
-	private List<Optimization> optimizations = new ArrayList<>();
+	List<Optimization> optimizations = new ArrayList<>();
 
 	@Option(names = { "-O", "--optimize" }, description = "Apply all optimizations.")
-	private boolean allOptimizations;
+	boolean allOptimizations;
+	
+	@Option(names = "--debug", description = "Print debug output.")
+	boolean debugFlag;
+	PrintStream debug = new PrintStream(new OutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+				// Do nothing
+			}
+		});
 	
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
-	private File sourceFile;
+	File sourceFile;
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		CommandLine.call(new Main(), args);
@@ -80,6 +94,7 @@ public class Main implements Callable<Void> {
 	@Override
 	public Void call() throws FileNotFoundException, IOException {
 		if (checkParameters()) {
+			if (debugFlag) debug = System.out;
 			process();
 		}
 		
@@ -92,10 +107,11 @@ public class Main implements Callable<Void> {
 			optimizations.clear();
 			optimizations.addAll(Arrays.asList(Optimization.values()));
 		}
-		if (pipeOutput && (hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport)) {
+		boolean hasOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport || debugFlag;
+		if (pipeOutput && hasOutput) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
-		} else if (!(pipeOutput || hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport || outputFile != null)) {
+		} else if (!(pipeOutput || hasOutput || outputFile != null)) {
 			System.err.println("What do you want to do?");
 			return false;
 		}
@@ -106,13 +122,14 @@ public class Main implements Callable<Void> {
 	public void process() throws FileNotFoundException, IOException {
 		Queue<Token> tokens = TokenReader.tokenize(sourceFile);
 		if (showTokens) {
-			System.out.println(tokens.toString());
+			tokens.forEach(t -> System.out.printf("%s%s", t, t.type == Type.EOL ? "\n" : ", "));
 		}
 		Parser parser = new Parser(tokens);
 		Program program = parser.parse();
 		
 		for (Optimization optimization : optimizations) {
-			program = program.accept(optimization.visitor);
+			debug.printf("Optimization: %s\n", optimization.name());
+			program = program.accept(optimization.create(this));
 		}
 
 		if (prettyPrint || listPrint) {

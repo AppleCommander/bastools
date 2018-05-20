@@ -47,7 +47,7 @@ public class Parser {
 		while (!tokens.isEmpty()) {
 			if (tokens.peek().type == Type.EOL) break;
 			Token t = tokens.remove();
-			if (":".equals(t.text)) break;
+			if (t.type == Type.SYNTAX && ":".equals(t.text)) break;
 			statement.tokens.add(t);
 		}
 		return statement;

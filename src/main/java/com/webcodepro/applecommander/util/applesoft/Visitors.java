@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -194,6 +193,14 @@ public class Visitors {
 			return getBytes();
 		}
 		
+		/** A convenience method to get the length of a line. */
+		public int length(Line line) {
+			stack.push(new ByteArrayOutputStream());
+			line.accept(this);
+			return stack.pop().size();
+			
+		}
+		
 		public byte[] getBytes() {
 			if (stack.size() != 1) {
 				throw new RuntimeException("Error in processing internal BASIC model!");
@@ -353,7 +360,7 @@ public class Visitors {
 	}
 
 	public static class LineNumberTargetCollector implements Visitor {
-		private Set<Integer> targets = new HashSet<>();
+		private Set<Integer> targets = new TreeSet<>();
 		
 		public Set<Integer> getTargets() {
 			return targets;
@@ -375,15 +382,18 @@ public class Visitors {
 		@Override
 		public Statement visit(Statement statement) {
 			boolean next = false;
+			boolean multiple = false;
 			for (Token t : statement.tokens) {
 				if (next) {
 					if (t.type == Type.NUMBER) {
 						targets.add(t.number.intValue());
 					}
+					next = multiple;	// preserve next based on if we have multiple line numbers or not.
 				} else {
 					next = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
 						|| t.keyword == ApplesoftKeyword.THEN || t.keyword == ApplesoftKeyword.RUN
 						|| t.keyword == ApplesoftKeyword.LIST;
+					multiple |= t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.ON;
 				}
 			}
 			return statement;
