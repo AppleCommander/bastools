@@ -1,31 +1,31 @@
-10 GOTO 100
+10 goto 100
 
-20 REM DRAW CIRCLE ROUTINE
-30 FOR A = 0 TO PT
-40 X = X(A) * SZ:Y = Y(A) * SZ
-50 HPLOT XO + X,YO + Y
-60 HPLOT XO - X,YO + Y
-70 HPLOT XO + X,YO - Y
-80 HPLOT XO - X,YO - Y
-90 NEXT A
-95 RETURN
+20 rem draw circle routine
+30 for a = 0 to pt
+40 x = x(a) * sz:y = y(a) * sz
+50 hplot xo + x,yo + y
+60 hplot xo - x,yo + y
+70 hplot xo + x,yo - y
+80 hplot xo - x,yo - y
+90 next a
+95 return
 
-100 REM MAIN PROGRAM
-110 HGR
-115 C(0)=1:C(1)=2:C(2)=3:C(3)=5:C(4)=6:C(5)=7
-120 HOME : VTAB 21: INVERSE : PRINT "JUST A MOMENT": NORMAL
-130 PI = 3.14159
-140 PT = 30: DIM X(PT),Y(PT)
-150 FOR A = 0 TO PT
-160 B = PI * (A / (PT * 2))
-170 X(A) = SIN (B)
-180 Y(A) = COS (B)
-190 NEXT A
-200 HOME : VTAB 21
-210 FOR Q = 1 TO 100
-215 C = 6 * RND(1) : HCOLOR= C(C)
-220 SZ = 10 + (40 * RND (1))
-230 XO = (279 - SZ*2) * RND (1) + SZ
-240 YO = (159 - SZ*2) * RND (1) + SZ
-250 GOSUB 30
-260 NEXT Q
+100 rem main program
+110 hgr
+115 c(0)=1:c(1)=2:c(2)=3:c(3)=5:c(4)=6:c(5)=7
+120 home : vtab 21: inverse : print "JUST A MOMENT": normal
+130 pi = 3.14159
+140 pt = 30: dim x(pt),y(pt)
+150 for a = 0 to pt
+160 b = pi * (a / (pt * 2))
+170 x(a) = sin (b)
+180 y(a) = cos (b)
+190 next a
+200 home : vtab 21
+210 for q = 1 to 100
+215 c = 6 * rnd(1) : hcolor= c(c)
+220 sz = 10 + (40 * rnd (1))
+230 xo = (279 - sz*2) * rnd (1) + sz
+240 yo = (159 - sz*2) * rnd (1) + sz
+250 gosub 30
+260 next q
