@@ -55,6 +55,10 @@ public class Parser {
 	
 	public int expectNumber() {
 		Token c = tokens.remove();
+		while (c.type == Type.EOL) {
+			// Allow blank lines...
+			c = tokens.remove();
+		}
 		if (c.type != Type.NUMBER) {
 			throw new RuntimeException("Expected a number in line #" + c.line);
 		}
