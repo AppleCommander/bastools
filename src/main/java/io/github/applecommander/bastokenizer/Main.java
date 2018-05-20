@@ -19,6 +19,7 @@ import com.webcodepro.applecommander.util.applesoft.Token;
 import com.webcodepro.applecommander.util.applesoft.Token.Type;
 import com.webcodepro.applecommander.util.applesoft.TokenReader;
 import com.webcodepro.applecommander.util.applesoft.Visitors;
+import com.webcodepro.applecommander.util.applesoft.Visitors.ByteVisitor;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -59,6 +60,9 @@ public class Main implements Callable<Void> {
 
 	@Option(names = "--tokens", description = "Dump token list to stdout for debugging.")
 	boolean showTokens;
+	
+	@Option(names = "--addresses", description = "Dump line number addresses out.")
+	boolean showLineAddresses;
 	
 	@Option(names = "--max-line-length", description = "Maximum line length for generated lines.", showDefaultValue = Visibility.ALWAYS)
 	int maxLineLength = 255;
@@ -107,11 +111,12 @@ public class Main implements Callable<Void> {
 			optimizations.clear();
 			optimizations.addAll(Arrays.asList(Optimization.values()));
 		}
-		boolean hasOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport || debugFlag;
-		if (pipeOutput && hasOutput) {
+		boolean hasTextOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport 
+				|| debugFlag || showLineAddresses;
+		if (pipeOutput && hasTextOutput) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
-		} else if (!(pipeOutput || hasOutput || outputFile != null)) {
+		} else if (!(pipeOutput || hasTextOutput || outputFile != null)) {
 			System.err.println("What do you want to do?");
 			return false;
 		}
@@ -139,7 +144,8 @@ public class Main implements Callable<Void> {
 			program.accept(Visitors.variableReportVisitor());
 		}
 
-		byte[] data = Visitors.byteVisitor(address).dump(program);
+		ByteVisitor byteVisitor = Visitors.byteVisitor(address);
+		byte[] data = byteVisitor.dump(program);
 		if (hexFormat) {
 			HexDumper.standard().dump(address, data);
 		}
@@ -148,6 +154,9 @@ public class Main implements Callable<Void> {
 		}
 		if (outputFile != null) {
 			Files.write(outputFile.toPath(), data);
+		}
+		if (showLineAddresses) {
+			byteVisitor.getLineAddresses().forEach((l,a) -> System.out.printf("%5d ... $%04x\n", l, a));
 		}
 		if (pipeOutput) {
 			System.out.write(data);

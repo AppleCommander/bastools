@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 
@@ -180,11 +181,13 @@ public class Visitors {
 	
 	public static class ByteVisitor implements Visitor {
 		private Stack<ByteArrayOutputStream> stack;
+		private Map<Integer,Integer> lineAddresses;
 		private int address;
 		
 		private ByteVisitor(int address) {
 			this.address = address;
 			this.stack = new Stack<>();
+			this.lineAddresses = new TreeMap<>();
 		}
 		
 		/** A convenience method to invoke {@link Program#accept(Visitor)} and {@link #getBytes()}. */
@@ -198,7 +201,10 @@ public class Visitors {
 			stack.push(new ByteArrayOutputStream());
 			line.accept(this);
 			return stack.pop().size();
-			
+		}
+		
+		public Map<Integer, Integer> getLineAddresses() {
+			return lineAddresses;
 		}
 		
 		public byte[] getBytes() {
@@ -210,9 +216,7 @@ public class Visitors {
 		
 		@Override
 		public Program visit(Program program) {
-			if (stack.size() != 0) {
-				throw new RuntimeException("Please do not reuse this ByteVisitor as that is an unsafe operation.");
-			}
+			stack.clear();
 			stack.push(new ByteArrayOutputStream());
 			program.lines.forEach(line -> line.accept(this));
 			ByteArrayOutputStream os = stack.peek();
@@ -234,7 +238,8 @@ public class Visitors {
 					}
 					statement.accept(this);
 				}
-				
+
+				this.lineAddresses.put(line.lineNumber, this.address);
 				byte[] content = stack.pop().toByteArray();
 				int nextAddress = address + content.length + 5;
 				ByteArrayOutputStream os = stack.peek();
