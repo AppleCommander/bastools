@@ -1,11 +1,10 @@
 package com.webcodepro.applecommander.util.applesoft;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import java.util.TreeMap;
 
 import com.webcodepro.applecommander.util.applesoft.Token.Type;
 
+import io.github.applecommander.bastokenizer.Main;
 import io.github.applecommander.bastokenizer.Main.IntegerTypeConverter;
 
 public abstract class Directive {
@@ -112,9 +112,9 @@ public abstract class Directive {
 			}
 			String filename = requiresString();
 			int targetAddress = requiresInteger();
-			
-			Path path = Paths.get(filename);
-			byte[] bin = Files.readAllBytes(path);
+
+			File file = new File(Main.configuration.sourceFile.getParentFile(), filename);
+			byte[] bin = Files.readAllBytes(file.toPath());
 			
 			Optional<Line> nextLine = line.nextLine();
 			byte[] basicCode = nextLine.isPresent() 

@@ -34,6 +34,8 @@ import picocli.CommandLine.Parameters;
 		name = "bt", mixinStandardHelpOptions = true, 
 		versionProvider = Main.VersionProvider.class)
 public class Main implements Callable<Void> {
+	public static Configuration configuration = new Configuration();
+	
 	@Option(names = { "-o", "--output" }, description = "Write binary output to file.")
 	File outputFile;
 	
@@ -99,6 +101,7 @@ public class Main implements Callable<Void> {
 	public Void call() throws FileNotFoundException, IOException {
 		if (checkParameters()) {
 			if (debugFlag) debug = System.out;
+			configuration.sourceFile = this.sourceFile;
 			process();
 		}
 		
@@ -249,5 +252,9 @@ public class Main implements Callable<Void> {
 				return Integer.valueOf(value);
 			}
 		}
+	}
+	/** Expose configuration details for other components to see. */
+	public static class Configuration {
+		public File sourceFile;
 	}
 }

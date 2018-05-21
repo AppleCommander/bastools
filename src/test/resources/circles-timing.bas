@@ -2,7 +2,7 @@
 1 REM to allow for timing and verify that the "optimizations" improve runtime
 2 REM to some degree... 
 
-5 $embed "src/test/resources/read.time.bin", "0x0260"
+5 $embed "read.time.bin", "0x0260"
 
 10 call 608: rem initialize clock routine
 15 call 768,t1$:goto 100
