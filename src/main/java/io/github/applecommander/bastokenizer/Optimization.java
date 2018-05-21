@@ -56,9 +56,10 @@ public enum Optimization {
 	/** Common base class for optimization visitors that allow the program tree to be rewritten. */
 	private static class BaseVisitor implements Visitor {
 		protected Map<Integer,Integer> reassignments = new HashMap<>();
+		protected Program newProgram;
 		@Override
 		public Program visit(Program program) {
-			final Program newProgram = new Program();
+			newProgram = new Program();
 			program.lines.forEach(l -> {
 				Line line = l.accept(this);
 				boolean lineKept = line != null && !line.statements.isEmpty();
@@ -79,7 +80,7 @@ public enum Optimization {
 		}
 		@Override
 		public Line visit(Line line) {
-			Line newLine = new Line(line.lineNumber);
+			Line newLine = new Line(line.lineNumber, this.newProgram);
 			line.statements.forEach(s -> {
 				Statement statement = s.accept(this);
 				if (statement != null) newLine.statements.add(statement);
@@ -133,14 +134,14 @@ public enum Optimization {
 		@Override
 		public Line visit(Line line) {
 			debug.printf("Line # %d : ", line.lineNumber);
-			Line newLine = new Line(line.lineNumber);
+			Line newLine = new Line(line.lineNumber, this.newProgram);
 			newLine.statements.addAll(line.statements);
 			if (mergeLine == null || targets.contains(line.lineNumber)) {
 				// Either forced to a new line or this is a GOTO type target: Ignore length
 				debug.printf("%s\n", mergeLine == null ? "mergeLine is null" : "target line #");
 			} else {
 				// Check length and decide if it merges based on that.
-				Line tmpLine = new Line(mergeLine.lineNumber);
+				Line tmpLine = new Line(mergeLine.lineNumber, mergeLine.program);
 				tmpLine.statements.addAll(mergeLine.statements);
 				tmpLine.statements.addAll(line.statements);
 				if (bv.length(tmpLine) > maxLineLength) {
@@ -161,12 +162,14 @@ public enum Optimization {
 		}
 		private boolean hasTerminal(Line line) {
 			// Terminals are: IF, REM, GOTO, END, ON .. GOTO (GOTO is trigger), RESUME, RETURN, STOP
+			// Includes directives.
 			for (Statement s : line.statements) {
 				for (Token t : s.tokens) {
 					boolean terminal = t.keyword == ApplesoftKeyword.IF || t.type == Type.COMMENT /* REM */
 							|| t.keyword == ApplesoftKeyword.GOTO || t.keyword == ApplesoftKeyword.END
 							|| t.keyword == ApplesoftKeyword.RESUME || t.keyword == ApplesoftKeyword.RETURN
-							|| t.keyword == ApplesoftKeyword.STOP;
+							|| t.keyword == ApplesoftKeyword.STOP
+							|| t.type == Type.DIRECTIVE;
 					if (terminal) return true;
 				}
 			}
@@ -177,7 +180,7 @@ public enum Optimization {
 		protected int lineNumber = 0;
 		@Override
 		public Line visit(Line line) {
-			Line newLine = new Line(lineNumber++);
+			Line newLine = new Line(lineNumber++, this.newProgram);
 			newLine.statements.addAll(line.statements);
 			// Track what went where so lines can get renumbered automatically
 			reassignments.put(line.lineNumber, newLine.lineNumber);

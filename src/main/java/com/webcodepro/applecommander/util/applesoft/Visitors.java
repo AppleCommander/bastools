@@ -114,6 +114,9 @@ public class Visitors {
 			case SYNTAX:
 				printStream.print(token.text);
 				break;
+			case DIRECTIVE:
+				printStream.printf("%s ", token.text);
+				break;
 			case NUMBER:
 				if (Math.rint(token.number) == token.number) {
 					printStream.print(token.number.intValue());
@@ -167,6 +170,9 @@ public class Visitors {
 			case SYNTAX:
 				printStream.print(token.text);
 				break;
+			case DIRECTIVE:
+				printStream.printf("%s ", token.text);
+				break;
 			case NUMBER:
 				if (Math.rint(token.number) == token.number) {
 					printStream.print(token.number.intValue());
@@ -183,6 +189,7 @@ public class Visitors {
 		private Stack<ByteArrayOutputStream> stack;
 		private Map<Integer,Integer> lineAddresses;
 		private int address;
+		private Directive currentDirective;
 		
 		private ByteVisitor(int address) {
 			this.address = address;
@@ -231,12 +238,18 @@ public class Visitors {
 				stack.push(new ByteArrayOutputStream());
 				boolean first = true;
 				for (Statement statement : line.statements) {
+					if (currentDirective != null) {
+						throw new RuntimeException("No statements are allowed after a directive!");
+					}
 					if (!first) {
 						stack.peek().write(':');
-					} else {
-						first = false;
 					}
+					first = false;
 					statement.accept(this);
+				}
+				if (currentDirective != null) {
+					currentDirective.writeBytes(this.address+4, line);
+					currentDirective = null;
 				}
 
 				this.lineAddresses.put(line.lineNumber, this.address);
@@ -259,6 +272,10 @@ public class Visitors {
 
 		@Override
 		public Token visit(Token token) {
+			if (currentDirective != null) {
+				currentDirective.append(token);
+				return token;
+			}
 			try {
 				ByteArrayOutputStream os = stack.peek();
 				switch (token.type) {
@@ -274,6 +291,9 @@ public class Visitors {
 					break;
 				case KEYWORD:
 					os.write(token.keyword.code);
+					break;
+				case DIRECTIVE:
+					currentDirective = Directive.find(token.text, os);
 					break;
 				case NUMBER:
 					if (Math.rint(token.number) == token.number) {
@@ -307,6 +327,7 @@ public class Visitors {
 	/** This is a mildly rewritable Visitor. */
 	private static class ReassignmentVisitor implements Visitor {
 		private Map<Integer,Integer> reassignments;
+		private Program newProgram;
 		
 		private ReassignmentVisitor(Map<Integer,Integer> reassignments) {
 			this.reassignments = reassignments;
@@ -314,7 +335,7 @@ public class Visitors {
 		
 		@Override
 		public Program visit(Program program) {
-			Program newProgram = new Program();
+			newProgram = new Program();
 			program.lines.forEach(l -> {
 				Line line = l.accept(this);
 				newProgram.lines.add(line);
@@ -323,7 +344,7 @@ public class Visitors {
 		}
 		@Override
 		public Line visit(Line line) {
-			Line newLine = new Line(line.lineNumber);
+			Line newLine = new Line(line.lineNumber, this.newProgram);
 			line.statements.forEach(s -> {
 				Statement statement = s.accept(this);
 				newLine.statements.add(statement);
@@ -346,6 +367,7 @@ public class Visitors {
 		@Override
 		public Statement visit(Statement statement) {
 			boolean next = false;
+			boolean multiple = false;
 			Statement newStatement = new Statement();
 			for (Token t : statement.tokens) {
 				Token newToken = t;
@@ -353,10 +375,12 @@ public class Visitors {
 					if (t.type == Type.NUMBER && reassignments.containsKey(t.number.intValue())) {
 						newToken = Token.number(t.line, reassignments.get(t.number.intValue()).doubleValue());
 					}
+					next = multiple;	// preserve next based on if we have multiple line numbers or not.
 				} else {
 					next = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
 						|| t.keyword == ApplesoftKeyword.THEN || t.keyword == ApplesoftKeyword.RUN
 						|| t.keyword == ApplesoftKeyword.LIST;
+					multiple |= t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.ON;
 				}
 				newStatement.tokens.add(newToken);
 			}

@@ -58,8 +58,11 @@ public class Token {
 	public static Token syntax(int line, int ch) {
 		return new Token(line, Type.SYNTAX, null, null, String.format("%c", ch));
 	}
+	public static Token directive(int line, String text) {
+		return new Token(line, Type.DIRECTIVE, null, null, text);
+	}
 	
 	public static enum Type {
-		EOL, NUMBER, IDENT, COMMENT, STRING, KEYWORD, SYNTAX
+		EOL, NUMBER, IDENT, COMMENT, STRING, KEYWORD, SYNTAX, DIRECTIVE
 	}
 }

@@ -20,14 +20,14 @@ public class Parser {
 	public Program parse() {
 		Program program = new Program();
 		while (!tokens.isEmpty()) {
-			Line line = readLine();
+			Line line = readLine(program);
 			program.lines.add(line);
 		}
 		return program;
 	}
 	
-	public Line readLine() {
-		Line line = new Line(expectNumber());
+	public Line readLine(Program program) {
+		Line line = new Line(expectNumber(), program);
 		while (!tokens.isEmpty() && tokens.peek().type != Type.EOL) {
 			Statement statement = readStatement();
 			if (statement != null) {

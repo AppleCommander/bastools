@@ -106,17 +106,20 @@ public class TokenReader {
 							    .orElseThrow(() -> new IOException("Expecting: " + opt.get().parts));
 						}
 						return Optional.of(Token.keyword(line, opt.get()));
-					} else {
-						// Found an identifier (A, A$, A%).  Test if it is an array ('A(', 'A$(', 'A%(').
-						String sval = tokenizer.sval;
-						tokenizer.nextToken();
-						if (tokenizer.ttype == '(') {
-							sval += (char)tokenizer.ttype;
-						} else {
-							tokenizer.pushBack();
-						}
-						return Optional.of(Token.ident(line, sval));
 					}
+					// Check if we found a directive
+					if (tokenizer.sval.startsWith("$")) {
+						return Optional.of(Token.directive(line, tokenizer.sval));
+					}
+					// Found an identifier (A, A$, A%).  Test if it is an array ('A(', 'A$(', 'A%(').
+					String sval = tokenizer.sval;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == '(') {
+						sval += (char)tokenizer.ttype;
+					} else {
+						tokenizer.pushBack();
+					}
+					return Optional.of(Token.ident(line, sval));
 				case '"':
 					return Optional.of(Token.string(line, tokenizer.sval));
 				case '(':

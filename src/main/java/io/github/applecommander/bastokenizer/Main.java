@@ -238,7 +238,7 @@ public class Main implements Callable<Void> {
 	/** Add support for "$801" and "0x801" instead of just decimal like 2049. */
 	public static class IntegerTypeConverter implements ITypeConverter<Integer> {
 		@Override
-		public Integer convert(String value) throws Exception {
+		public Integer convert(String value) {
 			if (value == null) {
 				return null;
 			} else if (value.startsWith("$")) {
