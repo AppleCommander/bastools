@@ -21,6 +21,7 @@ import com.webcodepro.applecommander.util.applesoft.TokenReader;
 import com.webcodepro.applecommander.util.applesoft.Visitors;
 import com.webcodepro.applecommander.util.applesoft.Visitors.ByteVisitor;
 
+import io.github.applecommander.applesingle.AppleSingle;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
@@ -30,10 +31,14 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 /** A command-line interface to the AppleSoft BAS tokenizer libraries. */
-@Command(description = "Transforms an AppleSoft program from text back to it's tokenized state.",
+@Command(description = "Transforms an AppleSoft program from text back to its tokenized state.",
+		descriptionHeading = "%n",
+		commandListHeading = "%nCommands:%n",
+		optionListHeading = "%nOptions:%n",
 		name = "bt", mixinStandardHelpOptions = true, 
 		versionProvider = Main.VersionProvider.class)
 public class Main implements Callable<Void> {
+	private static final int BAS = 0xfc;
 	public static Configuration configuration = new Configuration();
 	
 	@Option(names = { "-o", "--output" }, description = "Write binary output to file.")
@@ -51,8 +56,11 @@ public class Main implements Callable<Void> {
 	@Option(names = { "--variables" }, description = "Generate a variable report")
 	boolean showVariableReport;
 	
-	@Option(names = { "-p", "--pipe" }, description = "Pipe binary output to stdout.")
-	boolean pipeOutput;
+	@Option(names = "--stdout", description = "Send binary output to stdout.")
+	boolean stdoutFlag;
+	
+	@Option(names = "--applesingle", description = "Write output in AppleSingle format")
+	boolean applesingleFlag;
 	
 	@Option(names = "--pretty", description = "Pretty print structure as bastokenizer understands it.")
 	boolean prettyPrint;
@@ -116,10 +124,10 @@ public class Main implements Callable<Void> {
 		}
 		boolean hasTextOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport 
 				|| debugFlag || showLineAddresses;
-		if (pipeOutput && hasTextOutput) {
+		if (stdoutFlag && hasTextOutput) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
-		} else if (!(pipeOutput || hasTextOutput || outputFile != null)) {
+		} else if (!(stdoutFlag || hasTextOutput || outputFile != null)) {
 			System.err.println("What do you want to do?");
 			return false;
 		}
@@ -149,20 +157,51 @@ public class Main implements Callable<Void> {
 
 		ByteVisitor byteVisitor = Visitors.byteVisitor(address);
 		byte[] data = byteVisitor.dump(program);
+		if (showLineAddresses) {
+			byteVisitor.getLineAddresses().forEach((l,a) -> System.out.printf("%5d ... $%04x\n", l, a));
+		}
 		if (hexFormat) {
 			HexDumper.standard().dump(address, data);
 		}
 		if (copyFormat) {
 			HexDumper.apple2().dump(address, data);
 		}
-		if (outputFile != null) {
-			Files.write(outputFile.toPath(), data);
-		}
-		if (showLineAddresses) {
-			byteVisitor.getLineAddresses().forEach((l,a) -> System.out.printf("%5d ... $%04x\n", l, a));
-		}
-		if (pipeOutput) {
-			System.out.write(data);
+		
+		saveResults(data);
+	}
+	
+	public void saveResults(byte[] data) throws IOException {
+		if (applesingleFlag) {
+			String realName = null;
+			if (sourceFile != null) {
+				realName = sourceFile.getName().toUpperCase();
+			} else if (outputFile != null) {
+				realName = outputFile.getName().toUpperCase();
+			} else {
+				realName = "UNKNOWN";
+			}
+			if (realName.endsWith(".BAS")) {
+				realName = realName.substring(0, realName.length()-4);
+			}
+			AppleSingle as = AppleSingle.builder()
+					.auxType(address)
+					.fileType(BAS)
+					.dataFork(data)
+					.realName(realName)
+					.build();
+			if (outputFile != null) {
+				as.save(outputFile);
+			}
+			if (stdoutFlag) {
+				as.save(System.out);
+			}
+		} else {
+			if (outputFile != null) {
+				Files.write(outputFile.toPath(), data);
+			}
+			if (stdoutFlag) {
+				System.out.write(data);
+			}
 		}
 	}
 	
