@@ -33,7 +33,40 @@ Program program = parser.parse();
 
 The `Program` is now the parsed version of the BASIC program.  Various `Visitor`s may be used to report, gather information, or manipulate the tree in various ways.
 
+## Directives
+
+The framework allows embedding of directives.
+
+### `$embed`
+
+`$embed` will allow a binary to be embedded within the resulting application. Please note that once the application is loaeded on the Apple II, the program cannot be altered as the computer will crash.  Usage example:
+
+```
+5 $embed "read.time.bin", "0x0260"
+```
+
+The `$embed` directive _must_ be last on the line (if there are comments, be sure to use the `REMOVE_REM_STATEMENTS` optimization. It takes two parameters: file name and target address, both are strings.
+
+From the `circles-timing.bas` sample, this is the beginning of the program:
+
+```
+0801:9A 09 00 00 8C 32 30 36 32 3A AB 31 00 A9 2B 85
+     \___/ \___/ \____________/    \___/    \_______...
+     Ptr, Line 0, CALL 3062,    :, GOTO 1,   Assembly code...     
+``` 
+
 ## Optimizations
 
-## Visitors
+Optimizations are mechanisms to rewrite the `Program`, typically making the program smaller. `Optimization` itself is an enum which has a `create` method to setup the `Visitor`.
 
+Current optimizations are:
+* _Remove empty statements_ will remove all extra colons.  For example, if the application in question used `:` to indicate nesting. Or just accidents!
+* _Remove REM statements_ will remove all comments.
+* _Merge lines_ will identify all lines that are not a target of `GOTO`/`GOSUB`-type action and rewrite the line by merging it with others.  The concept involved is that the BASIC program is just a linked list and shortening the list will shorten the search path.  The default *max length* in bytes is set to `255`. 
+* _Renumber_ will renumber the application, beginning with line `0`. This makes the decoding a tiny bit more efficient in that the number to decode will be smaller in the token stream.
+
+Sample use:
+
+```java
+program = program.accept(Optimization.REMOVE_REM_STATEMENTS.create(config));
+```

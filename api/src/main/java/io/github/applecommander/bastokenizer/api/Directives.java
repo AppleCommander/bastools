@@ -7,7 +7,9 @@ import java.util.TreeMap;
 
 import io.github.applecommander.bastokenizer.api.directives.EmbeddedBinaryDirective;
 
-public abstract class Directives {
+public class Directives {
+	private Directives() { /* Prevent construction. */ }
+	
 	private static Map<String,Class<? extends Directive>> DIRECTIVES = 
 		new TreeMap<String,Class<? extends Directive>>(String.CASE_INSENSITIVE_ORDER) {
 			private static final long serialVersionUID = -8111460701487331592L;

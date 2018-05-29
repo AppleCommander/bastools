@@ -1,26 +1,10 @@
+# BASIC Tokenizer
 
+This project is an offshoot of AppleCommander's import of a BASIC program.  The tooling will have more capabilities than what is available in AppleCommander.  
 
-Metadata (v1)
-========
+# Subprojects
 
-    Program
-    - Lines
-      - Line number
-      - Statements
-        - Tokens (AppleSoft "token", strings, syntax, etc)
+This project is split into two sub-projects:
 
-
-Metadata (v2)
-========
-
-    Program
-    - Routines
-      - Label (default = "__main__" or something)
-      - Statements
-        - Distinct statements with expression trees
-          - LET
-          - FOR
-          - CALL
-          - POKE
-          - PRINT
-          - etc
+* [api](api) is the Java API
+* [bt](tools/bt) is a command-line tool for tokenizing AppleSoft BASIC programs.
