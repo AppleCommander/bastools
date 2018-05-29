@@ -1,0 +1,71 @@
+repositories {
+    jcenter()
+}
+
+apply plugin: 'java-library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+dependencies {
+    compile group: 'net.sf.applecommander', name: 'applesingle-api', version:'1.1.0'
+    testImplementation 'junit:junit:4.12'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
+      }
+
+      pom.project {
+        name archivesBaseName
+        packaging 'jar'
+        description 'Experiments with generating an AppleSoft B/BAS tokenized "binary".'
+        url 'https://applecommander.github.io/'
+
+        scm {
+          url 'https://github.com/AppleCommander/bastokenizer'
+        }
+
+        licenses {
+          license {
+            name 'The GNU General Public License (GPL) Version 3, 29 June 2007'
+            url 'https://www.gnu.org/licenses/gpl-3.0.html'
+          }
+        }
+
+        developers {
+          developer {
+            id 'robgreene'
+            email 'robgreene@gmail.com'
+          }
+        }
+      }
+    }
+  }
+}

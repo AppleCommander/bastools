@@ -1,0 +1,7 @@
+include 'api'
+include 'tools:bt'
+
+rootProject.name = 'bastokenizer'
+project(":api").name = 'bastokenizer-api'
+project(":tools").name = 'bastokenizer-tools'
+project(":tools:bt").name = 'bastokenizer-tools-bt'

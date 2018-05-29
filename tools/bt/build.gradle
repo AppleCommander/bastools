@@ -1,0 +1,25 @@
+plugins {
+    id 'org.springframework.boot' version '2.0.2.RELEASE'
+}
+
+repositories {
+    jcenter()
+}
+
+apply plugin: 'application'
+
+mainClassName = "io.github.applecommander.bastokenizer.tools.bt.Main"
+
+bootJar {
+  manifest {
+    attributes(
+      'Implementation-Title': 'bastokenizer',
+      'Implementation-Version': "${version} (${new Date().format('yyyy-MM-dd HH:mm')})" 
+    )
+  }
+}
+
+dependencies {
+    compile 'info.picocli:picocli:3.0.2'
+    compile project(':bastokenizer-api')
+}
