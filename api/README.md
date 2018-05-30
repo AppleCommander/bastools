@@ -2,6 +2,28 @@
 
 The BASIC Tokenizer API is a set of reusable code that can be used to parse a text-based AppleSoft BASIC program an generate the appropriate tokens.  It also has multiple types of visitors that can re-write that parse tree to rearrange the code (calling them optimizations is a bit over-the-top).
 
+## Maven / Gradle
+
+To include in a Maven project:
+
+```xml
+<dependency>
+  <groupId>net.sf.applecommander</groupId>
+  <artifactId>bastokenizer-api</artifactId>
+  <version>0.2.0</version>
+</dependency>
+```
+
+To include in a Gradle project:
+
+```
+dependencies {
+    // ...
+    compile "net.sf.applecommander:bastokenizer-api:0.2.0"
+    // ...
+}
+```
+
 ## Overview
 
 Generally, the usage pattern is:
