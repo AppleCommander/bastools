@@ -21,5 +21,6 @@ bootJar {
 
 dependencies {
     compile 'info.picocli:picocli:3.0.2'
+    compile 'net.sf.applecommander:applesingle-api:1.1.0'
     compile project(':bastokenizer-api')
 }
