@@ -61,7 +61,7 @@ The framework allows embedding of directives.
 
 ### `$embed`
 
-`$embed` will allow a binary to be embedded within the resulting application. Please note that once the application is loaeded on the Apple II, the program cannot be altered as the computer will crash.  Usage example:
+`$embed` will allow a binary to be embedded within the resulting application *and will move it to a destination in memory*. Please note that once the application is loaded on the Apple II, the program cannot be altered as the computer will crash.  Usage example:
 
 ```
 5 $embed "read.time.bin", "0x0260"
@@ -76,6 +76,25 @@ From the `circles-timing.bas` sample, this is the beginning of the program:
      \___/ \___/ \____________/    \___/    \_______...
      Ptr, Line 0, CALL 3062,    :, GOTO 1,   Assembly code...     
 ``` 
+
+The move code is based on what Beagle Bros put into their [Peeks, Pokes, and Pointers](https://beagle.applearchives.com/Posters/Poster%202.pdf) poster.  (See _Memory Move_ under the *Useful Calls*; the `CALL -468` entry.)
+
+```
+LDA #<embeddedStart
+STA $3C
+LDA #>embeddedStart
+STA $3D
+LDA #<embeddedEnd
+STA $3E
+LDA #>embeddedEnd
+STA $3F
+LDA #<targetAddress
+STA $42
+LDA #>targetAddress
+STA $43
+LDY #0
+JMP $FE2C
+```
 
 ## Optimizations
 
