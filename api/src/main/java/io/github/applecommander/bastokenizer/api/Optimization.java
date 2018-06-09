@@ -8,10 +8,10 @@ import io.github.applecommander.bastokenizer.api.optimizations.RemoveRemStatemen
 import io.github.applecommander.bastokenizer.api.optimizations.Renumber;
 
 public enum Optimization {
-	REMOVE_EMPTY_STATEMENTS(config -> new RemoveEmptyStatements()),
-	REMOVE_REM_STATEMENTS(config -> new RemoveRemStatements()),
-	MERGE_LINES(config -> new MergeLines(config)),
-	RENUMBER(config -> new Renumber());
+	REMOVE_EMPTY_STATEMENTS(RemoveEmptyStatements::new),
+	REMOVE_REM_STATEMENTS(RemoveRemStatements::new),
+	MERGE_LINES(MergeLines::new),
+	RENUMBER(Renumber::new);
 	
 	private Function<Configuration,Visitor> factory;
 	

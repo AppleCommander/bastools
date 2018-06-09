@@ -10,7 +10,11 @@ import io.github.applecommander.bastokenizer.api.model.Program;
 import io.github.applecommander.bastokenizer.api.model.Statement;
 import io.github.applecommander.bastokenizer.api.model.Token;
 
-/** Common base class for optimization visitors that allow the program tree to be rewritten. */
+/** 
+ * Common base class for optimization visitors that allow the program tree to be rewritten.
+ * Note that {@code #reassignments} is used to track line number movement and is <em>automatically</em>
+ * applied at the end of the program visit. 
+ */
 public class BaseVisitor implements Visitor {
 	protected Map<Integer,Integer> reassignments = new HashMap<>();
 	protected Program newProgram;

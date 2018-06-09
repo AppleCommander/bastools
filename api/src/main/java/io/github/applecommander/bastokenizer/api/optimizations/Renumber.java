@@ -1,9 +1,19 @@
 package io.github.applecommander.bastokenizer.api.optimizations;
 
+import io.github.applecommander.bastokenizer.api.Configuration;
 import io.github.applecommander.bastokenizer.api.model.Line;
 
+/**
+ * A simple renumbering algorithm that maps the reassignments and lets {@code BaseVisitor}
+ * perform the actual renumbering!
+ */
 public class Renumber extends BaseVisitor {
 	protected int lineNumber = 0;
+	
+	public Renumber(Configuration config) {
+		// ignored
+	}
+	
 	@Override
 	public Line visit(Line line) {
 		Line newLine = new Line(lineNumber++, this.newProgram);
