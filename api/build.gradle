@@ -10,6 +10,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+jar {
+  manifest {
+    attributes(
+      'Implementation-Title': 'B/BAS Tokenizer',
+      'Implementation-Version': "${version} (${new Date().format('yyyy-MM-dd HH:mm')})"
+    )
+  }
+}
+
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
