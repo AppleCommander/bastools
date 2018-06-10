@@ -19,6 +19,10 @@ public class Line {
 		this.program = program;
 	}
 	
+	public int getLineNumber() {
+		return lineNumber;
+	}
+	
 	public Optional<Line> nextLine() {
 		int i = program.lines.indexOf(this);
 		if (i == -1 || i+1 >= program.lines.size()) {
