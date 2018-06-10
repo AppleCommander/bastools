@@ -10,6 +10,7 @@ import io.github.applecommander.bastokenizer.api.visitors.LineNumberTargetCollec
 import io.github.applecommander.bastokenizer.api.visitors.PrettyPrintVisitor;
 import io.github.applecommander.bastokenizer.api.visitors.PrintVisitor;
 import io.github.applecommander.bastokenizer.api.visitors.ReassignmentVisitor;
+import io.github.applecommander.bastokenizer.api.visitors.VariableCollectorVisitor;
 import io.github.applecommander.bastokenizer.api.visitors.VariableReportVisitor;
 
 /**
@@ -65,6 +66,10 @@ public class Visitors {
 	/** Collect all line numbers that are a target of GOTO, GOSUB, etc. */
 	public static LineNumberTargetCollector lineNumberTargetCollector() {
 		return new LineNumberTargetCollector();
+	}
+	
+	public static VariableCollectorVisitor variableCollectorVisitor() {
+		return new VariableCollectorVisitor();
 	}
 	
 	public static Visitor variableReportVisitor() {
