@@ -16,6 +16,8 @@ bin/
 # Misc. Apple II remnants
 *.bin
 *.dsk
+*.po
+*.do
 
 # Gradle extras
 .gradle/
