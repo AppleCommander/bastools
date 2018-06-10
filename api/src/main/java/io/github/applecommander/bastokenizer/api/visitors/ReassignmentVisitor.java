@@ -44,6 +44,7 @@ public class ReassignmentVisitor implements Visitor {
 	 * - GOSUB n
 	 * - GOTO n
 	 * - IF ... THEN n
+	 * - IF ... THEN [GOTO|GOSUB] n
 	 * - LIST n [ ,m ]
 	 * - ON x GOTO n, m, ...
 	 * - ON x GOSUB n, m, ...
@@ -66,7 +67,8 @@ public class ReassignmentVisitor implements Visitor {
 				next = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
 					|| t.keyword == ApplesoftKeyword.THEN || t.keyword == ApplesoftKeyword.RUN
 					|| t.keyword == ApplesoftKeyword.LIST;
-				multiple |= t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.ON;
+				multiple |= t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.ON
+					|| t.keyword == ApplesoftKeyword.THEN;
 			}
 			newStatement.tokens.add(newToken);
 		}
