@@ -32,6 +32,8 @@ Options:
                             * remove-empty-statements - Strip out all '::'-like
                               statements.
                             * remove-rem-statements - Remove all REM statements.
+                            * extract-constant-values - Assign all constant values
+                              first.
                             * merge-lines - Merge lines.
                             * renumber - Renumber program.
   -h, --help                Show this help message and exit.
@@ -122,9 +124,18 @@ $ bt --list tools/bt/src/test/resources/circles.bas
 
 ```shell
 $ bt --optimize --list tools/bt/src/test/resources/circles.bas 
-0  GOTO 2
-1  FOR A = 0 TO PT:X = X(A) * SZ:Y = Y(A) * SZ: HPLOT XO + X,YO + Y: HPLOT XO - X,YO + Y: HPLOT XO + X,YO - Y: HPLOT XO - X,YO - Y: NEXT A: RETURN 
-2  HGR :C(0) = 1:C(1) = 2:C(2) = 3:C(3) = 5:C(4) = 6:C(5) = 7: HOME : VTAB 21: INVERSE : PRINT "JUST A MOMENT": NORMAL :PI = 3.14159:PT = 30: DIM X(PT),Y(PT): FOR A = 0 TO PT:B = PI * (A / (PT * 2)):X(A) =  SIN (B):Y(A) =  COS (B): NEXT A: HOME : VTAB 21: FOR Q = 1 TO 100:C = 6 *  RND (1): HCOLOR= C(C):SZ = 10 + (40 *  RND (1)):XO = (279 - SZ * 2) *  RND (1) + SZ:YO = (159 - SZ * 2) *  RND (1) + SZ: GOSUB 1: NEXT Q
+0 D=0:E=1:F=2:G=3:H=5:I=4:J=6:K=7:L=21:M=100:N=10:O=40:P=279:R=159: GOTO 2
+1  FOR A = D TO PT:X = X(A) * SZ:Y = Y(A) * SZ: HPLOT XO + X,YO + Y: HPLOT XO - X,YO + Y: HPLOT XO + X,YO - Y: HPLOT XO - X,YO - Y: NEXT A: RETURN 
+2  HGR :C(D) = E:C(E) = F:C(F) = G:C(G) = H:C(I) = J:C(H) = K: HOME : VTAB L: INVERSE : PRINT "JUST A MOMENT": NORMAL :PI = 3.14159:PT = 30: DIM X(PT),Y(PT): FOR A = D TO PT:B = PI * (A / (PT * F)):X(A) =  SIN (B):Y(A) =  COS (B): NEXT A: HOME : VTAB L: FOR Q = E TO M:C = J *  RND (E): HCOLOR= C(C):SZ = N + (O *  RND (E)):XO = (P - SZ * F) *  RND (E) + SZ:YO = (R - SZ * F) *  RND (E) + SZ: GOSUB 1: NEXT Q
+```
+
+Specific optimizations may also be triggered:
+
+```shell
+$ bt -fremove-rem-statements,merge-lines --list tools/bt/src/test/resources/circles.bas 
+10  GOTO 110
+30  FOR A = 0 TO PT:X = X(A) * SZ:Y = Y(A) * SZ: HPLOT XO + X,YO + Y: HPLOT XO - X,YO + Y: HPLOT XO + X,YO - Y: HPLOT XO - X,YO - Y: NEXT A: RETURN 
+110  HGR :C(0) = 1:C(1) = 2:C(2) = 3:C(3) = 5:C(4) = 6:C(5) = 7: HOME : VTAB 21: INVERSE : PRINT "JUST A MOMENT": NORMAL :PI = 3.14159:PT = 30: DIM X(PT),Y(PT): FOR A = 0 TO PT:B = PI * (A / (PT * 2)):X(A) =  SIN (B):Y(A) =  COS (B): NEXT A: HOME : VTAB 21: FOR Q = 1 TO 100:C = 6 *  RND (1): HCOLOR= C(C):SZ = 10 + (40 *  RND (1)):XO = (279 - SZ * 2) *  RND (1) + SZ:YO = (159 - SZ * 2) *  RND (1) + SZ: GOSUB 30: NEXT Q
 ```
 
 ## Piping to stdout

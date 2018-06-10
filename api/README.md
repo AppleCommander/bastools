@@ -103,6 +103,7 @@ Optimizations are mechanisms to rewrite the `Program`, typically making the prog
 Current optimizations are:
 * _Remove empty statements_ will remove all extra colons.  For example, if the application in question used `:` to indicate nesting. Or just accidents!
 * _Remove REM statements_ will remove all comments.
+* _Extract constant values_ will find all constant numerical references, insert a line `0` with assignments, and finally replace all the numbers with the approrpiate variable name. Hypothesis is that the BASIC interpreter only parses the number once.
 * _Merge lines_ will identify all lines that are not a target of `GOTO`/`GOSUB`-type action and rewrite the line by merging it with others.  The concept involved is that the BASIC program is just a linked list and shortening the list will shorten the search path.  The default *max length* in bytes is set to `255`. 
 * _Renumber_ will renumber the application, beginning with line `0`. This makes the decoding a tiny bit more efficient in that the number to decode will be smaller in the token stream.
 
