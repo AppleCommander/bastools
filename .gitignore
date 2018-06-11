@@ -18,6 +18,7 @@ bin/
 *.dsk
 *.po
 *.do
+*.bas
 
 # Gradle extras
 .gradle/

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import io.github.applecommander.bastokenizer.api.directives.EmbeddedBinaryDirective;
+import io.github.applecommander.bastokenizer.api.directives.HexDirective;
 
 public class Directives {
 	private Directives() { /* Prevent construction. */ }
@@ -16,6 +17,7 @@ public class Directives {
 
 			{
 				put("$embed", EmbeddedBinaryDirective.class);
+				put("$hex", HexDirective.class);
 			}
 		};
 

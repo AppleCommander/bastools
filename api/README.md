@@ -96,6 +96,22 @@ LDY #0
 JMP $FE2C
 ```
 
+### `$hex`
+
+If embedding hexidecimal addresses into an application makes sense, the `$hex` directive allows that to be done in a rudimentary manner.
+
+Sample:
+
+```
+10 call $hex "fc58"
+```
+
+Yields:
+
+```
+10 call -936
+```
+
 ## Optimizations
 
 Optimizations are mechanisms to rewrite the `Program`, typically making the program smaller. `Optimization` itself is an enum which has a `create` method to setup the `Visitor`.
