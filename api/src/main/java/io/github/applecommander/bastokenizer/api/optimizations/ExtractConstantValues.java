@@ -80,6 +80,8 @@ public class ExtractConstantValues extends BaseVisitor {
 	}
 	private void injectLine0(Program program) {
 		Line line = generateLine0(program);
+		// Bypass if there were no constants
+		if (line.statements.isEmpty()) return;
 		// setup a renumber of lines that interfere if we have any
 		if (program.lines.get(0).lineNumber == 0) {
 			// start with line #0 should become line #1
