@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 
@@ -88,7 +89,7 @@ public class Main implements Callable<Void> {
 	private boolean allOptimizations;
 	
 	@Option(names = "--debug", description = "Print debug output.")
-	private boolean debugFlag;
+	private static boolean debugFlag;
 	private PrintStream debug = new PrintStream(new OutputStream() {
 			@Override
 			public void write(int b) throws IOException {
@@ -100,7 +101,21 @@ public class Main implements Callable<Void> {
 	private File sourceFile;
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		CommandLine.call(new Main(), args);
+		try {
+			CommandLine.call(new Main(), args);
+		} catch (Throwable t) {
+			if (Main.debugFlag) {
+				t.printStackTrace(System.err);
+			} else {
+				String message = t.getMessage();
+				while (t != null) {
+					message = t.getMessage();
+					t = t.getCause();
+				}
+				System.err.printf("Error: %s\n", Optional.ofNullable(message).orElse("An error occurred."));
+			}
+			System.exit(1);
+		}
 	}
 	
 	@Override
