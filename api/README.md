@@ -1,6 +1,6 @@
 # BT API
 
-The BASIC Tokenizer API is a set of reusable code that can be used to parse a text-based AppleSoft BASIC program an generate the appropriate tokens.  It also has multiple types of visitors that can re-write that parse tree to rearrange the code (calling them optimizations is a bit over-the-top).
+The BASIC Tools API is a set of reusable code that can be used to parse a text-based Applesoft BASIC program an generate the appropriate tokens.  It also has multiple types of visitors that can re-write that parse tree to rearrange the code (calling them optimizations is a bit over-the-top).
 
 ## Maven / Gradle
 
