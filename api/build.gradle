@@ -13,7 +13,7 @@ dependencies {
 jar {
   manifest {
     attributes(
-      'Implementation-Title': 'B/BAS Tokenizer',
+      'Implementation-Title': 'B/BAS Tools API',
       'Implementation-Version': "${version} (${new Date().format('yyyy-MM-dd HH:mm')})"
     )
   }
@@ -55,11 +55,11 @@ uploadArchives {
       pom.project {
         name archivesBaseName
         packaging 'jar'
-        description 'Experiments with generating an AppleSoft B/BAS tokenized "binary".'
+        description 'An Applesoft BASIC tools library.'
         url 'https://applecommander.github.io/'
 
         scm {
-          url 'https://github.com/AppleCommander/bastokenizer'
+          url 'https://github.com/AppleCommander/bastools'
         }
 
         licenses {

@@ -8,12 +8,12 @@ repositories {
 
 apply plugin: 'application'
 
-mainClassName = "io.github.applecommander.bastokenizer.tools.bt.Main"
+mainClassName = "io.github.applecommander.bastools.tools.bt.Main"
 
 bootJar {
   manifest {
     attributes(
-      'Implementation-Title': 'bastokenizer',
+      'Implementation-Title': 'BT CLI',
       'Implementation-Version': "${version} (${new Date().format('yyyy-MM-dd HH:mm')})" 
     )
   }
@@ -22,5 +22,5 @@ bootJar {
 dependencies {
     compile 'info.picocli:picocli:3.0.2'
     compile 'net.sf.applecommander:applesingle-api:1.2.1'
-    compile project(':bastokenizer-api')
+    compile project(':bastools-api')
 }

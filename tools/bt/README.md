@@ -15,11 +15,11 @@ Options:
       --addresses           Dump line number addresses out.
       --applesingle         Write output in AppleSingle format
       --debug               Print debug output.
-      --list                List structure as bastokenizer understands it.
+      --list                List structure as bastools understands it.
       --max-line-length=<maxLineLength>
                             Maximum line length for generated lines.
                               Default: 255
-      --pretty              Pretty print structure as bastokenizer understands it.
+      --pretty              Pretty print structure as bastools understands it.
       --stdout              Send binary output to stdout.
       --tokens              Dump token list to stdout for debugging.
       --variables           Generate a variable report

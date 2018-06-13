@@ -9,8 +9,8 @@ To include in a Maven project:
 ```xml
 <dependency>
   <groupId>net.sf.applecommander</groupId>
-  <artifactId>bastokenizer-api</artifactId>
-  <version>0.2.0</version>
+  <artifactId>bastools-api</artifactId>
+  <version>0.3.0</version>
 </dependency>
 ```
 
@@ -19,7 +19,7 @@ To include in a Gradle project:
 ```
 dependencies {
     // ...
-    compile "net.sf.applecommander:bastokenizer-api:0.2.0"
+    compile "net.sf.applecommander:bastools-api:0.2.0"
     // ...
 }
 ```
