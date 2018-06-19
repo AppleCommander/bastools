@@ -37,21 +37,6 @@ public class ImageShapeExporter implements ShapeExporter {
         Objects.requireNonNull(outputStream);
         
         export(Arrays.asList(shape.toBitmap()), outputStream);
-        
-//        int shapeWidth = pixelSize * bshape.getWidth();
-//        int shapeHeight = pixelSize * bshape.getHeight();
-//        int imageWidth = shapeWidth + (border ? 2 : 0);
-//        int imageHeight = shapeHeight + (border ? 2 : 0);
-//        int borderEdgeWidth = border ? 1+padding : 0;
-//        BufferedImage image = new BufferedImage(imageWidth + borderEdgeWidth*2, 
-//                                                imageHeight + borderEdgeWidth*2, 
-//                                                BufferedImage.TYPE_INT_RGB);
-//        
-//        Graphics g = image.createGraphics();
-//        if (border) drawBorders(g, shapeWidth, shapeHeight, imageWidth, imageHeight);
-//        drawShapeAt(g, bshape, new Point(borderEdgeWidth,borderEdgeWidth));
-//        g.dispose();
-//        ImageIO.write(image, imageFormat, outputStream);
     }
 
     @Override
