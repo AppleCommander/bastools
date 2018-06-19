@@ -7,11 +7,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import io.github.applecommander.bastools.api.shapes.exporters.ImageShapeExporter;
 import io.github.applecommander.bastools.api.shapes.exporters.TextShapeExporter;
 
 public interface ShapeExporter {
     /** Export a single shape to the OutputStream. */
-    public void export(Shape shape, OutputStream outputStream);
+    public void export(Shape shape, OutputStream outputStream) throws IOException;
     /** Export a single shape to the File. */
     public default void export(Shape shape, File file) throws IOException {
         Objects.requireNonNull(shape);
@@ -28,7 +29,7 @@ public interface ShapeExporter {
     }
 
     /** Export the entire shape table to the OutputStream. */
-    public void export(ShapeTable shapeTable, OutputStream outputStream);
+    public void export(ShapeTable shapeTable, OutputStream outputStream) throws IOException;
     /** Export the entire shape table to the File. */
     public default void export(ShapeTable shapeTable, File file) throws IOException {
         Objects.requireNonNull(shapeTable);
@@ -46,5 +47,8 @@ public interface ShapeExporter {
     
     public static TextShapeExporter.Builder text() {
         return new TextShapeExporter.Builder();
+    }
+    public static ImageShapeExporter.Builder image() {
+        return new ImageShapeExporter.Builder();
     }
 }

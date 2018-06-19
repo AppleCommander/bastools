@@ -19,6 +19,7 @@ import io.github.applecommander.bastools.api.shapes.ShapeTable;
 public class TextShapeExporter implements ShapeExporter {
     private int maxWidth = 80;
     private BorderStrategy borderStrategy = BorderStrategy.BOX_DRAWING;
+    private boolean skipEmptyShapes;
     
     /** Use the {@code Builder} to create a TextShapeExporter. */
     private TextShapeExporter() { }
@@ -45,6 +46,7 @@ public class TextShapeExporter implements ShapeExporter {
         Objects.requireNonNull(outputStream);
         
         List<BitmapShape> blist = shapeTable.shapes.stream()
+                                                   .filter(this::displayThisShape)
                                                    .map(Shape::toBitmap)
                                                    .collect(Collectors.toList());
         int width = blist.stream().mapToInt(BitmapShape::getWidth).max().getAsInt();
@@ -64,6 +66,10 @@ public class TextShapeExporter implements ShapeExporter {
         
         drawBottomLine(pw, columns, width);
         pw.flush();
+    }
+    
+    private boolean displayThisShape(Shape shape) {
+        return !(skipEmptyShapes && shape.isEmpty());
     }
     
     private void drawTopLine(PrintWriter pw, int columns, int width) {
@@ -239,6 +245,14 @@ public class TextShapeExporter implements ShapeExporter {
         }
         public Builder borderStrategy(BorderStrategy borderStrategy) {
             textShapeExporter.borderStrategy = borderStrategy;
+            return this;
+        }
+
+        public Builder skipEmptyShapes() {
+            return skipEmptyShapes(true);
+        }
+        public Builder skipEmptyShapes(boolean skipEmptyShapes) {
+            textShapeExporter.skipEmptyShapes = skipEmptyShapes;
             return this;
         }
         

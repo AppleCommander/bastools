@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import org.junit.Test;
 
@@ -54,7 +55,7 @@ public class ShapesTest {
     }
     
     @Test
-    public void testTextShapeExporterNoBorder() {
+    public void testTextShapeExporterNoBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
         final String expected = ".XXX.\n"
@@ -72,7 +73,7 @@ public class ShapesTest {
     }
 
     @Test
-    public void testTextShapeExporterAsciiBorder() {
+    public void testTextShapeExporterAsciiBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
         final String expected = "+-----+\n"
@@ -92,7 +93,7 @@ public class ShapesTest {
     }
 
     @Test
-    public void testTextShapeTableExporterNoBorder() {
+    public void testTextShapeTableExporterNoBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
         // Simulate 4 of these identical shapes by adding 3 more
@@ -116,7 +117,7 @@ public class ShapesTest {
     }
 
     @Test
-    public void testTextShapeTableExporterAsciiBorder() {
+    public void testTextShapeTableExporterAsciiBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
         // Simulate 4 of these identical shapes by adding 3 more

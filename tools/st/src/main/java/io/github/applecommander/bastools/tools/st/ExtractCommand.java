@@ -34,9 +34,15 @@ public class ExtractCommand implements Callable<Void> {
     @Option(names = "--border", description = "Set border style (none, simple, box)", showDefaultValue = Visibility.ALWAYS)
     private String borderStyle = "simple";
     
-    @Option(names = { "-w", "--width" }, description = "Set text width", showDefaultValue = Visibility.ALWAYS)
-    private int textWidth = 80;
+    @Option(names = "--format", description = "Select output format (text, png, gif, jpeg, bmp, wbmp)", showDefaultValue = Visibility.ALWAYS)
+    private String outputFormat = "text";
     
+    @Option(names = "--skip-empty", description = "Skip empty shapes")
+    private boolean skipEmptyShapesFlag = false;
+    
+    @Option(names = { "-w", "--width" }, description = "Set width (defaults: text=80, image=1024)")
+    private int width = -1;
+
     @Option(names = "--shape", description = "Extract specific shape")
     private int shapeNum = 0;
 	
@@ -47,14 +53,9 @@ public class ExtractCommand implements Callable<Void> {
 	
 	@Override
 	public Void call() throws IOException {
-	    validateArguments();
+	    ShapeExporter exporter = validateAndParseArguments();
 	    
 	    ShapeTable shapeTable = stdinFlag ? ShapeTable.read(System.in) : ShapeTable.read(file);
-	    
-	    ShapeExporter exporter = ShapeExporter.text()
-	                                          .borderStrategy(borderStrategy)
-	                                          .maxWidth(textWidth)
-	                                          .build();
 	    
 	    if (shapeNum > 0) {
 	        if (shapeNum <= shapeTable.shapes.size()) {
@@ -78,7 +79,7 @@ public class ExtractCommand implements Callable<Void> {
 	    return null;
 	}
 	
-	private void validateArguments() throws IOException {
+	private ShapeExporter validateAndParseArguments() throws IOException {
         if (stdoutFlag && filename != null) {
             throw new IOException("Please choose one of stdout or output file");
         }
@@ -98,5 +99,31 @@ public class ExtractCommand implements Callable<Void> {
         default:
             throw new IOException("Please select a valid border strategy");
         }
+        
+        ShapeExporter exporter = null;
+        switch (outputFormat) {
+        case "text":
+            exporter = ShapeExporter.text()
+                                    .borderStrategy(borderStrategy)
+                                    .maxWidth(width == -1 ? 80 : width)
+                                    .skipEmptyShapes(skipEmptyShapesFlag)
+                                    .build();
+            break;
+        case "png":
+        case "jpeg":
+        case "gif":
+        case "bmp":
+        case "wbmp":
+            exporter = ShapeExporter.image()
+                                    .border(borderStrategy != BorderStrategy.NONE)
+                                    .maxWidth(width == -1 ? 1024 : width)
+                                    .imageFormat(outputFormat)
+                                    .skipEmptyShapes(skipEmptyShapesFlag)
+                                    .build();
+            break;
+        default:
+            throw new IOException("Please select a valid output format");
+        }
+        return exporter;
 	}
 }

@@ -47,6 +47,11 @@ public class VectorShape implements Shape {
 		this.vectors.add(vectorCommand);
 		return this;
 	}
+	
+	@Override
+	public boolean isEmpty() {
+	    return vectors.isEmpty();
+	}
 
 	@Override
 	public BitmapShape toBitmap() {

@@ -67,6 +67,17 @@ public class BitmapShape implements Shape {
         }
         return grid.get(y).get(x);
     }
+    
+    @Override
+    public boolean isEmpty() {
+        boolean isEmpty = false;
+        for (List<Boolean> row : grid) {
+            for (Boolean plot : row) {
+                isEmpty |= plot;
+            }
+        }
+        return isEmpty;
+    }
 
     @Override
     public BitmapShape toBitmap() {
