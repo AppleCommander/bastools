@@ -113,11 +113,15 @@ public class TextShapeExporter implements ShapeExporter {
     private void drawRowLine(PrintWriter pw, BitmapShape bshape, int width, int y) {
         List<Boolean> row = bshape.grid.size() > y ? bshape.grid.get(y) : new ArrayList<>();
         for (int x=0; x<width; x++) {
-            Boolean plot = row.size() > x ? row.get(x) : Boolean.FALSE;
-            if (bshape.origin.x == x && bshape.origin.y == y) {
-                pw.printf("%c", plot ? '*' : '+');
+            if (row.size() > x) {
+                Boolean plot = row.get(x);
+                if (bshape.origin.x == x && bshape.origin.y == y) {
+                    pw.printf("%c", plot ? '*' : '+');
+                } else {
+                    pw.printf("%c", plot ? 'X' : '.');
+                }
             } else {
-                pw.printf("%c", plot ? 'X' : '.');
+                pw.print(" ");
             }
         }
     }
