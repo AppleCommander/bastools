@@ -2,8 +2,11 @@ package io.github.applecommander.bastools.api.shapes;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 
 public class VectorShape implements Shape {
     public static VectorShape from(ByteBuffer buf) {
@@ -46,6 +49,52 @@ public class VectorShape implements Shape {
 	private VectorShape add(VectorCommand vectorCommand) {
 		this.vectors.add(vectorCommand);
 		return this;
+	}
+	
+	public void appendShortCommands(String line) {
+	    for (char cmd : line.trim().toCharArray()) {
+	        switch (cmd) {
+	        case 'u': moveUp();    break;
+	        case 'd': moveDown();  break;
+	        case 'l': moveLeft();  break;
+	        case 'r': moveRight(); break;
+            case 'U': plotUp();    break;
+            case 'D': plotDown();  break;
+            case 'L': plotLeft();  break;
+            case 'R': plotRight(); break;
+            default:
+                if (Character.isWhitespace(cmd)) {
+                    // whitespace is allowed
+                    continue;
+                }
+                throw new RuntimeException("Unknown command: " + cmd);
+	        }
+	    }
+	}
+	
+	public void appendLongCommands(String line) {
+	    Queue<String> tokens = new LinkedList<>(Arrays.asList(line.split("\\s+")));
+	    while (!tokens.isEmpty()) {
+	        String command = tokens.remove();
+	        int count = 1;
+	        String checkNumber = tokens.peek();
+	        if (checkNumber != null && checkNumber.matches("\\d+")) count = Integer.parseInt(tokens.remove());
+	        
+	        for (int i=0; i<count; i++) {
+	            switch (command.toLowerCase()) {
+	            case "moveup":    moveUp();    break;
+	            case "movedown":  moveDown();  break;
+	            case "moveleft":  moveLeft();  break;
+	            case "moveright": moveRight(); break;
+	            case "plotup":    plotUp();    break;
+	            case "plotdown":  plotDown();  break;
+	            case "plotleft":  plotLeft();  break;
+	            case "plotright": plotRight(); break;
+	            default:
+	                throw new RuntimeException("Unknown command: " + command);
+	            }
+	        }
+	    }
 	}
 	
 	@Override

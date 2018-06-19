@@ -44,6 +44,35 @@ public class BitmapShape implements Shape {
         grid.add(newRow(getWidth()));
     }
     
+    public void appendBitmapRow(String line) {
+        line = line.trim();
+        List<Boolean> row = new ArrayList<>();
+        Runnable setOrigin = () -> {
+                // Share origin logic for '+' and '*'
+                origin.x = row.size();
+                origin.y = grid.size();
+            };
+        for (char pixel : line.toCharArray()) {
+            switch (pixel) {
+            case '+':
+                setOrigin.run();
+                // fall through to '.'
+            case '.':
+                row.add(Boolean.FALSE);
+                break;
+            case '*':
+                setOrigin.run();
+                // fall through to 'x'
+            case 'x':
+                row.add(Boolean.TRUE);
+                break;
+            default:
+                throw new RuntimeException("Unexpected bitmap pixel type: " + pixel);
+            }
+        }
+        grid.add(row);
+    }
+    
     public int getHeight() {
         return grid.size(); 
     }
