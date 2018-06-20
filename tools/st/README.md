@@ -2,7 +2,7 @@
 
 `st` is a command-line tool to investigate and (ultimately) author shape tables for inclusion in Applesoft programs.
 
-Samples are extracted from the [original Mouse Maze](https://github.com/a2geek/mouse-maze-2001/tree/master/doc/original), written in 1983.  
+Samples are extracted from the [original Mouse Maze](https://github.com/a2geek/mouse-maze-2001/tree/master/doc/original), written in 1983.
 
 ## Usage
 
@@ -13,13 +13,45 @@ Usage: st [-hV] [--debug] [COMMAND]
 Shape Tools utility
 
 Options:
-      --debug     Dump full stack trackes if an error occurs
+      --debug     Dump full stack traces if an error occurs
   -h, --help      Show this help message and exit.
   -V, --version   Print version information and exit.
 
 Commands:
-  extract  Extract shapes from shape table
-  help     Displays help information about the specified command
+  extract   Extract shapes from shape table
+  generate  Generate a shape table from source code
+  help      Displays help information about the specified command
+```
+
+## Sub-command help
+
+```shell
+$ st extract --help
+Usage: st extract [-h] [--skip-empty] [--stdin] [--stdout]
+                  [--border=<borderStyle>] [--format=<outputFormat>]
+                  [--shape=<shapeNum>] [-o=<outputFile>] [-w=<width>]
+                  [<inputFile>]
+
+Extract shapes from shape table
+
+Parameters:
+      [<inputFile>]        File to process
+
+Options:
+      --border=<borderStyle>
+                           Set border style (none, simple, box)
+                             Default: simple
+      --format=<outputFormat>
+                           Select output format (text, png, gif, jpeg, bmp, wbmp)
+                             Default: text
+      --shape=<shapeNum>   Extract specific shape
+      --skip-empty         Skip empty shapes
+      --stdin              Read from stdin
+      --stdout             Write to stdout
+  -h, --help               Show help for subcommand
+  -o, --output=<outputFile>
+                           Write output to file
+  -w, --width=<width>      Set width (defaults: text=80, image=1024)
 ```
 
 ## Text extract
@@ -77,3 +109,16 @@ $ st --debug extract --shape 3 --output robot.png --format png --border box ~/Do
 $ st --debug extract --output=new-mouse-shapes.png --border=box --skip-empty --format=png ~/Downloads/shapes/NEW\ MOUSE
 ```
 ![All shapes](images/new-mouse-shapes.png "All shapes") 
+
+## Shape generation
+
+```shell
+$ st generate --stdout api/src/test/resources/box-longform.st | st extract --stdin --stdout
++-----+
+|.XXX.|
+|X...X|
+|X.+.X|
+|X...X|
+|.XXX.|
++-----+
+```
