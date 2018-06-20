@@ -1,14 +1,36 @@
 package io.github.applecommander.bastools.tools.st;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
+
+import com.webcodepro.applecommander.storage.DiskException;
+import com.webcodepro.applecommander.storage.FileEntry;
+import com.webcodepro.applecommander.storage.FormattedDisk;
+import com.webcodepro.applecommander.storage.os.prodos.ProdosFormatDisk;
+import com.webcodepro.applecommander.storage.physical.ByteArrayImageLayout;
+import com.webcodepro.applecommander.storage.physical.ImageOrder;
+import com.webcodepro.applecommander.storage.physical.ProdosOrder;
 
 import io.github.applecommander.applesingle.AppleSingle;
+import io.github.applecommander.applesingle.Utilities;
+import io.github.applecommander.bastools.api.Configuration;
+import io.github.applecommander.bastools.api.Parser;
+import io.github.applecommander.bastools.api.TokenReader;
+import io.github.applecommander.bastools.api.Visitors;
+import io.github.applecommander.bastools.api.model.Program;
+import io.github.applecommander.bastools.api.model.Token;
+import io.github.applecommander.bastools.api.shapes.BitmapShape;
+import io.github.applecommander.bastools.api.shapes.Shape;
 import io.github.applecommander.bastools.api.shapes.ShapeGenerator;
 import io.github.applecommander.bastools.api.shapes.ShapeTable;
 import picocli.CommandLine.Command;
@@ -40,6 +62,9 @@ public class GenerateCommand implements Callable<Void> {
 	
 	@Option(names = "--name", description = "Filename assign in AppleSingle file", showDefaultValue = Visibility.ALWAYS)
 	private String realName = "SHAPES.BIN";
+	
+	@Option(names = "--demo-code", description = "Generate a ProDOS .po image with Applesoft BASIC code demoing the shape table")
+	private boolean demoCodeFlag;
 
 	@Option(names = { "-o", "--output" }, description = "Write output to file")
 	private Path outputFile;
@@ -48,7 +73,7 @@ public class GenerateCommand implements Callable<Void> {
 	private Path inputFile;
 	
 	@Override
-	public Void call() throws IOException {
+	public Void call() throws IOException, DiskException {
 	    validateArguments();
 	    
 	    ShapeTable st = stdinFlag ? ShapeGenerator.generate(System.in) : ShapeGenerator.generate(inputFile);
@@ -56,7 +81,10 @@ public class GenerateCommand implements Callable<Void> {
 	    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 	    st.write(byteStream);
 
-	    if (applesingleFlag) {
+	    if (demoCodeFlag) {
+	        byteStream.reset();
+	        byteStream.write(generateDemoCode(st));
+	    } else if (applesingleFlag) {
 	        AppleSingle applesingle = AppleSingle.builder()
             	                                 .realName(realName)
             	                                 .dataFork(byteStream.toByteArray())
@@ -85,10 +113,68 @@ public class GenerateCommand implements Callable<Void> {
         if ((stdinFlag && inputFile != null) || (!stdinFlag && inputFile == null)) {
             throw new IOException("Please select ONE of stdin or file");
         }
+        
+        if (demoCodeFlag && applesingleFlag) {
+            System.err.println("Warning: Demo code and AppleSingle exclusive, ignoring AppleSingle request.");
+            applesingleFlag = false;
+        }
 
         // Assign defaults
         if (!stdoutFlag && outputFile == null) {
             outputFile = Paths.get("shape.out");
         }
+	}
+	
+	private byte[] generateDemoCode(ShapeTable shapeTable) throws IOException, DiskException {
+	    // Get shape metadata
+        List<BitmapShape> blist = shapeTable.shapes.stream()
+                                                   .map(Shape::toBitmap)
+                                                   .collect(Collectors.toList());
+        int width = blist.stream().mapToInt(BitmapShape::getWidth).max().getAsInt();
+        int height = blist.stream().mapToInt(BitmapShape::getHeight).max().getAsInt();
+        
+        // Insert variables into program code
+        String demoProgram = new String(Utilities.toByteArray(getClass().getResourceAsStream("/demo-template.bas")))
+                .replace("$SOURCE$", stdinFlag ? "STDIN" : inputFile.toFile().getName().toUpperCase())
+                .replace("$COUNT$", Integer.toString(shapeTable.shapes.size()))
+                .replace("$WIDTH$", Integer.toString(width))
+                .replace("$HEIGHT$", Integer.toString(height));
+
+        // Generate Applesoft program data
+        ByteArrayInputStream sourceStream = new ByteArrayInputStream(demoProgram.getBytes());
+        Configuration config = Configuration.builder().sourceFile(new File("FAKEFILE")).build();
+        Queue<Token> tokens = TokenReader.tokenize(sourceStream);
+        Parser parser = new Parser(tokens);
+        Program program = parser.parse();
+        byte[] programBytes = Visitors.byteVisitor(config).dump(program);
+        
+        // Generate Shape table binary data
+        ByteArrayOutputStream shapeTableStream = new ByteArrayOutputStream();
+        shapeTable.write(shapeTableStream);
+        byte[] shapeTableBytes = shapeTableStream.toByteArray();
+        
+        // Copy template into AppleCommander. Note that there doesn't appear to be a load from stream capability.
+        byte[] templateBytes = Utilities.toByteArray(getClass().getResourceAsStream("/template.po"));
+        ByteArrayImageLayout layout = new ByteArrayImageLayout(templateBytes.length);
+        ImageOrder imageOrder = new ProdosOrder(layout);
+        FormattedDisk[] disks = ProdosFormatDisk.create("DELETEME", "GONESOON", imageOrder);
+        FormattedDisk template = disks[0];
+        template.getDiskImageManager().setDiskImage(templateBytes);
+        
+        // Copy in BASIC code.
+        FileEntry basicFile = template.createFile();
+        basicFile.setFilename("SHAPE.DEMO");
+        basicFile.setFiletype("BAS");
+        basicFile.setAddress(config.startAddress);
+        basicFile.setFileData(programBytes);
+        
+        // Copy in shape table.
+        FileEntry shapeFile = template.createFile();
+        shapeFile.setFilename("SHAPES.BIN");
+        shapeFile.setFiletype("BIN");
+        shapeFile.setAddress(0x6000);
+        shapeFile.setFileData(shapeTableBytes);
+        
+        return template.getDiskImageManager().getDiskImage();
 	}
 }

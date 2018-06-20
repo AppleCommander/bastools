@@ -14,11 +14,11 @@ gradle-app.setting
 bin/
 
 # Misc. Apple II remnants
-*.bin
-*.dsk
-*.po
-*.do
-*.bas
+/*.bin
+/*.dsk
+/*.po
+/*.do
+/*.bas
 
 # Gradle extras
 .gradle/
