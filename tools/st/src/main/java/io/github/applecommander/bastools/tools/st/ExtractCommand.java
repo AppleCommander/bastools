@@ -28,8 +28,8 @@ public class ExtractCommand implements Callable<Void> {
 	@Option(names = "--stdout", description = "Write to stdout")
 	private boolean stdoutFlag;
 
-	@Option(names = { "-o", "--output" }, description = "Write to filename")
-	private String filename;
+	@Option(names = { "-o", "--output" }, description = "Write output to file")
+	private Path outputFile;
 	
     @Option(names = "--border", description = "Set border style (none, simple, box)", showDefaultValue = Visibility.ALWAYS)
     private String borderStyle = "simple";
@@ -47,7 +47,7 @@ public class ExtractCommand implements Callable<Void> {
     private int shapeNum = 0;
 	
 	@Parameters(arity = "0..1", description = "File to process")
-	private Path file;
+	private Path inputFile;
 
 	private BorderStrategy borderStrategy;
 	
@@ -55,7 +55,7 @@ public class ExtractCommand implements Callable<Void> {
 	public Void call() throws IOException {
 	    ShapeExporter exporter = validateAndParseArguments();
 	    
-	    ShapeTable shapeTable = stdinFlag ? ShapeTable.read(System.in) : ShapeTable.read(file);
+	    ShapeTable shapeTable = stdinFlag ? ShapeTable.read(System.in) : ShapeTable.read(inputFile);
 	    
 	    if (shapeNum > 0) {
 	        if (shapeNum <= shapeTable.shapes.size()) {
@@ -63,7 +63,7 @@ public class ExtractCommand implements Callable<Void> {
 	            if (stdoutFlag) {
                     exporter.export(shape, System.out);
 	            } else {
-                    exporter.export(shape, Paths.get(filename));
+                    exporter.export(shape, outputFile);
 	            }
 	        } else {
 	            throw new IOException("Invalid shape number");
@@ -72,7 +72,7 @@ public class ExtractCommand implements Callable<Void> {
             if (stdoutFlag) {
                 exporter.export(shapeTable, System.out);
             } else {
-                exporter.export(shapeTable, Paths.get(filename));
+                exporter.export(shapeTable, outputFile);
             }
         }
 	    
@@ -80,12 +80,18 @@ public class ExtractCommand implements Callable<Void> {
 	}
 	
 	private ShapeExporter validateAndParseArguments() throws IOException {
-        if (stdoutFlag && filename != null) {
+        if (stdoutFlag && outputFile != null) {
             throw new IOException("Please choose one of stdout or output file");
         }
-        if ((stdinFlag && file != null) || (!stdinFlag && file == null)) {
+        if ((stdinFlag && inputFile != null) || (!stdinFlag && inputFile == null)) {
             throw new IOException("Please select ONE of stdin or file");
         }
+        
+        // Assign defaults
+        if (!stdoutFlag && outputFile == null) {
+            outputFile = Paths.get("shapes.txt");
+        }
+        
         switch (borderStyle) {
         case "box":
             this.borderStrategy = BorderStrategy.BOX_DRAWING;
