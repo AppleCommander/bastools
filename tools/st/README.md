@@ -1,10 +1,10 @@
-## Overview
+# Overview
 
 `st` is a command-line tool to investigate and (ultimately) author shape tables for inclusion in Applesoft programs.
 
 Samples are extracted from the [original Mouse Maze](https://github.com/a2geek/mouse-maze-2001/tree/master/doc/original), written in 1983.
 
-## Usage
+# Usage
 
 ```shell
 $ st --help
@@ -53,6 +53,8 @@ Options:
                            Write output to file
   -w, --width=<width>      Set width (defaults: text=80, image=1024)
 ```
+
+# Features
 
 ## Text extract
 
@@ -121,4 +123,22 @@ $ st generate --stdout api/src/test/resources/box-longform.st | st extract --std
 |X...X|
 |.XXX.|
 +-----+
+```
+
+## Generate to AppleSingle
+
+```shell
+$ cat api/src/test/resources/box-longform.st | st generate --stdin --stdout --single | asu info --stdin
+Real Name: SHAPES.BIN
+ProDOS info:
+  Access: 0xC3
+  File Type: 0x06
+  Auxtype: 0x6000
+File dates info:
+  Creation: 2018-06-20T01:36:59Z
+  Modification: 2018-06-20T01:36:59Z
+  Access: 2018-06-20T01:36:59Z
+  Backup: 2018-06-20T01:36:59Z
+Data Fork: Present, 14 bytes
+Resource Fork: Not present
 ```

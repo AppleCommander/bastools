@@ -1,13 +1,18 @@
 package io.github.applecommander.bastools.tools.st;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
+import io.github.applecommander.applesingle.AppleSingle;
 import io.github.applecommander.bastools.api.shapes.ShapeGenerator;
 import io.github.applecommander.bastools.api.shapes.ShapeTable;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
@@ -16,6 +21,8 @@ import picocli.CommandLine.Parameters;
 		descriptionHeading = "%n",
 		optionListHeading = "%nOptions:%n")
 public class GenerateCommand implements Callable<Void> {
+    public static final int BIN = 0x06;
+
 	@Option(names = { "-h", "--help" }, description = "Show help for subcommand", usageHelp = true)
 	private boolean helpFlag;
 
@@ -24,23 +31,48 @@ public class GenerateCommand implements Callable<Void> {
 
 	@Option(names = "--stdout", description = "Write to stdout")
 	private boolean stdoutFlag;
+	
+	@Option(names = "--single", description = "Write to AppleSingle file (requires address, defaults to 0x6000)")
+	private boolean applesingleFlag;
+	
+	@Option(names = "--address", description = "Address for AppleSingle file", showDefaultValue = Visibility.ALWAYS)
+	private int address = 0x6000;
+	
+	@Option(names = "--name", description = "Filename assign in AppleSingle file", showDefaultValue = Visibility.ALWAYS)
+	private String realName = "SHAPES.BIN";
 
 	@Option(names = { "-o", "--output" }, description = "Write output to file")
 	private Path outputFile;
 	
 	@Parameters(arity = "0..1", description = "File to process")
 	private Path inputFile;
-
+	
 	@Override
 	public Void call() throws IOException {
 	    validateArguments();
 	    
-	    ShapeTable st = stdinFlag ? ShapeGenerator.generate(System.in) : ShapeGenerator.generate(inputFile); 
+	    ShapeTable st = stdinFlag ? ShapeGenerator.generate(System.in) : ShapeGenerator.generate(inputFile);
 	    
+	    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+	    st.write(byteStream);
+
+	    if (applesingleFlag) {
+	        AppleSingle applesingle = AppleSingle.builder()
+            	                                 .realName(realName)
+            	                                 .dataFork(byteStream.toByteArray())
+            	                                 .auxType(address)
+            	                                 .fileType(BIN)
+            	                                 .build();
+	        byteStream.reset();
+	        applesingle.save(byteStream);
+	    }
+
 	    if (stdoutFlag) {
-	        st.write(System.out);
+	        System.out.write(byteStream.toByteArray());
 	    } else {
-	        st.write(outputFile);
+	        try (OutputStream outputStream = Files.newOutputStream(outputFile)) {
+	            outputStream.write(byteStream.toByteArray());
+	        }
 	    }
 	    
 	    return null;
