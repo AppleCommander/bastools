@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import io.github.applecommander.bastools.api.utils.Streams;
 
@@ -59,16 +60,32 @@ public class ShapeTable {
 
     public void write(OutputStream outputStream) throws IOException {
         Objects.requireNonNull(outputStream);
-        // TODO
+        // Header
+        outputStream.write(shapes.size());
+        outputStream.write(0);
+        // Collect each shape
+        List<byte[]> data = this.shapes.stream()
+                                       .map(Shape::toVector)
+                                       .map(VectorShape::toBytes)
+                                       .collect(Collectors.toList());
+        // Build offset table
+        int offset = 2 + 2*data.size();
+        for (byte[] d : data) {
+            outputStream.write(offset & 0xff);
+            outputStream.write(offset >> 8);
+            offset += d.length;
+        }
+        // Write shape data
+        for (byte[] d : data) {
+            outputStream.write(d);
+        }
     }
-
     public void write(File file) throws IOException {
         Objects.requireNonNull(file);
         try (OutputStream outputStream = new FileOutputStream(file)) {
             write(file);
         }
     }
-
     public void write(Path path) throws IOException {
         Objects.requireNonNull(path);
         write(path.toFile());

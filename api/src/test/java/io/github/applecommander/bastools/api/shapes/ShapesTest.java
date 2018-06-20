@@ -1,6 +1,7 @@
 package io.github.applecommander.bastools.api.shapes;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -10,15 +11,40 @@ import org.junit.Test;
 
 public class ShapesTest {
     /** 
-     * This shape is taken from the Applesoft BASIC Programmer's Reference Manual (1987), p146.
+     * This shape data is taken from the Applesoft BASIC Programmer's Reference Manual (1987), p146.
      */
+    public static final byte[] BOX_SAMPLE = { 0x01, 0x00, 0x04, 0x00, 0x12, 0x3F, 0x20, 0x64, 0x2d, 0x15, 0x36, 0x1e, 0x07, 0x00 };
+    /** 
+     * These shape vectors are taken from the Applesoft BASIC Programmer's Reference Manual (1987), p146.
+     */
+    public static VectorShape drawStandardBoxShape() {
+        return new VectorShape()
+                .moveDown().moveDown()
+                .plotLeft().plotLeft()
+                .moveUp().plotUp().plotUp().plotUp()
+                .moveRight().plotRight().plotRight().plotRight()
+                .moveDown().plotDown().plotDown().plotDown()
+                .moveLeft().plotLeft();
+
+    }
+
     public ShapeTable readStandardShapeTable() {
-        final byte[] sample = { 0x01, 0x00, 0x04, 0x00, 0x12, 0x3F, 0x20, 0x64, 0x2d, 0x15, 0x36, 0x1e, 0x07, 0x00 };
-        ShapeTable st = ShapeTable.read(sample);
+        ShapeTable st = ShapeTable.read(BOX_SAMPLE);
         assertNotNull(st);
         assertNotNull(st.shapes);
         assertEquals(1, st.shapes.size());
         return st;
+    }
+    
+    @Test
+    public void testWriteStandardShapeTable() throws IOException {
+        ShapeTable st = new ShapeTable();
+        st.shapes.add(drawStandardBoxShape());
+        
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        st.write(outputStream);
+        
+        assertArrayEquals(BOX_SAMPLE, outputStream.toByteArray());
     }
     
     @Test

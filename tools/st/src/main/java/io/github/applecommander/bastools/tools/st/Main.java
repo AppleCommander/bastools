@@ -17,12 +17,13 @@ import picocli.CommandLine.Option;
     description = "Shape Tools utility", 
     subcommands = {
             ExtractCommand.class,
+            GenerateCommand.class,
             HelpCommand.class, 
             })
 public class Main implements Runnable {
-    @Option(names = "--debug", description = "Dump full stack trackes if an error occurs")
+    @Option(names = "--debug", description = "Dump full stack traces if an error occurs")
     private static boolean debugFlag;
-
+    
     public static void main(String[] args) {
         try {
             CommandLine.run(new Main(), args);

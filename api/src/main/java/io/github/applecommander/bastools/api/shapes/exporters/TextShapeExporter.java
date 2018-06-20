@@ -52,7 +52,7 @@ public class TextShapeExporter implements ShapeExporter {
         int width = blist.stream().mapToInt(BitmapShape::getWidth).max().getAsInt();
         int height = blist.stream().mapToInt(BitmapShape::getHeight).max().getAsInt();
 
-        int columns = Math.max(1, this.maxWidth / width);
+        int columns = Math.min(Math.max(1, this.maxWidth / width), blist.size());
         
         PrintWriter pw = new PrintWriter(outputStream);
         drawTopLine(pw, columns, width);

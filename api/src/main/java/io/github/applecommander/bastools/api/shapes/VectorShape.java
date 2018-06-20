@@ -1,11 +1,13 @@
 package io.github.applecommander.bastools.api.shapes;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 
 public class VectorShape implements Shape {
@@ -95,6 +97,45 @@ public class VectorShape implements Shape {
 	            }
 	        }
 	    }
+	}
+	
+	public byte[] toBytes() {
+	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	    LinkedList<VectorCommand> work = new LinkedList<>(vectors);
+	    while (!work.isEmpty()) {
+            int section1 = work.remove().ordinal();
+	        VectorCommand vector2 = work.poll();
+            int section2 = Optional.ofNullable(vector2).map(VectorCommand::ordinal).orElse(0);
+            VectorCommand vector3 = work.poll();
+            if (vector3 != null && vector3.plot) {
+                work.add(0, vector3);
+                vector3 = null;
+            }
+            int section3 = Optional.ofNullable(vector3).map(VectorCommand::ordinal).orElse(0);
+            if ((section1 + section2 + section3) == 0) {
+                // Cannot write a 0 byte except at end
+                if (vector2 == null) {
+                    section2 = VectorCommand.MOVE_LEFT.ordinal();
+                } else if (vector3 == null) {
+                    section3 = VectorCommand.MOVE_LEFT.ordinal();
+                } else {
+                    section3 = VectorCommand.MOVE_LEFT.ordinal();
+                    if (!work.isEmpty()) {
+                        work.add(0, VectorCommand.MOVE_RIGHT);
+                    }
+                }
+            } else if (vector3 == VectorCommand.MOVE_UP) {
+                // section 3 cannot be 0
+                work.add(0, vector3);
+                if (vector2 == VectorCommand.MOVE_UP) {
+                    // section 2 and 3 cannot be 0
+                    work.add(0, vector2);
+                }
+            }
+            outputStream.write(section3 << 6 | section2 << 3 | section1);
+	    }
+	    outputStream.write(0);
+	    return outputStream.toByteArray();
 	}
 	
 	@Override
