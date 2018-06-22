@@ -29,4 +29,14 @@ public enum VectorCommand {
 			this.ymove = (this.ordinal() & 0b011) - 1;
 		}
 	}
+	
+	public VectorCommand opposite() {
+	    int newDirection = this.ordinal() ^ 0b010;
+	    return VectorCommand.values()[newDirection];
+	}
+
+	public char shortCommand() {
+        char shortCommand = "urdl".charAt(this.ordinal() & 0b011);
+        return plot ? Character.toUpperCase(shortCommand) : shortCommand;
+	}
 }

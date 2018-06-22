@@ -17,7 +17,7 @@ public class ShapesTest {
     /** 
      * These shape vectors are taken from the Applesoft BASIC Programmer's Reference Manual (1987), p146.
      */
-    public static VectorShape drawStandardBoxShape() {
+    public VectorShape drawStandardBoxShape() {
         return new VectorShape()
                 .moveDown().moveDown()
                 .plotLeft().plotLeft()
@@ -26,6 +26,17 @@ public class ShapesTest {
                 .moveDown().plotDown().plotDown().plotDown()
                 .moveLeft().plotLeft();
 
+    }
+    public BitmapShape plotStandardBoxShape() {
+        BitmapShape boxShape = new BitmapShape(5, 5);
+        for (int i=1; i<=3; i++) {
+            boxShape.plot(i, 0);
+            boxShape.plot(i, 4);
+            boxShape.plot(0, i);
+            boxShape.plot(4, i);
+        }
+        boxShape.origin.setLocation(2, 2);
+        return boxShape;
     }
 
     public ShapeTable readStandardShapeTable() {
@@ -68,16 +79,33 @@ public class ShapesTest {
     public void testStandardShapeTableBitmap() {
         ShapeTable st = readStandardShapeTable();
         
-        BitmapShape expected = new BitmapShape(5, 5);
-        for (int i=1; i<=3; i++) {
-            expected.plot(i, 0);
-            expected.plot(i, 4);
-            expected.plot(0, i);
-            expected.plot(4, i);
-        }
+        BitmapShape expected = plotStandardBoxShape();
         
         Shape s = st.shapes.get(0);
         assertEquals(expected.grid, s.toBitmap().grid);
+    }
+    
+    @Test
+    public void testToVectorFromBitmap() throws IOException {
+        BitmapShape bitmapShape = plotStandardBoxShape();
+        
+        VectorShape vectorShape = bitmapShape.toVector();
+        BitmapShape newBitmapShape = vectorShape.toBitmap();
+    
+        ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
+        System.out.println("Original/expected:");
+        exp.export(bitmapShape, System.out);
+        System.out.println("Transformed/actual:");
+        exp.export(newBitmapShape, System.out);
+        System.out.println("Transformed vectors:");
+        System.out.println(vectorShape.vectors);
+        System.out.println(vectorShape.vectors.size());
+        System.out.println("Optimized vectors:");
+        System.out.println(vectorShape.optimize().vectors);
+        System.out.println(vectorShape.optimize().vectors.size());
+        exp.export(vectorShape.optimize().toBitmap(), System.out);
+
+        assertEquals(bitmapShape.grid, newBitmapShape.grid);
     }
     
     @Test

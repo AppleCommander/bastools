@@ -29,4 +29,16 @@ public class VectorCommandTest {
             assertEquals(plot, command.plot);
         }
     }
+    
+    @Test
+    public void testOpposite() {
+        test(VectorCommand.MOVE_DOWN, VectorCommand.MOVE_UP);
+        test(VectorCommand.MOVE_LEFT, VectorCommand.MOVE_RIGHT);
+        test(VectorCommand.PLOT_DOWN, VectorCommand.PLOT_UP);
+        test(VectorCommand.PLOT_LEFT, VectorCommand.PLOT_RIGHT);
+    }
+    public void test(VectorCommand a, VectorCommand b) {
+        assertEquals(a, b.opposite());
+        assertEquals(b, a.opposite());
+    }
 }

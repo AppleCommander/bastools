@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class VectorShape implements Shape {
     public static VectorShape from(ByteBuffer buf) {
@@ -51,6 +54,76 @@ public class VectorShape implements Shape {
 	private VectorShape add(VectorCommand vectorCommand) {
 		this.vectors.add(vectorCommand);
 		return this;
+	}
+	
+	/** 
+	 * Optimize the vectors by removing useless vectors or replacing a series with a shorter series.
+	 * At this point, everything is based off of a regex with a potential modification. 
+	 */
+	public VectorShape optimize() {
+	    String commands = toShortCommands();
+	    Function<String,String> opts =
+	            // Unused moves (left followed by a right with no plotting in between, for instance).
+	            VectorRegexOptimization.of("l([ud]*)r")
+	            .andThen(VectorRegexOptimization.of("r([ud]*)l"))
+                .andThen(VectorRegexOptimization.of("u([rl]*)d"))
+                .andThen(VectorRegexOptimization.of("d([rl]*)u"))
+                // These are plot/move combinations, such as LEFT>up>right that can be replaced by just UP.
+                .andThen(VectorRegexOptimization.of("L([ud])r", String::toUpperCase))
+                .andThen(VectorRegexOptimization.of("R([ud])l", String::toUpperCase))
+                .andThen(VectorRegexOptimization.of("U([rl])d", String::toUpperCase))
+                .andThen(VectorRegexOptimization.of("D([rl])u", String::toUpperCase))
+                // Base assumption is that any tail moves can be removed as they don't lead to a plot.
+                .andThen(VectorRegexOptimization.of("()[udlr]+$"));
+	    
+	    String oldCommands = null;
+	    do {
+	        oldCommands = commands;
+	        commands = opts.apply(commands);
+	    } while (!oldCommands.equals(commands));
+	    
+	    VectorShape newShape = new VectorShape();
+	    newShape.appendShortCommands(commands);
+	    return newShape;
+	}
+	
+	/** 
+	 * A vector optimization based on regex.  Transformation is optional to (for instance) change a {@code move} 
+	 * to a {@code plot} command.  Note that the regex requires a matcher group; also be aware that an empty group
+	 * "{@code ()}" is a viable solution. 
+	 */
+	public static class VectorRegexOptimization implements Function<String,String> {
+	    public static Function<String,String> of(String regex, Function<String,String> transformation) {
+	        VectorRegexOptimization opt = new VectorRegexOptimization();
+	        opt.pattern = Pattern.compile(regex);
+	        opt.fn = transformation;
+	        return opt;
+	    }
+	    public static Function<String,String> of(String regex) {
+	        return of(regex, (s) -> s);
+	    }
+	    
+        private Pattern pattern;
+        private Function<String,String> fn;
+        
+	    private VectorRegexOptimization() { /* Prevent construction */ }
+	    
+	    @Override
+	    public String apply(String shortCommands) {
+            Matcher matcher = pattern.matcher(shortCommands);
+            StringBuffer sb = new StringBuffer();
+            while (matcher.find()) {
+                matcher.appendReplacement(sb, fn.apply(matcher.group(1)));
+            }
+            matcher.appendTail(sb);
+            return sb.toString();
+	    }
+	}
+	
+	public String toShortCommands() {
+	    StringBuilder sb = new StringBuilder();
+	    vectors.stream().map(VectorCommand::shortCommand).forEach(sb::append);
+	    return sb.toString();
 	}
 	
 	public void appendShortCommands(String line) {

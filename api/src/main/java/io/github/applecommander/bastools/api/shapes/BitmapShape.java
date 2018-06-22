@@ -96,6 +96,9 @@ public class BitmapShape implements Shape {
         }
         return grid.get(y).get(x);
     }
+    public Boolean get(Point point) {
+        return get(point.x, point.y);
+    }
     
     @Override
     public boolean isEmpty() {
@@ -115,7 +118,112 @@ public class BitmapShape implements Shape {
 
     @Override
     public VectorShape toVector() {
-        // TODO Auto-generated method stub
-        return null;
+        VectorShape vshape = new VectorShape();
+        int width = getWidth();
+        int height = getHeight();
+        Point pt = new Point(origin);
+        // Relocate to 0,0
+        while (pt.y > 0) {
+            vshape.moveUp();
+            pt.y -= 1;
+        }
+        while (pt.x > 0) {
+            vshape.moveLeft();
+            pt.x -= 1;
+        }
+        VectorMotion motion = new RightVectorMotion(pt, vshape);
+        while (pt.y >= 0 && pt.y < height) {
+            while (pt.x >= 0 && pt.x < width) {
+                if (get(pt)) {
+                    motion.plot();
+                } else {
+                    motion.move();
+                }
+            }
+            motion = motion.changeDirection();
+        }
+        return vshape;
+    }
+    
+//    public static class Whatever {
+//        private VectorCommand movement;
+//        private VectorCommand nextRow;
+//        private Point point;
+//        private BitmapShape bitmapShape;
+//        private VectorShape vectorShape;
+//        
+//        public Whatever(VectorCommand movement, VectorCommand nextRow, Point point, BitmapShape bitmapShape) {
+//            this.movement = movement;
+//            this.nextRow = nextRow;
+//            this.point = point;
+//            this.bitmapShape = bitmapShape;
+//            this.vectorShape = new VectorShape();
+//        }
+//        
+//        public VectorShape transform() {
+//            findStartPosition();
+//            while (hasMoreRows()) {
+//                scanRow();
+//            }
+//            return vectorShape;
+//        }
+//    }
+    
+    public interface VectorMotion {
+        public void move();
+        public void plot();
+        public VectorMotion changeDirection();
+    }
+    public static class RightVectorMotion implements VectorMotion {
+        private Point point;
+        private VectorShape vshape;
+        public RightVectorMotion(Point point, VectorShape vshape) {
+            this.point = point;
+            this.vshape = vshape;
+        }
+        @Override
+        public void move() {
+            point.x += 1;
+            vshape.moveRight();
+        }
+        @Override
+        public void plot() {
+            point.x += 1;
+            vshape.plotRight();
+        }
+        @Override
+        public VectorMotion changeDirection() {
+            point.x -= 1;
+            point.y += 1;
+            vshape.moveDown();
+            vshape.moveLeft();
+            return new LeftVectorMotion(point, vshape);
+        }
+    }
+    public static class LeftVectorMotion implements VectorMotion {
+        private Point point;
+        private VectorShape vshape;
+        public LeftVectorMotion(Point point, VectorShape vshape) {
+            this.point = point;
+            this.vshape = vshape;
+        }
+        @Override
+        public void move() {
+            point.x -= 1;
+            vshape.moveLeft();
+        }
+        @Override
+        public void plot() {
+            point.x -= 1;
+            vshape.plotLeft();
+        }
+        @Override
+        public VectorMotion changeDirection() {
+            point.x += 1;
+            point.y += 1;
+            vshape.moveDown();
+            vshape.moveRight();
+            return new RightVectorMotion(point, vshape);
+        }
     }
 }
