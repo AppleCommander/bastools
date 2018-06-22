@@ -122,29 +122,31 @@ public class VectorShape implements Shape {
 	
 	public String toShortCommands() {
 	    StringBuilder sb = new StringBuilder();
-	    vectors.stream().map(VectorCommand::shortCommand).forEach(sb::append);
+	    vectors.stream().map(v -> v.shortCommand).forEach(sb::append);
 	    return sb.toString();
 	}
 	
 	public void appendShortCommands(String line) {
 	    for (char cmd : line.trim().toCharArray()) {
-	        switch (cmd) {
-	        case 'u': moveUp();    break;
-	        case 'd': moveDown();  break;
-	        case 'l': moveLeft();  break;
-	        case 'r': moveRight(); break;
-            case 'U': plotUp();    break;
-            case 'D': plotDown();  break;
-            case 'L': plotLeft();  break;
-            case 'R': plotRight(); break;
-            default:
-                if (Character.isWhitespace(cmd)) {
-                    // whitespace is allowed
-                    continue;
-                }
-                throw new RuntimeException("Unknown command: " + cmd);
-	        }
+	        appendShortCommand(cmd);
 	    }
+	}
+	public void appendShortCommand(char cmd) {
+        switch (cmd) {
+        case 'u': moveUp();    break;
+        case 'd': moveDown();  break;
+        case 'l': moveLeft();  break;
+        case 'r': moveRight(); break;
+        case 'U': plotUp();    break;
+        case 'D': plotDown();  break;
+        case 'L': plotLeft();  break;
+        case 'R': plotRight(); break;
+        default:
+            // whitespace is allowed
+            if (!Character.isWhitespace(cmd)) {
+                throw new RuntimeException("Unknown command: " + cmd);
+            }
+        }
 	}
 	
 	public void appendLongCommands(String line) {

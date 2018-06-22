@@ -14,6 +14,10 @@ public enum VectorCommand {
 	public final boolean plot;
 	public final int xmove;
 	public final int ymove;
+	
+	public final char shortCommand;
+	public final boolean vertical;
+	public final boolean horizontal;
 
 	private VectorCommand() {
 		this.plot = (this.ordinal() & 0b100) != 0;
@@ -28,15 +32,15 @@ public enum VectorCommand {
 			this.xmove = 0;
 			this.ymove = (this.ordinal() & 0b011) - 1;
 		}
+		this.vertical = xmove == 0;
+		this.horizontal = ymove == 0;
+		
+        char shortCommand = "urdl".charAt(this.ordinal() & 0b011);
+        this.shortCommand = plot ? Character.toUpperCase(shortCommand) : shortCommand;
 	}
 	
 	public VectorCommand opposite() {
 	    int newDirection = this.ordinal() ^ 0b010;
 	    return VectorCommand.values()[newDirection];
-	}
-
-	public char shortCommand() {
-        char shortCommand = "urdl".charAt(this.ordinal() & 0b011);
-        return plot ? Character.toUpperCase(shortCommand) : shortCommand;
 	}
 }
