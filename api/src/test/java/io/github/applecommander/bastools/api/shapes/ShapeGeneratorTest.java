@@ -42,12 +42,7 @@ public class ShapeGeneratorTest {
                               + "|.XXX.|\n"
                               + "+-----+\n";
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
-        exp.export(st.shapes.get(0), outputStream);
-        String actual = new String(outputStream.toByteArray());
-        
-        assertEquals(expected, actual);
+        assertShapeMatches(expected, st.shapes.get(0));
     }
     
     public void assertShapeBoxVectors(ShapeTable st) {
@@ -65,5 +60,42 @@ public class ShapeGeneratorTest {
         Shape s = st.shapes.get(0);
         assertNotNull(s);
         assertEquals(expected.vectors, s.toVector().vectors);
+    }
+    
+    @Test
+    public void testMouseShape() throws IOException {
+        final String mouse = "+--------------+\n" 
+                           + "|..........*X..|\n"  
+                           + "|....XXXX.XX...|\n"  
+                           + "|...XXXXXXXX...|\n"
+                           + "|.XXXXXXXXXXX..|\n"
+                           + "|XX.XXXXXXX.XX.|\n"
+                           + "|X...XXXXXXXXXX|\n"
+                           + "|XX............|\n"
+                           + "|.XXX.XX.......|\n"
+                           + "|...XXX........|\n"
+                           + "+--------------+\n";
+
+        ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/mouse-bitmap.st"));
+        assertNotNull(st);
+        assertEquals(1, st.shapes.size());
+
+        // Verify we read the shape correctly...
+        Shape shape = st.shapes.get(0);
+        assertNotNull(shape);
+        assertShapeMatches(mouse, shape);
+        
+        // Run vector transform to be certain we're ok
+        Shape vectorShape = shape.toVector();
+        assertNotNull(vectorShape);
+        assertShapeMatches(mouse, vectorShape);
+    }
+    
+    public void assertShapeMatches(final String expected, Shape shape) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
+        exp.export(shape, outputStream);
+        String actual = new String(outputStream.toByteArray());
+        assertEquals(expected, actual);
     }
 }

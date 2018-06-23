@@ -1,7 +1,7 @@
 package io.github.applecommander.bastools.api.shapes;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -91,19 +91,6 @@ public class ShapesTest {
         
         VectorShape vectorShape = bitmapShape.toVector();
         BitmapShape newBitmapShape = vectorShape.toBitmap();
-    
-        ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
-        System.out.println("Original/expected:");
-        exp.export(bitmapShape, System.out);
-        System.out.println("Transformed/actual:");
-        exp.export(newBitmapShape, System.out);
-        System.out.println("Transformed vectors:");
-        System.out.println(vectorShape.vectors);
-        System.out.println(vectorShape.vectors.size());
-        System.out.println("Optimized vectors:");
-        System.out.println(vectorShape.optimize().vectors);
-        System.out.println(vectorShape.optimize().vectors.size());
-        exp.export(vectorShape.optimize().toBitmap(), System.out);
 
         assertEquals(bitmapShape.grid, newBitmapShape.grid);
     }

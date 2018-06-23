@@ -34,7 +34,7 @@ public class BitmapShape implements Shape {
     }
     
     public void insertColumn() {
-        origin.y++;
+        origin.x++;
         for (List<Boolean> row : grid) {
             row.add(0, Boolean.FALSE);
         }
@@ -45,7 +45,7 @@ public class BitmapShape implements Shape {
         }
     }
     public void insertRow() {
-        origin.x++;
+        origin.y++;
         grid.add(0, newRow(getWidth()));
     }
     public void addRow() {
@@ -61,7 +61,7 @@ public class BitmapShape implements Shape {
                 origin.y = grid.size();
             };
         for (char pixel : line.toCharArray()) {
-            switch (pixel) {
+            switch (Character.toLowerCase(pixel)) {
             case '+':
                 setOrigin.run();
                 // fall through to '.'
@@ -138,7 +138,8 @@ public class BitmapShape implements Shape {
                 new SweepVectorization(this, VectorCommand.MOVE_DOWN, VectorCommand.MOVE_RIGHT),
                 new SweepVectorization(this, VectorCommand.MOVE_DOWN, VectorCommand.MOVE_LEFT),
                 new SweepVectorization(this, VectorCommand.MOVE_UP, VectorCommand.MOVE_RIGHT),
-                new SweepVectorization(this, VectorCommand.MOVE_UP, VectorCommand.MOVE_LEFT)
+                new SweepVectorization(this, VectorCommand.MOVE_UP, VectorCommand.MOVE_LEFT),
+                new EuclidianDistanceVectorization(this)
             );
         
         int byteLength = Integer.MAX_VALUE;
@@ -246,6 +247,97 @@ public class BitmapShape implements Shape {
                 return point.x >= width;
             default:
                 throw new RuntimeException("Unexpected vector: " + vector);
+            }
+        }
+    }
+
+    /**
+     * Encode a bitmap shape by using the Euclidean distance between plotted points to determine
+     * which vectors take precedence.  Most of the math is captured in the Point class, which makes
+     * this much more straight-forward.
+     */
+    public static class EuclidianDistanceVectorization implements Supplier<VectorShape> {
+        private List<Point> points;
+        private BitmapShape bitmapShape;
+        private VectorShape vshape;
+        
+        public EuclidianDistanceVectorization(BitmapShape bitmapShape) {
+            this.bitmapShape = bitmapShape;
+            this.points = new ArrayList<>();
+            this.vshape = new VectorShape();
+            // Collect vector targets
+            for (int y=0; y<bitmapShape.getHeight(); y++) {
+                for (int x=0; x<bitmapShape.getWidth(); x++) {
+                    if (bitmapShape.get(x,y)) {
+                        points.add(new Point(x,y));
+                    }
+                }
+            }
+        }
+
+        @Override
+        public VectorShape get() {
+            Point point = new Point(bitmapShape.origin);
+            boolean plotFirst = false;
+            while (!points.isEmpty()) {
+                Point target = null;
+                double distance = Double.MAX_VALUE;
+                for (Point candidate : points) {
+                    double candidateDistance = point.distance(candidate);
+                    if (distance >= candidateDistance) {
+                        distance = candidateDistance;
+                        target = candidate;
+                    }
+                }
+                moveTo(plotFirst, point, target);
+                points.remove(target);
+                point = target;
+                plotFirst = true;
+            }
+            // Need to plot that last pixel
+            vshape.plotUp();
+            return vshape;
+        }
+        
+        /**
+         * Move from origin to target.  General strategy is to work from distance between points and bias the one that "loses"
+         * each time while resetting the one that "won".  Hopefully this draws more of a jagged line than something entirely
+         * straight.  (The goal being to prevent a bunch of plot up's in the worst case that doesn't encode nicely.)
+         * @param plotFirst Indicates if the first vector needs to plot; otherwise all other vectors will be moves
+         * @param origin Is the point of origin (which can be a plotted pixel)
+         * @param target Is the target point 
+         */
+        public void moveTo(boolean plotFirst, Point origin, Point target) {
+            if (origin.equals(target)) return;
+            VectorCommand xvector = origin.x < target.x ? VectorCommand.MOVE_RIGHT : VectorCommand.MOVE_LEFT;
+            VectorCommand yvector = origin.y < target.y ? VectorCommand.MOVE_DOWN : VectorCommand.MOVE_UP;
+            if (plotFirst) {
+                xvector = xvector.plot();
+                yvector = yvector.plot();
+            }
+            Point point = new Point(origin);
+            int xdist = Math.abs(point.x - target.x);
+            int ydist = Math.abs(point.y - target.y);
+            while (!point.equals(target)) {
+                if (xdist > ydist) {
+                    xdist = Math.abs(point.x - target.x);
+                    ydist += 1;
+                    if (point.x != target.x) {
+                        point.translate(xvector.xmove, xvector.ymove);
+                        vshape.append(xvector);
+                        xvector = xvector.move();
+                        yvector = yvector.move();
+                    }
+                } else {
+                    xdist += 1;
+                    ydist = Math.abs(point.y - target.y);
+                    if (point.y != target.y) {
+                        point.translate(yvector.xmove, yvector.ymove);
+                        vshape.append(yvector);
+                        xvector = xvector.move();
+                        yvector = yvector.move();
+                    }
+                }
             }
         }
     }

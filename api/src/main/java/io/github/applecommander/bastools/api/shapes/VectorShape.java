@@ -42,16 +42,16 @@ public class VectorShape implements Shape {
     
 	public final List<VectorCommand> vectors = new ArrayList<>();
 	
-	public VectorShape moveUp()    { return add(VectorCommand.MOVE_UP);    } 
-	public VectorShape moveRight() { return add(VectorCommand.MOVE_RIGHT); } 
-	public VectorShape moveDown()  { return add(VectorCommand.MOVE_DOWN);  } 
-	public VectorShape moveLeft()  { return add(VectorCommand.MOVE_LEFT);  } 
-	public VectorShape plotUp()    { return add(VectorCommand.PLOT_UP);    } 
-	public VectorShape plotRight() { return add(VectorCommand.PLOT_RIGHT); } 
-	public VectorShape plotDown()  { return add(VectorCommand.PLOT_DOWN);  } 
-	public VectorShape plotLeft()  { return add(VectorCommand.PLOT_LEFT);  }
+	public VectorShape moveUp()    { return append(VectorCommand.MOVE_UP);    } 
+	public VectorShape moveRight() { return append(VectorCommand.MOVE_RIGHT); } 
+	public VectorShape moveDown()  { return append(VectorCommand.MOVE_DOWN);  } 
+	public VectorShape moveLeft()  { return append(VectorCommand.MOVE_LEFT);  } 
+	public VectorShape plotUp()    { return append(VectorCommand.PLOT_UP);    } 
+	public VectorShape plotRight() { return append(VectorCommand.PLOT_RIGHT); } 
+	public VectorShape plotDown()  { return append(VectorCommand.PLOT_DOWN);  } 
+	public VectorShape plotLeft()  { return append(VectorCommand.PLOT_LEFT);  }
 	
-	private VectorShape add(VectorCommand vectorCommand) {
+	public VectorShape append(VectorCommand vectorCommand) {
 		this.vectors.add(vectorCommand);
 		return this;
 	}

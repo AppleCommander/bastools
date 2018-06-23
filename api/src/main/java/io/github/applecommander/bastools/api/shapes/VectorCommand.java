@@ -43,4 +43,10 @@ public enum VectorCommand {
 	    int newDirection = this.ordinal() ^ 0b010;
 	    return VectorCommand.values()[newDirection];
 	}
+	public VectorCommand plot() {
+	    return VectorCommand.values()[this.ordinal() | 0b100];
+	}
+	public VectorCommand move() {
+	    return VectorCommand.values()[this.ordinal() & 0b011];
+	}
 }
