@@ -163,7 +163,7 @@ public class GenerateCommand implements Callable<Void> {
         
         // Copy in BASIC code.
         FileEntry basicFile = template.createFile();
-        basicFile.setFilename("SHAPE.DEMO");
+        basicFile.setFilename("STARTUP");
         basicFile.setFiletype("BAS");
         basicFile.setAddress(config.startAddress);
         basicFile.setFileData(programBytes);
