@@ -6,7 +6,7 @@
 ;   whitespace is ignored
 ;   case insensitive
 
-.long
+.long label-long
     movedown 2
     plotleft 2
     moveup

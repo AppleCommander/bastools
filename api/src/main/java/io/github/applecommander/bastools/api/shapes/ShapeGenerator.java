@@ -24,19 +24,23 @@ public class ShapeGenerator {
             if (comment > -1) line = line.substring(0, comment);
             line = line.trim();
             
-            switch (line.toLowerCase()) {
+            String[] parts = line.split("\\s+");
+            String command = parts[0];
+            String label = parts.length > 1 ? parts[1] : null;
+            
+            switch (command.toLowerCase()) {
             case ".short":
-                VectorShape shortShape = new VectorShape();
+                VectorShape shortShape = new VectorShape(label);
                 st.shapes.add(shortShape);
                 shapeConsumer = shortShape::appendShortCommands;
                 break;
             case ".long":
-                VectorShape longShape = new VectorShape();
+                VectorShape longShape = new VectorShape(label);
                 st.shapes.add(longShape);
                 shapeConsumer = longShape::appendLongCommands;
                 break;
             case ".bitmap":
-                BitmapShape bitmapShape = new BitmapShape();
+                BitmapShape bitmapShape = new BitmapShape(label);
                 st.shapes.add(bitmapShape);
                 shapeConsumer = bitmapShape::appendBitmapRow;
                 break;

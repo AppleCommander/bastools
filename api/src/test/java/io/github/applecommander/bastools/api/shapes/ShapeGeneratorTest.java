@@ -1,6 +1,6 @@
 package io.github.applecommander.bastools.api.shapes;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -13,14 +13,14 @@ public class ShapeGeneratorTest {
     public void generateBoxShortformTest() throws IOException {
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/box-shortform.st"));
         assertShapeIsBox(st);
-        assertShapeBoxVectors(st);
+        assertShapeBoxVectors(st, "label-short");
     }
 
     @Test
     public void generateBoxLongformTest() throws IOException {
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/box-longform.st"));
         assertShapeIsBox(st);
-        assertShapeBoxVectors(st);
+        assertShapeBoxVectors(st, "label-long");
     }
 
     @Test
@@ -28,6 +28,7 @@ public class ShapeGeneratorTest {
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/box-bitmap.st"));
         assertShapeIsBox(st);
         // Unable to test vectors for bitmaps
+        assertEquals("label-bitmap", st.shapes.get(0).toBitmap().label);
     }
 
     public void assertShapeIsBox(ShapeTable st) throws IOException {
@@ -45,11 +46,11 @@ public class ShapeGeneratorTest {
         assertShapeMatches(expected, st.shapes.get(0));
     }
     
-    public void assertShapeBoxVectors(ShapeTable st) {
+    public void assertShapeBoxVectors(ShapeTable st, String label) {
         assertNotNull(st);
         assertEquals(1, st.shapes.size());
         
-        VectorShape expected = new VectorShape()
+        VectorShape expected = new VectorShape(label)
                 .moveDown().moveDown()
                 .plotLeft().plotLeft()
                 .moveUp().plotUp().plotUp().plotUp()
@@ -57,9 +58,12 @@ public class ShapeGeneratorTest {
                 .moveDown().plotDown().plotDown().plotDown()
                 .moveLeft().plotLeft();
       
-        Shape s = st.shapes.get(0);
-        assertNotNull(s);
-        assertEquals(expected.vectors, s.toVector().vectors);
+        Shape shape = st.shapes.get(0);
+        assertNotNull(shape);
+        assertTrue(shape instanceof VectorShape);
+        VectorShape vshape = shape.toVector();
+        assertEquals(expected.vectors, vshape.vectors);
+        assertEquals(expected.label, vshape.label);
     }
     
     @Test

@@ -8,7 +8,7 @@
 ;   * = origin. plot
 ;   whitespace is ignored
 
-.bitmap
+.bitmap label-bitmap
     .xxx.
     x...x
     x.+.x

@@ -6,7 +6,7 @@
 ;   whitespace is ignored
 ;   case sensitive
 
-.short
+.short label-short
     dd
     LL
     uUUU

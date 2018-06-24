@@ -40,7 +40,15 @@ public class VectorShape implements Shape {
         return shape;
     }
     
+    public final String label;
 	public final List<VectorCommand> vectors = new ArrayList<>();
+	
+	public VectorShape() {
+	    this.label = null;
+	}
+	public VectorShape(String label) {
+	    this.label = label;
+	}
 	
 	public VectorShape moveUp()    { return append(VectorCommand.MOVE_UP);    } 
 	public VectorShape moveRight() { return append(VectorCommand.MOVE_RIGHT); } 

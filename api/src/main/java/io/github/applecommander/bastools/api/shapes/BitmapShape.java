@@ -13,15 +13,23 @@ import java.util.function.Supplier;
  * easier to understand than vectors.
  */
 public class BitmapShape implements Shape {
+    public final String label;
     public final List<List<Boolean>> grid = new ArrayList<>();
     public final Point origin = new Point();
     
     public BitmapShape() {
-        this(0,0);
+        this(0, 0, null);
+    }
+    public BitmapShape(String label) {
+        this(0, 0, label);
     }
     public BitmapShape(int height, int width) {
-        while (grid.size() < height) {
-            grid.add(newRow(width));
+        this(height, width, null);
+    }
+    public BitmapShape(int height, int width, String label) {
+        this.label = label;
+        while (this.grid.size() < height) {
+            this.grid.add(newRow(width));
         }
     }
     
