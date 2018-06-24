@@ -145,7 +145,32 @@ $ st --debug extract --output=new-mouse-shapes.png --border=box --skip-empty --f
 
 ## Shape generation
 
+These samples show a variety of input methods and pipes the resulting (binary) shape table back to `st` to display the results. (Otherwise it's a bit hard to demonstrate!)
+
+### Apple 'box'
+
 ```shell
+$ cat api/src/test/resources/box-longform.st
+; A vector box as given by Applesoft BASIC Programmer's Reference Manual
+
+; Notes:
+;   move[up|down|left|right] = move vector
+;   plot[up|down|left|right] = plot vector
+;   whitespace is ignored
+;   case insensitive
+
+.long label-long
+    movedown 2
+    plotleft 2
+    moveup
+    plotup 3
+    moveright
+    plotright 3
+    movedown
+    plotdown 3
+    moveleft
+    plotleft
+
 $ st generate --stdout api/src/test/resources/box-longform.st | st extract --stdin --stdout
 +-----+
 |.XXX.|
@@ -154,6 +179,29 @@ $ st generate --stdout api/src/test/resources/box-longform.st | st extract --std
 |X...X|
 |.XXX.|
 +-----+
+```
+
+### The Mouse Maze mouse
+
+```shell
+$ cat mouse.st
+; extracted from NEW MOUSE
+
+.bitmap
+    ..........*X..  
+    ....XXXX.XX...  
+    ...XXXXXXXX...  
+    .XXXXXXXXXXX..  
+    XX.XXXXXXX.XX.  
+    X...XXXXXXXXXX  
+    XX............  
+    .XXX.XX.......  
+    ...XXX........  
+
+$ st generate --stdout mouse.st | st extract --format=source --coding=short --stdin --stdout
+.short
+  DDDRDDRRUlLdlLLLLLLURRRRRULLLLLLDUlLDLDDRDRRDRRURUuluuruRRRULlLLDLLUrRrrrurrrU
+
 ```
 
 ## Generate to AppleSingle
