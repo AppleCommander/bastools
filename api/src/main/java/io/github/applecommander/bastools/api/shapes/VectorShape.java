@@ -178,33 +178,43 @@ public class VectorShape implements Shape {
 	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	    LinkedList<VectorCommand> work = new LinkedList<>(vectors);
 	    while (!work.isEmpty()) {
-            int section1 = work.remove().ordinal();
+	        VectorCommand vector1 = work.remove();
+            int section1 = vector1.ordinal();
 	        VectorCommand vector2 = work.poll();
             int section2 = Optional.ofNullable(vector2).map(VectorCommand::ordinal).orElse(0);
             VectorCommand vector3 = work.poll();
             if (vector3 != null && vector3.plot) {
-                work.add(0, vector3);
+                work.addFirst(vector3);
                 vector3 = null;
             }
             int section3 = Optional.ofNullable(vector3).map(VectorCommand::ordinal).orElse(0);
             if ((section1 + section2 + section3) == 0) {
-                // Cannot write a 0 byte except at end
+                // Can only write a 0 byte to terminate shape
                 if (vector2 == null) {
-                    section2 = VectorCommand.MOVE_LEFT.ordinal();
+                    vector2 = VectorCommand.MOVE_LEFT;
+                    section2 = vector2.ordinal();
                 } else if (vector3 == null) {
-                    section3 = VectorCommand.MOVE_LEFT.ordinal();
-                } else {
-                    section3 = VectorCommand.MOVE_LEFT.ordinal();
+                    vector3 = VectorCommand.MOVE_LEFT;
+                    section3 = vector3.ordinal();
                     if (!work.isEmpty()) {
-                        work.add(0, VectorCommand.MOVE_RIGHT);
+                        work.addFirst(VectorCommand.MOVE_RIGHT);
+                    }
+                } else {
+                    work.addFirst(vector3);
+                    vector3 = VectorCommand.MOVE_LEFT;
+                    section3 = vector3.ordinal();
+                    if (!work.isEmpty()) {
+                        work.addFirst(VectorCommand.MOVE_RIGHT);
                     }
                 }
             } else if (vector3 == VectorCommand.MOVE_UP) {
                 // section 3 cannot be 0
-                work.add(0, vector3);
+                work.addFirst(vector3);
+                vector3 = null;
                 if (vector2 == VectorCommand.MOVE_UP) {
                     // section 2 and 3 cannot be 0
-                    work.add(0, vector2);
+                    work.addFirst(vector2);
+                    vector2 = null;
                 }
             }
             outputStream.write(section3 << 6 | section2 << 3 | section1);
