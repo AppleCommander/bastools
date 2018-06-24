@@ -110,13 +110,13 @@ public class BitmapShape implements Shape {
     
     @Override
     public boolean isEmpty() {
-        boolean isEmpty = false;
+        boolean hasData = false;
         for (List<Boolean> row : grid) {
             for (Boolean plot : row) {
-                isEmpty |= plot;
+                hasData |= plot;
             }
         }
-        return isEmpty;
+        return !hasData;
     }
 
     @Override
