@@ -183,39 +183,26 @@ public class VectorShape implements Shape {
 	        VectorCommand vector2 = work.poll();
             int section2 = Optional.ofNullable(vector2).map(VectorCommand::ordinal).orElse(0);
             VectorCommand vector3 = work.poll();
-            if (vector3 != null && vector3.plot) {
+            // Remove all invalid encodings 100, 101, 110, 111, and 000.
+            if (vector3 != null && (vector3.plot || vector3 == VectorCommand.MOVE_UP)) {
                 work.addFirst(vector3);
                 vector3 = null;
             }
             int section3 = Optional.ofNullable(vector3).map(VectorCommand::ordinal).orElse(0);
-            if ((section1 + section2 + section3) == 0) {
-                // Can only write a 0 byte to terminate shape
-                if (vector2 == null) {
-                    vector2 = VectorCommand.MOVE_LEFT;
-                    section2 = vector2.ordinal();
-                } else if (vector3 == null) {
-                    vector3 = VectorCommand.MOVE_LEFT;
-                    section3 = vector3.ordinal();
-                    if (!work.isEmpty()) {
-                        work.addFirst(VectorCommand.MOVE_RIGHT);
-                    }
-                } else {
-                    work.addFirst(vector3);
-                    vector3 = VectorCommand.MOVE_LEFT;
-                    section3 = vector3.ordinal();
-                    if (!work.isEmpty()) {
-                        work.addFirst(VectorCommand.MOVE_RIGHT);
+            if (section3 == 0 && section2 == 0 && !work.isEmpty()) {
+                vector3 = VectorCommand.MOVE_LEFT;
+                section3 = vector3.ordinal();
+                // If we have a series of MOVE_UP, we'll end up with a "uul", "rul", "rul", etc.
+                // It can be compressed a bit by stretching that right out a bit to get "uul", "uur", "uul, "uur", etc.
+                int moveUpCount = 0;
+                for (VectorCommand test : work) {
+                    if (test == VectorCommand.MOVE_UP) {
+                        moveUpCount += 1;
+                    } else {
+                        break;
                     }
                 }
-            } else if (vector3 == VectorCommand.MOVE_UP) {
-                // section 3 cannot be 0
-                work.addFirst(vector3);
-                vector3 = null;
-                if (vector2 == VectorCommand.MOVE_UP) {
-                    // section 2 and 3 cannot be 0
-                    work.addFirst(vector2);
-                    vector2 = null;
-                }
+                work.add(Math.min(moveUpCount,2), VectorCommand.MOVE_RIGHT);
             }
             outputStream.write(section3 << 6 | section2 << 3 | section1);
 	    }
