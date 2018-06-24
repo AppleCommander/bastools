@@ -23,35 +23,66 @@ Commands:
   help      Displays help information about the specified command
 ```
 
-## Sub-command help
+## Sub-command extract
 
 ```shell
 $ st extract --help
-Usage: st extract [-h] [--skip-empty] [--stdin] [--stdout]
-                  [--border=<borderStyle>] [--format=<outputFormat>]
-                  [--shape=<shapeNum>] [-o=<outputFile>] [-w=<width>]
-                  [<inputFile>]
+Usage: st extract [-hO] [--skip-empty] [--stdin] [--stdout]
+                  [--border=<borderStyle>] [--coding=<codeStyle>]
+                  [--format=<outputFormat>] [-o=<outputFile>] [-w=<width>]
+                  [--shapes=<shapeNums>]... [<inputFile>]
 
 Extract shapes from shape table
 
 Parameters:
-      [<inputFile>]        File to process
+      [<inputFile>]          File to process
 
 Options:
-      --border=<borderStyle>
-                           Set border style (none, simple, box)
-                             Default: simple
+      --border=<borderStyle> Set border style (none, simple, box)
+                               Default: simple
+      --coding=<codeStyle>   Select source style (bitmap, long, short)
+                               Default: long
       --format=<outputFormat>
-                           Select output format (text, png, gif, jpeg, bmp, wbmp)
-                             Default: text
-      --shape=<shapeNum>   Extract specific shape
-      --skip-empty         Skip empty shapes
-      --stdin              Read from stdin
-      --stdout             Write to stdout
-  -h, --help               Show help for subcommand
-  -o, --output=<outputFile>
-                           Write output to file
-  -w, --width=<width>      Set width (defaults: text=80, image=1024)
+                             Select output format (text, source, png, gif, jpeg,
+                               bmp, wbmp)
+                               Default: text
+      --shapes=<shapeNums>   Extract specific shape(s); formats are '1' or '1-4' and
+                               can be combined with a comma
+      --skip-empty           Skip empty shapes
+      --stdin                Read from stdin
+      --stdout               Write to stdout
+  -h, --help                 Show help for subcommand
+  -o, --output=<outputFile>  Write output to file
+  -O, --optimize             Optimize vector shapes (source only)
+  -w, --width=<width>        Set width (defaults: text=80, image=1024)
+```
+
+## Sub-command generate
+
+```shell
+$ st generate --help
+Usage: st generate [-h] [--demo-code] [--single] [--stdin] [--stdout]
+                   [--address=<address>] [--name=<realName>] [-o=<outputFile>]
+                   [<inputFile>]
+
+Generate a shape table from source code
+
+Parameters:
+      [<inputFile>]         File to process
+
+Options:
+      --address=<address>   Address for AppleSingle file
+                              Default: 24576
+      --demo-code           Generate a ProDOS .po image with Applesoft BASIC code
+                              demoing the shape table
+      --name=<realName>     Filename assign in AppleSingle file
+                              Default: SHAPES.BIN
+      --single              Write to AppleSingle file (requires address, defaults to
+                              0x6000)
+      --stdin               Read from stdin
+      --stdout              Write to stdout
+  -h, --help                Show help for subcommand
+  -o, --output=<outputFile> Write output to file
 ```
 
 # Features
@@ -142,3 +173,14 @@ File dates info:
 Data Fork: Present, 14 bytes
 Resource Fork: Not present
 ```
+
+## Generate demo disk
+
+Demonstration of a Beagle Bros font:
+
+```shell
+st --debug extract --format=source --coding=short ~/Downloads/shapes/\]WESTERN.dump --stdout --skip-empty --optimize |
+    st generate --demo-code -o western.po --stdin
+```
+
+![Western Font Demo](images/western-font-demo.png "]WESTERN")
