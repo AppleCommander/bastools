@@ -91,6 +91,39 @@ public class ShapeGeneratorTest {
         assertShapeMatches(mouse, vectorShape);
     }
     
+    @Test
+    public void testRobotShape() throws IOException {
+        final String robot = "+-------------+\n"
+                           + "|....XXXXX...+|\n" 
+                           + "|XXXXX...XX...|\n" 
+                           + "|....XXXXX....|\n" 
+                           + "|.............|\n" 
+                           + "|..XX..XXX....|\n" 
+                           + "|...XX.XXX....|\n" 
+                           + "|...XX.XXXX...|\n" 
+                           + "|..XX.XXXXX...|\n" 
+                           + "|....XXXXXX...|\n" 
+                           + "|.XXXXXXXXXXX.|\n" 
+                           + "|XX.........XX|\n" 
+                           + "|XX.........XX|\n" 
+                           + "|.XXXXXXXXXXX.|\n" 
+                           + "+-------------+\n";
+
+        ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/robot-bitmap.st"));
+        assertNotNull(st);
+        assertEquals(1, st.shapes.size());
+
+        // Verify we read the shape correctly...
+        Shape shape = st.shapes.get(0);
+        assertNotNull(shape);
+        assertShapeMatches(robot, shape);
+        
+        // Run vector transform to be certain we're ok
+        Shape vectorShape = shape.toVector();
+        assertNotNull(vectorShape);
+        assertShapeMatches(robot, vectorShape);
+    }
+    
     public void assertShapeMatches(final String expected, Shape shape) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
