@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import io.github.applecommander.bastools.api.shapes.exporters.ImageShapeExporter;
+import io.github.applecommander.bastools.api.shapes.exporters.SourceShapeExporter;
 import io.github.applecommander.bastools.api.shapes.exporters.TextShapeExporter;
 
 public interface ShapeExporter {
@@ -50,5 +51,8 @@ public interface ShapeExporter {
     }
     public static ImageShapeExporter.Builder image() {
         return new ImageShapeExporter.Builder();
+    }
+    public static SourceShapeExporter.Builder source() {
+        return new SourceShapeExporter.Builder();
     }
 }

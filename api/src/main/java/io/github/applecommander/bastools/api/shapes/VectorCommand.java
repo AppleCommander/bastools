@@ -16,6 +16,7 @@ public enum VectorCommand {
 	public final int ymove;
 	
 	public final char shortCommand;
+	public final String longCommand;
 	public final boolean vertical;
 	public final boolean horizontal;
 
@@ -37,6 +38,8 @@ public enum VectorCommand {
 		
         char shortCommand = "urdl".charAt(this.ordinal() & 0b011);
         this.shortCommand = plot ? Character.toUpperCase(shortCommand) : shortCommand;
+        
+        this.longCommand = this.name().replaceAll("_", "").toLowerCase();
 	}
 	
 	public VectorCommand opposite() {

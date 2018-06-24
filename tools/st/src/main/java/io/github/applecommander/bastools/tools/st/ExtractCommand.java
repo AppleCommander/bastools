@@ -1,9 +1,14 @@
 package io.github.applecommander.bastools.tools.st;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import io.github.applecommander.bastools.api.shapes.Shape;
 import io.github.applecommander.bastools.api.shapes.ShapeExporter;
@@ -34,8 +39,11 @@ public class ExtractCommand implements Callable<Void> {
     @Option(names = "--border", description = "Set border style (none, simple, box)", showDefaultValue = Visibility.ALWAYS)
     private String borderStyle = "simple";
     
-    @Option(names = "--format", description = "Select output format (text, png, gif, jpeg, bmp, wbmp)", showDefaultValue = Visibility.ALWAYS)
+    @Option(names = "--format", description = "Select output format (text, source, png, gif, jpeg, bmp, wbmp)", showDefaultValue = Visibility.ALWAYS)
     private String outputFormat = "text";
+    
+    @Option(names = "--coding", description = "Select source style (bitmap, long, short)", showDefaultValue = Visibility.ALWAYS)
+    private String codeStyle;
     
     @Option(names = "--skip-empty", description = "Skip empty shapes")
     private boolean skipEmptyShapesFlag = false;
@@ -43,8 +51,9 @@ public class ExtractCommand implements Callable<Void> {
     @Option(names = { "-w", "--width" }, description = "Set width (defaults: text=80, image=1024)")
     private int width = -1;
 
-    @Option(names = "--shape", description = "Extract specific shape")
-    private int shapeNum = 0;
+    @Option(names = "--shapes", description = "Extract specific shape(s); formats are '1' or '1-4' and can be combined with a comma",
+            converter = IntegerRangeTypeConverter.class)
+    private List<Integer> shapeNums = new ArrayList<>();
 	
 	@Parameters(arity = "0..1", description = "File to process")
 	private Path inputFile;
@@ -57,22 +66,33 @@ public class ExtractCommand implements Callable<Void> {
 	    
 	    ShapeTable shapeTable = stdinFlag ? ShapeTable.read(System.in) : ShapeTable.read(inputFile);
 	    
-	    if (shapeNum > 0) {
-	        if (shapeNum <= shapeTable.shapes.size()) {
-	            Shape shape = shapeTable.shapes.get(shapeNum-1);
-	            if (stdoutFlag) {
-                    exporter.export(shape, System.out);
-	            } else {
-                    exporter.export(shape, outputFile);
-	            }
-	        } else {
-	            throw new IOException("Invalid shape number");
-	        }
-        } else {
+	    if (shapeNums.isEmpty()) {
             if (stdoutFlag) {
                 exporter.export(shapeTable, System.out);
             } else {
                 exporter.export(shapeTable, outputFile);
+            }
+        } else {
+            List<Integer> outOfRange = shapeNums.stream()
+                                                .filter(n -> n > shapeTable.shapes.size())
+                                                .collect(Collectors.toList());
+            if (!outOfRange.isEmpty()) {
+                throw new IOException("Invalid shape numbers: " + outOfRange);
+            }
+
+            OutputStream outputStream = System.out;
+            try {
+                if (outputFile != null) {
+                    outputStream = Files.newOutputStream(outputFile);
+                }
+                for (int shapeNum : shapeNums) {
+                    Shape shape = shapeTable.shapes.get(shapeNum - 1);
+                    exporter.export(shape, outputStream);
+                }
+            } finally {
+                if (outputFile != null) {
+                    outputStream.close();
+                }
             }
         }
 	    
@@ -126,6 +146,30 @@ public class ExtractCommand implements Callable<Void> {
                                     .imageFormat(outputFormat)
                                     .skipEmptyShapes(skipEmptyShapesFlag)
                                     .build();
+            break;
+        case "source":
+            switch (codeStyle) {
+            case "bitmap":
+                exporter = ShapeExporter.source()
+                                        .bitmap()
+                                        .skipEmptyShapes(skipEmptyShapesFlag)
+                                        .build();
+                break;
+            case "short":
+                exporter = ShapeExporter.source()
+                                        .shortCommands()
+                                        .skipEmptyShapes(skipEmptyShapesFlag)
+                                        .build();
+                break;
+            case "long":
+                exporter = ShapeExporter.source()
+                                        .longCommands()
+                                        .skipEmptyShapes(skipEmptyShapesFlag)
+                                        .build();
+                break;
+            default:
+                throw new IOException("Please select a valid code style");
+            }
             break;
         default:
             throw new IOException("Please select a valid output format");
