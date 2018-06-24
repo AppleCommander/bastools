@@ -20,13 +20,9 @@ public class ShapeGenerator {
         String line = reader.readLine();
         Consumer<String> shapeConsumer = null;
         while (line != null) {
-            line = reader.readLine();
-            if (line == null) break;
-            
             int comment = line.indexOf(';');
             if (comment > -1) line = line.substring(0, comment);
             line = line.trim();
-            if (line.length() == 0) continue;
             
             switch (line.toLowerCase()) {
             case ".short":
@@ -45,7 +41,9 @@ public class ShapeGenerator {
                 shapeConsumer = bitmapShape::appendBitmapRow;
                 break;
             default:
-                if (shapeConsumer != null) {
+                if (line.length() == 0) {
+                    // do nothing
+                } else if (shapeConsumer != null) {
                     try {
                         shapeConsumer.accept(line);
                     } catch (Throwable t) {
@@ -57,6 +55,7 @@ public class ShapeGenerator {
                 }
                 break;
             }
+            line = reader.readLine();
         }
         return st;
     }
