@@ -43,7 +43,10 @@ public class ExtractCommand implements Callable<Void> {
     private String outputFormat = "text";
     
     @Option(names = "--coding", description = "Select source style (bitmap, long, short)", showDefaultValue = Visibility.ALWAYS)
-    private String codeStyle;
+    private String codeStyle = "long";
+    
+    @Option(names = { "-O", "--optimize" }, description = "Optimize vector shapes (source only)")
+    private boolean optimize;
     
     @Option(names = "--skip-empty", description = "Skip empty shapes")
     private boolean skipEmptyShapesFlag = false;
@@ -153,18 +156,21 @@ public class ExtractCommand implements Callable<Void> {
                 exporter = ShapeExporter.source()
                                         .bitmap()
                                         .skipEmptyShapes(skipEmptyShapesFlag)
+                                        .optimize(optimize)
                                         .build();
                 break;
             case "short":
                 exporter = ShapeExporter.source()
                                         .shortCommands()
                                         .skipEmptyShapes(skipEmptyShapesFlag)
+                                        .optimize(optimize)
                                         .build();
                 break;
             case "long":
                 exporter = ShapeExporter.source()
                                         .longCommands()
                                         .skipEmptyShapes(skipEmptyShapesFlag)
+                                        .optimize(optimize)
                                         .build();
                 break;
             default:

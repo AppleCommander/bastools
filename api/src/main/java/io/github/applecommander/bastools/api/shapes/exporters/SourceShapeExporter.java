@@ -14,11 +14,13 @@ import io.github.applecommander.bastools.api.shapes.Shape;
 import io.github.applecommander.bastools.api.shapes.ShapeExporter;
 import io.github.applecommander.bastools.api.shapes.ShapeTable;
 import io.github.applecommander.bastools.api.shapes.VectorCommand;
+import io.github.applecommander.bastools.api.shapes.VectorShape;
 
 public class SourceShapeExporter implements ShapeExporter {
     private BiConsumer<Shape,PrintWriter> formatFunction = this::exportShapeAsBitmap;
     private ShapeExporter textExporter;
     private boolean skipEmptyShapes;
+    private boolean optimize;
 
     /** Use the {@code Builder} to create a TextShapeExporter. */
     private SourceShapeExporter() {
@@ -58,28 +60,36 @@ public class SourceShapeExporter implements ShapeExporter {
     }
     
     public void exportShapeAsShortCommands(Shape shape, PrintWriter pw) {
-        pw.printf(".short\n");
-        pw.printf("  %s\n", shape.toVector().toShortCommands());
-        pw.printf("\n");
+        VectorShape vshape = shape.toVector();
+        if (optimize) vshape = vshape.optimize();
+        if (displayThisShape(vshape)) {
+            pw.printf(".short\n");
+            pw.printf("  %s\n", vshape.toShortCommands());
+            pw.printf("\n");
+        }
     }
     
     public void exportShapeAsLongCommands(Shape shape, PrintWriter pw) {
-        pw.printf(".long\n");
-        Queue<VectorCommand> vectors = new LinkedList<>(shape.toVector().vectors);
-        while (!vectors.isEmpty()) {
-            VectorCommand vector = vectors.remove();
-            int count = 1;
-            while (vectors.peek() == vector) {
-                vectors.remove();
-                count += 1;
+        VectorShape vshape = shape.toVector();
+        if (optimize) vshape = vshape.optimize();
+        if (displayThisShape(vshape)) {
+            pw.printf(".long\n");
+            Queue<VectorCommand> vectors = new LinkedList<>(vshape.vectors);
+            while (!vectors.isEmpty()) {
+                VectorCommand vector = vectors.remove();
+                int count = 1;
+                while (vectors.peek() == vector) {
+                    vectors.remove();
+                    count += 1;
+                }
+                if (count == 1) {
+                    pw.printf("  %s\n", vector.longCommand);
+                } else {
+                    pw.printf("  %s %d\n", vector.longCommand, count);
+                }
             }
-            if (count == 1) {
-                pw.printf("  %s\n", vector.longCommand);
-            } else {
-                pw.printf("  %s %d\n", vector.longCommand, count);
-            }
+            pw.printf("\n");
         }
-        pw.printf("\n");
     }
     
     public static class Builder {
@@ -103,6 +113,14 @@ public class SourceShapeExporter implements ShapeExporter {
         }
         public Builder skipEmptyShapes(boolean skipEmptyShapes) {
             exporter.skipEmptyShapes = skipEmptyShapes;
+            return this;
+        }
+        
+        public Builder optimize() {
+            return optimize(true);
+        }
+        public Builder optimize(boolean optimize) {
+            exporter.optimize = optimize;
             return this;
         }
         
