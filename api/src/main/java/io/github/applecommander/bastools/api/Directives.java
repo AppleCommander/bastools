@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import io.github.applecommander.bastools.api.directives.EmbeddedBinaryDirective;
+import io.github.applecommander.bastools.api.directives.EmbeddedShapeTable;
 import io.github.applecommander.bastools.api.directives.HexDirective;
 
 public class Directives {
@@ -16,8 +17,9 @@ public class Directives {
 			private static final long serialVersionUID = -8111460701487331592L;
 
 			{
-				put("$embed", EmbeddedBinaryDirective.class);
-				put("$hex", HexDirective.class);
+				put(EmbeddedBinaryDirective.NAME, EmbeddedBinaryDirective.class);
+				put(HexDirective.NAME, HexDirective.class);
+				put(EmbeddedShapeTable.NAME, EmbeddedShapeTable.class);
 			}
 		};
 

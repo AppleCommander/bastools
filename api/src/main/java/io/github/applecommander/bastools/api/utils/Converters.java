@@ -19,4 +19,10 @@ public class Converters {
 		}
 	}
 
+	public static Boolean toBoolean(String value) {
+	    if (value == null) {
+	        return null;
+	    }
+	    return "true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value);
+	}
 }

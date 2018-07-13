@@ -57,6 +57,16 @@ public class ShapeTable {
     }
 
     public final List<Shape> shapes = new ArrayList<>();
+    
+    public int findPositionByLabel(String label) {
+        for (int i=0; i<shapes.size(); i++) {
+            if (label.equalsIgnoreCase(shapes.get(i).getLabel())) {
+                // Applesoft shape tables are 1-based, not 0-based.
+                return i+1;
+            }
+        }
+        throw new RuntimeException(String.format("Unable to locate shape with label of '%s'", label));
+    }
 
     public void write(OutputStream outputStream) throws IOException {
         Objects.requireNonNull(outputStream);

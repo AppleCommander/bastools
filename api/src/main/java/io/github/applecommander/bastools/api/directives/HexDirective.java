@@ -9,21 +9,19 @@ import io.github.applecommander.bastools.api.model.ApplesoftKeyword;
 import io.github.applecommander.bastools.api.model.Line;
 
 /** 
- * A simple directive to introduce hexidecimal capabilities. StreamTokenizer does not 
+ * A simple directive to introduce hexadecimal capabilities. StreamTokenizer does not 
  * appear to support syntax, so using a directive to introduce the capability. 
  */
 public class HexDirective extends Directive {
+    public static final String NAME = "$hex";
+    
 	public HexDirective(Configuration config, OutputStream outputStream) {
-		super(config, outputStream);
+		super(NAME, config, outputStream);
 	}
-
+	
 	@Override
 	public void writeBytes(int startAddress, Line line) throws IOException {
-		if (parameters.size() != 1) {
-			throw new RuntimeException("$hex directive requires one parameter");
-		}
-		String string = requiresString();
-		int value = Integer.parseInt(string, 16);
+	    int value = requiredIntegerExpression("value", "$hex directive requires 'value' parameter");
 		
 		if (value < 0 || value > 65535) {
 			throw new RuntimeException("$hex address out of range");

@@ -37,6 +37,18 @@ public class Token {
 			return String.format("%s(%s)", type, text);
 		}
 	}
+	public String asString() {
+	    switch (type) {
+	    case EOL:
+	        return "\n";
+	    case KEYWORD:
+	        return keyword.toString();
+	    case NUMBER:
+	        return number.toString();
+        default:
+            return text;
+	    }
+	}
 	
 	public static Token eol(int line) {
 		return new Token(line, Type.EOL, null, null, null);

@@ -82,6 +82,8 @@ public class ByteVisitor implements Visitor {
 				statement.accept(this);
 			}
 			if (currentDirective != null) {
+			    // Need to force the last set of parameters to be processed. Yeah, stinky. :-)
+			    currentDirective.append(Token.eol(-1));
 				currentDirective.writeBytes(this.address+4, line);
 				currentDirective = null;
 			}

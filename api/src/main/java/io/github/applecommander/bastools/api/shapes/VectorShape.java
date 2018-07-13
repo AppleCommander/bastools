@@ -222,6 +222,11 @@ public class VectorShape implements Shape {
 	public boolean isEmpty() {
 	    return vectors.isEmpty();
 	}
+	
+	@Override
+	public String getLabel() {
+	    return label;
+	}
 
 	@Override
 	public BitmapShape toBitmap() {

@@ -1,6 +1,5 @@
 package io.github.applecommander.bastools.api.directives;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,73 +8,77 @@ import java.util.Optional;
 
 import io.github.applecommander.bastools.api.Configuration;
 import io.github.applecommander.bastools.api.Directive;
-import io.github.applecommander.bastools.api.model.ApplesoftKeyword;
+import io.github.applecommander.bastools.api.code.CodeBuilder;
+import io.github.applecommander.bastools.api.code.CodeMark;
 import io.github.applecommander.bastools.api.model.Line;
 
+/**
+ * Embed an binary file into a BASIC program.  See writeup in the README-TOKENIZER.md file.
+ */
 public class EmbeddedBinaryDirective extends Directive {
+    public static final String NAME = "$embed";
+    public static final String PARAM_FILE = "file";
+    public static final String PARAM_MOVETO = "moveto";
+    public static final String PARAM_VAR = "var";
+    
 	public EmbeddedBinaryDirective(Configuration config, OutputStream outputStream) {
-		super(config, outputStream);
+		super(NAME, config, outputStream, PARAM_FILE, PARAM_MOVETO, PARAM_VAR);
 	}
 	
 	@Override
 	public void writeBytes(int startAddress, Line line) throws IOException {
-		if (parameters.size() != 2) {
-			throw new IllegalArgumentException("$embed requires a name and address parameter");
-		}
-		String filename = requiresString();
-		int targetAddress = requiresInteger();
+		String filename = requiredStringExpression(PARAM_FILE, "$embed requires a 'name=<string>' parameter");
+		Optional<Integer> targetAddress = optionalIntegerExpression(PARAM_MOVETO);
+		Optional<String> variableName = optionalStringExpression(PARAM_VAR);
+		
+		validateSet(ONLY_ONE, "$embed requires either a 'var' assignment or a 'moveto' parameter", targetAddress, variableName);
 
 		File file = new File(config.sourceFile.getParentFile(), filename);
 		byte[] bin = Files.readAllBytes(file.toPath());
+
+		CodeBuilder builder = new CodeBuilder();
+		CodeMark embeddedStart = new CodeMark();
+		CodeMark embeddedEnd = new CodeMark();
 		
-		Optional<Line> nextLine = line.nextLine();
-		byte[] basicCode = nextLine.isPresent() 
-				? callAndGoto(startAddress,nextLine.get()) 
-				: callAndReturn(startAddress);
+		variableName.ifPresent(var -> {
+		    builder.basic()
+    	           .assign(var, embeddedStart)
+    	           .endStatement();
+		});
 		
-		final int moveLength = 8*3 + 2 + 3;	// LDA/STA, LDY, JMP.
-		int embeddedStart = startAddress + basicCode.length + moveLength;
-		int embeddedEnd = embeddedStart + bin.length;
+		targetAddress.ifPresent(address -> {
+		    builder.basic()
+		           .CALL(embeddedStart)
+		           .endStatement();
+		    
+    		Optional<Line> nextLine = line.nextLine();
+    		if (nextLine.isPresent()) {
+    		    builder.basic()
+		               .GOTO(nextLine.get().lineNumber);
+    		} else {
+    		    builder.basic()
+        		       .RETURN();
+    		}
+		});
+
+		builder.basic()
+               .endLine();
+
+		targetAddress.ifPresent(address -> {
+		    builder.asm()
+                   .setAddress(embeddedStart, 0x3c)
+                   .setAddress(embeddedEnd, 0x3e)
+                   .setAddress(address, 0x42)
+                   .ldy(0x00)
+                   .jmp(0xfe2c)
+                   .end();
+		});
+
+		builder.set(embeddedStart)
+	           .addBinary(bin)
+	           .set(embeddedEnd);
 		
-		outputStream.write(basicCode);
-		setAddress(embeddedStart, 0x3c);
-		setAddress(embeddedEnd, 0x3e);
-		setAddress(targetAddress, 0x42);
-		ldy(0x00);
-		jmp(0xfe2c);
-		outputStream.write(bin);
-	}
-	// In program, "CALL <address>:GOTO line"
-	private byte[] callAndGoto(int startAddress, Line line) throws IOException {
-		// 3 for the tokens "CALL", ":", "GOTO", end of line (0x00)
-		final int tokenCount = 3 + 1;
-		int offset = Integer.toString(line.lineNumber).length() + tokenCount;
-		offset += Integer.toString(startAddress).length();
-		// Attempting to adjust if we bump from 4 digit address to a 5 digit address
-		if (startAddress < 10000 && startAddress + offset >= 10000) offset += 1;
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		os.write(ApplesoftKeyword.CALL.code);
-		os.write(Integer.toString(startAddress+offset).getBytes());
-		os.write(':');
-		os.write(ApplesoftKeyword.GOTO.code);
-		os.write(Integer.toString(line.lineNumber).getBytes());
-		os.write(0x00);
-		return os.toByteArray();
-	}
-	// At end of program, just "CALL <address>:RETURN"
-	private byte[] callAndReturn(int startAddress) throws IOException {
-		// 3 for the tokens "CALL", ":", "RETURN", end of line (0x00)
-		final int tokenCount = 3 + 1;
-		int offset = tokenCount;
-		offset += Integer.toString(startAddress).length();
-		// Attempting to adjust if we bump from 4 digit address to a 5 digit address
-		if (startAddress < 10000 && startAddress + offset >= 10000) offset += 1;
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		os.write(ApplesoftKeyword.CALL.code);
-		os.write(Integer.toString(startAddress+offset).getBytes());
-		os.write(':');
-		os.write(ApplesoftKeyword.RETURN.code);
-		os.write(0x00);
-		return os.toByteArray();
+		builder.generate(startAddress)
+		       .writeTo(super.outputStream);
 	}
 }

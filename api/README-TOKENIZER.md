@@ -35,13 +35,22 @@ The framework allows embedding of directives.
 
 ### `$embed`
 
-`$embed` will allow a binary to be embedded within the resulting application *and will move it to a destination in memory*. Please note that once the application is loaded on the Apple II, the program cannot be altered as the computer will crash.  Usage example:
+`$embed` will allow a binary to be embedded within the resulting application and can move it to a destination in memory. Please note that once the application is loaded on the Apple II, the program cannot be altered as the computer will crash.  
+
+Options:
+* `file=<string>`, required. Specifies the file to load.
+* `moveto=<addr>`, optional. If provided, generates code to move binary to destination. Automatically `CALL`ed.
+* `var=<variable>`, optional. If provided, address is assigned to variable specified.
+
+> Note that the current parser does not handle hex formats (_at all_). You may provide a string as well that starts with a `$` or `0x` prefix.
+
+Usage example:
 
 ```
-5 $embed "read.time.bin", "0x0260"
+5 $embed file="read.time.bin", moveto="0x0260"
 ```
 
-The `$embed` directive _must_ be last on the line (if there are comments, be sure to use the `REMOVE_REM_STATEMENTS` optimization. It takes two parameters: file name and target address, both are strings.
+The `$embed` directive _must_ be last on the line (if there are comments, be sure to use the `REMOVE_REM_STATEMENTS` optimization.
 
 From the `circles-timing.bas` sample, this is the beginning of the program:
 
@@ -70,14 +79,61 @@ LDY #0
 JMP $FE2C
 ```
 
+### `$shape`
+
+`$shape` will generate a shape table based either on the source (`src=`) or binary (`bin=`) shape table provided. Source shape table generation is based on the shape table `st` tool support and is described [here in more detail](README-SHAPES.md).
+
+Overall format is as follows:
+
+```
+$shape ( src="path" [ ,label=variable | ,assign=(varname1="label1" [,varname2="label2"]* ] ) 
+       | bin="path" )
+       [,poke=yes(default)|no]
+       [,address=<variable>] 
+       [,init=yes|no ]
+```
+
+#### Shape from source
+
+By using the `src=` option, the source code will be generated on the fly.  For example the following shape source will insert a shape named "mouse" into the BASIC program:
+
+```
+; extracted from NEW MOUSE
+
+.bitmap mouse
+    ..........*X..  
+    ....XXXX.XX...  
+    ...XXXXXXXX...  
+    .XXXXXXXXXXX..  
+    XX.XXXXXXX.XX.  
+    X...XXXXXXXXXX  
+    XX............  
+    .XXX.XX.......  
+    ...XXX........  
+```
+
+Options on the source include:
+* `label=variable` which indicates a label is really a variable name; in the example, the variable name would be "MOUSE".
+* `assign=(...)` will define a mapping from the label in the source to the BASIC variable name.  A `assign(m=mouse)` will define the variable `M` to be the shape number for the mouse.
+
+#### Shape from binary
+
+By using the `bin=` option, an already existing binary shape table can be inserted into the code.  There are no additional options available in this case.
+
+#### General options
+
+* `poke=yes|no` (default=`yes`) will embed a `POKE 232,<lowAddr>:POKE 233,<highAddr>` into the line of code.
+* `address=<variable>`, if supplied, will assign the address to a variable; therefore a `address=AD` will embed the variable `AD` into the line of code.
+* `init=yes|no` (default=`yes`) will embed a simple `ROT=0:SCALE=1` into the line of code for simple shape initialization.
+
 ### `$hex`
 
-If embedding hexidecimal addresses into an application makes sense, the `$hex` directive allows that to be done in a rudimentary manner.
+If embedding hexadecimal addresses into an application makes sense, the `$hex` directive allows that to be done in a rudimentary manner.
 
 Sample:
 
 ```
-10 call $hex "fc58"
+10 call $hex value="fc58"
 ```
 
 Yields:

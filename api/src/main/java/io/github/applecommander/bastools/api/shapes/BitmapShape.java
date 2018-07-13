@@ -126,6 +126,11 @@ public class BitmapShape implements Shape {
         }
         return !hasData;
     }
+    
+    @Override
+    public String getLabel() {
+        return label;
+    }
 
     @Override
     public BitmapShape toBitmap() {
