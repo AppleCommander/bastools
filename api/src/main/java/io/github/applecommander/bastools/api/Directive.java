@@ -91,15 +91,20 @@ public abstract class Directive {
      * (probably EOL) to prevent loss of information. 
      */
 	public void append(Token token) {
-	    if (token.type == Type.EOL || (token.type == Type.SYNTAX && ",".equals(token.text))) {
-	        String name = requireIdentToken();
-	        if (!parameterNames.contains(name)) {
-	            String message = String.format("Parameter '%s' is invalid for %s directive", name, directiveName);
-	            throw new RuntimeException(message);
+	    if (token.type == Type.EOL) {
+	        while (!paramTokens.isEmpty()) {
+    	        String name = requireIdentToken();
+    	        if (!parameterNames.contains(name)) {
+    	            String message = String.format("Parameter '%s' is invalid for %s directive", name, directiveName);
+    	            throw new RuntimeException(message);
+    	        }
+    	        requireSyntaxToken("=");
+    	        Expression expr = buildExpression();
+    	        parameters.put(name, expr);
+    	        if (!paramTokens.isEmpty()) {
+    	            requireSyntaxToken(",");
+    	        }
 	        }
-	        requireSyntaxToken("=");
-	        Expression expr = buildExpression();
-	        parameters.put(name, expr);
 	    } else {
 	        paramTokens.add(token);
 	    }
@@ -166,6 +171,7 @@ public abstract class Directive {
 	    }
 	}
 	private boolean checkSyntaxToken(String syntax) {
+	    if (paramTokens.isEmpty()) return false;
         Type tokenType = ApplesoftKeyword.find(syntax).map(t -> Type.KEYWORD).orElse(Type.SYNTAX);
         Token token = paramTokens.get(0);
         return tokenType == token.type && syntax.equals(token.text);
