@@ -67,8 +67,7 @@ public class ReassignmentVisitor implements Visitor {
 				next = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
 					|| t.keyword == ApplesoftKeyword.THEN || t.keyword == ApplesoftKeyword.RUN
 					|| t.keyword == ApplesoftKeyword.LIST;
-				multiple |= t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.ON
-					|| t.keyword == ApplesoftKeyword.THEN;
+				multiple |= t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.ON;
 			}
 			newStatement.tokens.add(newToken);
 		}
