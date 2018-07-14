@@ -53,21 +53,21 @@ public class ReassignmentVisitor implements Visitor {
 	 */
 	@Override
 	public Statement visit(Statement statement) {
-		boolean next = false;
-		boolean multiple = false;
+		boolean trigger = false;
+		boolean then = false;     // Special case: Immediately after THEN, a number triggers reassignment.
 		Statement newStatement = new Statement();
 		for (Token t : statement.tokens) {
 			Token newToken = t;
-			if (next) {
+			if (trigger || then) {
 				if (t.type == Type.NUMBER && reassignments.containsKey(t.number.intValue())) {
 					newToken = Token.number(t.line, reassignments.get(t.number.intValue()).doubleValue());
 				}
-				next = multiple;	// preserve next based on if we have multiple line numbers or not.
-			} else {
-				next = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
-					|| t.keyword == ApplesoftKeyword.THEN || t.keyword == ApplesoftKeyword.RUN
-					|| t.keyword == ApplesoftKeyword.LIST;
-				multiple |= t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.ON;
+				then = false;
+			}
+			if (!trigger) {
+				trigger = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
+                    || t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.RUN;
+				then = t.keyword == ApplesoftKeyword.THEN;
 			}
 			newStatement.tokens.add(newToken);
 		}
