@@ -16,7 +16,12 @@ import java.util.stream.Collectors;
 
 import io.github.applecommander.bastools.api.utils.Streams;
 
+/** 
+ * Represents an Applesoft shape table.  Note that this direct class is somewhat useless,
+ * except for the I/O routines.  Access the individual shapes via the {@code #shapes} list.
+ */
 public class ShapeTable {
+    /** Read an existing Applesoft shape table binary file. */
     public static ShapeTable read(byte[] data) {
         Objects.requireNonNull(data);
         ShapeTable shapeTable = new ShapeTable();

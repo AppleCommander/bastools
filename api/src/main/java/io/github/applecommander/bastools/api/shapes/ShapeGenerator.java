@@ -44,6 +44,10 @@ public class ShapeGenerator {
                 st.shapes.add(bitmapShape);
                 shapeConsumer = bitmapShape::appendBitmapRow;
                 break;
+            case ".external":
+                ExternalShapeImporter importer = new ExternalShapeImporter(st, label);
+                shapeConsumer = importer::process;
+                break;
             default:
                 if (line.length() == 0) {
                     // do nothing

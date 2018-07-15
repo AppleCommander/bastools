@@ -109,3 +109,9 @@
   .xx
   x*x
   xx.
+
+; "]IMPERATOR" font from Beagle Bros. "Apple Mechanic"
+.external characters
+  type=bin
+  shapes=1-96
+  import=imperator.bin
