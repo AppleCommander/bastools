@@ -114,14 +114,13 @@ public class ExtractConstantValues extends BaseVisitor {
 	public Statement visit(Statement statement) {
 		try {
 			if (!statement.tokens.isEmpty()) {
-				int size = statement.tokens.size();
 				Token t = statement.tokens.get(0);
-				// Special logic for "A=5+1" while trying to skip constant forms of "A=1234" (don't replicate)
-				if (t.type == Token.Type.IDENT && size > 3) {
+				// Assignment
+				if (t.type == Token.Type.IDENT) {
 					this.consumer = this::numberToIdentTransformation;
 				}
-				// Special logic for "LET A=5+1" while trying to skip constant forms of "LET A=1234" (don't replicate)
-				if (t.type == Token.Type.KEYWORD && t.keyword == ApplesoftKeyword.LET && size > 4) {
+				// Assignment with LET
+				if (t.type == Token.Type.KEYWORD && t.keyword == ApplesoftKeyword.LET) {
 					this.consumer = this::numberToIdentTransformation;
 				}
 			}
