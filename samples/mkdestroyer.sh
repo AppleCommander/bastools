@@ -12,5 +12,5 @@ fi
 shopt -s expand_aliases
 source ./setup.sh
 
-cp template.po ships.po
-bt --stdout --applesingle --optimize ships.bas | ac -as ships.po startup
+cp template.po destroyer.po
+bt --stdout --applesingle --optimize destroyer.bas | ac -as destroyer.po startup
