@@ -1,7 +1,7 @@
-10 gosub 50000:goto 1000
+10 gosub 50000:mm=5:dim dx(mm),dy(mm),ds(mm),ox(mm),oy(mm),os(mm):goto 1000
 
 20 for i=1 to mm:if dx(i) then next i:return
-30 dx(i)=x:dy(i)=wc:ds(i)=dc:return
+30 dx(i)=x:dy(i)=wc:ds(i)=dc:qd=qd-1:gosub 40:vtab 3:htab 37:qq=qd:return
 
 40 a$="0000"+str$(qq):a$=mid$(a$,len(a$)-3)
 50 ly=peek(cv)*lh:lx=peek(ch)*lw
@@ -9,8 +9,7 @@
 
 90 vtab 1:htab 37:qq=qh:gosub 40:vtab 2:qq=qs:gosub 40:vtab 3:qq=qd:gosub 40:return
 
-100 x=140:sd=0:s=sh:qs=0:qd=30
-110 di=1:mm=5:dim dx(mm),dy(mm),ds(mm),ox(mm),oy(mm),os(mm)
+100 x=140:sd=0:s=sh:qs=0:qd=30:di=1
 120 for i=1 to mm:dx(i)=0:dy(i)=0:ds(i)=0:next i
 130 bs=0:bx=0:by=0:bd=0
 140 xs=0:xx=0:xy=0
@@ -28,7 +27,7 @@
 330 if ky=149 then s=sh+1:sd=sd+1
 340 if sd > 3 then sd=3
 350 if sd < -3 then sd=-3
-360 if ky=160 and qd > 0 then qd=qd-1:gosub 20:vtab 3:htab 37:qq=qd:gosub 40 
+360 if ky=160 and qd > 0 then gosub 20 
 
 400 if not bx then 450
 410 bx=bx+bd
@@ -59,13 +58,13 @@
 800 if qs > qh then qh = qs 
 
 1000 hgr:poke -16302,0:ch=36:cv=37:lw=7:lh=8:sp=asc(" "):wl=40:ws=wl-3:wc=wl+2:ru=95+cb
-1010 hcolor=0:vtab 1:htab 1:a$="DESTROYER!":gosub 50
-1020 vtab 22:htab 4:a$="| LEFT, } RIGHT, SPACEBAR TO FIRE":gosub 50 
-1030 vtab 1:htab 28:a$="HISCORE:":gosub 50:vtab 2:a$="SCORE:":gosub 50:vtab 3:a$="CHARGES:":gosub 50:gosub 90
+1010 hcolor=0:vtab 1:htab 1:a$="Destroyer!":gosub 50
+1020 vtab 22:htab 4:a$="| Left, } Right, Spacebar to fire":gosub 50 
+1030 vtab 1:htab 28:a$="Hiscore:":gosub 50:vtab 2:a$="Score:":gosub 50:vtab 3:a$="Charges:":gosub 50:gosub 90
 1050 hcolor=6:hplot 0,wl to 279,wl:hplot 0,159 to 279,159:hcolor=0
-1060 ly=wl+15:xdraw sh at 45,ly+3:a$="YOUR DESTROYER":lx=70:gosub 60 
-1070 ly=ly+10:xdraw sb at 45,ly+3:a$="ENEMY SUBMARINE (1 point)":lx=70:gosub 60
-1080 ly=ly+10:lx=40:for s=dc to dc+3:xdraw s at lx,ly+3:lx=lx+5:next s:a$="DEPTH CHARGES (hit = +5!)":lx=70:gosub 60
+1060 ly=wl+15:xdraw sh at 45,ly+3:a$="Your destroyer":lx=70:gosub 60 
+1070 ly=ly+10:xdraw sb at 45,ly+3:a$="Enemy submarine (1 point)":lx=70:gosub 60
+1080 ly=ly+10:lx=40:for s=dc to dc+3:xdraw s at lx,ly+3:lx=lx+5:next s:a$="Depth charges (hit = +5!)":lx=70:gosub 60
 1090 ly=ly+20:lx=40:a$="Demo code for 'bastools'":gosub 60
 1100 ly=ly+10:lx=40:a$="Visit applecommander.github.io":gosub 60
 1110 ly=ly+20:lx=40:a$="PRESS ANY KEY TO BEGIN!":gosub 60 
