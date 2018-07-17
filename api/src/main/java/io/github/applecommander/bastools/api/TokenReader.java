@@ -145,6 +145,13 @@ public class TokenReader {
 							ApplesoftKeyword.find(String.format("%c", tokenizer.ttype))
 							   .map(kw -> Token.keyword(line, kw))
 							   .orElse(Token.syntax(line, tokenizer.ttype)));
+				case '\\':
+				    // Special case: introducing a backslash to ignore the IMMEDIATELY following EOL
+				    // If this does not occur, we simply fall through and fail.  That is intentional!
+				    if (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
+				        // Consume the EOL and continue on our merry way
+				        break;
+				    }
 				default:
 					throw new IOException(String.format(
 						"Unknown! ttype=%d, nval=%f, sval=%s\n", tokenizer.ttype, tokenizer.nval, tokenizer.sval));
