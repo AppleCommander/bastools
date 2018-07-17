@@ -187,6 +187,8 @@ public enum ApplesoftKeyword {
 		// This resets part of parseNumbers to match AppleSoft tokenization!
 		tokenizer.ordinaryChar('-');
 		tokenizer.eolIsSignificant(true);
+		// Special case: Allow a single line comment with ' as that is not part of language
+		tokenizer.commentChar('\'');
 		return tokenizer;
 	}
 	
