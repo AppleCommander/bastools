@@ -38,6 +38,16 @@ public abstract class Directive {
 		this.parameterNames = new TreeSet<>(String::compareToIgnoreCase);
 		this.parameterNames.addAll(Arrays.asList(parameterNames));
 	}
+
+	/** Resolve the given variable name with any variable replacements that should occur. */
+    public String resolve(String originalVariableName) {
+        if (config.variableReplacements.containsKey(originalVariableName)) {
+            String replacementVariableName = config.variableReplacements.get(originalVariableName);
+            config.debugStream.printf("Replacing '%s' with '%s'\n", originalVariableName, replacementVariableName);
+            return replacementVariableName;
+        }
+        return originalVariableName;
+    }
 	
 	public Optional<Expression> optionalExpression(String paramName) {
 	    return Optional.ofNullable(parameters.get(paramName));

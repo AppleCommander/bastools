@@ -67,7 +67,7 @@ public class EmbeddedShapeTable extends Directive {
         // Setup common code
         if (poke) basic.POKEW(232, shapeTableStart).endStatement();
         if (init) basic.ROT(0).endStatement().SCALE(1).endStatement();
-        address.ifPresent(var -> basic.assign(var, shapeTableStart).endStatement());
+        address.ifPresent(var -> basic.assign(resolve(var), shapeTableStart).endStatement());
         
         // Inject src options
         assign.ifPresent(expr -> setupVariables(expr, basic, shapeTable));
@@ -85,7 +85,7 @@ public class EmbeddedShapeTable extends Directive {
         
         builder.generate(startAddress).writeTo(this.outputStream);
     }
-
+    
     public void setupVariables(MapExpression expr, BasicBuilder basic, Optional<ShapeTable> shapeTableOptional) {
         ShapeTable st = shapeTableOptional.orElseThrow(() -> new RuntimeException("ShapeTable source not supplied"));
         expr.entrySet().forEach(e -> {
@@ -93,7 +93,7 @@ public class EmbeddedShapeTable extends Directive {
                                        .map(SimpleExpression::asString)
                                        .orElseThrow(() -> new RuntimeException(
                                                String.format("Unexpected format of asignments for variable '%s'", e.getKey())));
-            basic.assign(e.getKey(), st.findPositionByLabel(label)).endStatement();
+            basic.assign(resolve(e.getKey()), st.findPositionByLabel(label)).endStatement();
         });
     }
     
@@ -104,7 +104,7 @@ public class EmbeddedShapeTable extends Directive {
         ShapeTable st = shapeTableOptional.orElseThrow(() -> new RuntimeException("ShapeTable source not supplied"));
         for (int i=0; i<st.shapes.size(); i++) {
             Shape s = st.shapes.get(i);
-            basic.assign(s.getLabel(), i+1);
+            basic.assign(resolve(s.getLabel()), i+1);
         }
     }
 

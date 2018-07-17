@@ -42,7 +42,7 @@ public class EmbeddedBinaryDirective extends Directive {
 		
 		variableName.ifPresent(var -> {
 		    builder.basic()
-    	           .assign(var, embeddedStart)
+    	           .assign(resolve(var), embeddedStart)
     	           .endStatement();
 		});
 		

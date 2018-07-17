@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Configuration {
@@ -11,6 +13,7 @@ public class Configuration {
 	public final int startAddress;
 	public final int maxLineLength;
 	public final PrintStream debugStream;
+	public final Map<String,String >variableReplacements = new HashMap<>();
 	
 	private Configuration(Builder b) {
 		this.sourceFile = b.sourceFile;

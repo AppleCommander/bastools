@@ -79,6 +79,7 @@ public class Main implements Callable<Void> {
 			"Enable specific optimizations.",
 			"* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
 			"* @|green remove-rem-statements|@ - Remove all REM statements.",
+			"* @|green shorten-variable-names|@ - Ensure all variables are 1 or 2 characters long.",
 			"* @|green extract-constant-values|@ - Assign all constant values first.",
 			"* @|green merge-lines|@ - Merge lines.",
 			"* @|green renumber|@ - Renumber program."
