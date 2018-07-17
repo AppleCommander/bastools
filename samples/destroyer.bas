@@ -116,13 +116,7 @@
        chargeindex = 1
 
 ' Erase shapes
-700 if priorchargex(chargeindex) then \
-       xdraw priorchargeshape(chargeindex) at priorchargex(chargeindex),priorchargey(chargeindex): \
-       if peek(234) then \
-          chargex(chargeindex)=0: \
-          chargey(chargeindex)=0: \
-          chargeshape(chargeindex)=0
-710 if oldsubx then \
+700 if oldsubx then \
        xdraw oldsubshape at oldsubx,oldsuby: \
        a=oldsubx:oldsubx=0: \
        if peek(234) then \
@@ -134,6 +128,12 @@
           remainingcharges=remainingcharges+5: \
           vtab 2:htab 37:qq=score:gosub 40: \
           vtab 3:qq=remainingcharges:gosub 40
+710 if priorchargex(chargeindex) then \
+       xdraw priorchargeshape(chargeindex) at priorchargex(chargeindex),priorchargey(chargeindex): \
+       if peek(234) then \
+          chargex(chargeindex)=0: \
+          chargey(chargeindex)=0: \
+          chargeshape(chargeindex)=0
 720 if zx then xdraw zs at zx,explosiony:zx=0
 730 xdraw oldshipshape at oldshipx,shipy
 740 if remainingcharges > 0 then 200 
