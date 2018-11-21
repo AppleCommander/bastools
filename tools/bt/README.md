@@ -32,6 +32,8 @@ Options:
                             * remove-empty-statements - Strip out all '::'-like
                               statements.
                             * remove-rem-statements - Remove all REM statements.
+                            * shorten-variable-names - Ensure all variables are 1 or
+                              2 characters long.
                             * extract-constant-values - Assign all constant values
                               first.
                             * merge-lines - Merge lines.
