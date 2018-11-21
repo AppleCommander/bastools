@@ -1,6 +1,7 @@
 package io.github.applecommander.bastools.api;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 
 import io.github.applecommander.bastools.api.model.Line;
@@ -24,26 +25,27 @@ public class Parser {
 	public Program parse() {
 		Program program = new Program();
 		while (!tokens.isEmpty()) {
-			Line line = readLine(program);
-			program.lines.add(line);
+		    readLine(program).ifPresent(program.lines::add);
 		}
 		return program;
 	}
 	
-	public Line readLine(Program program) {
-		Line line = new Line(expectNumber(), program);
-		while (!tokens.isEmpty() && tokens.peek().type != Type.EOL) {
-			Statement statement = readStatement();
-			if (statement != null) {
-				line.statements.add(statement);
-			} else {
-				break;
-			}
-		}
-		if (!tokens.isEmpty() && tokens.peek().type == Type.EOL) {
-			tokens.remove();	// Skip that EOL
-		}
-		return line;
+	public Optional<Line> readLine(Program program) {
+	    return expectNumber().map(lineNumber -> {
+            Line line = new Line(lineNumber, program);
+            while (!tokens.isEmpty() && tokens.peek().type != Type.EOL) {
+                Statement statement = readStatement();
+                if (statement != null) {
+                    line.statements.add(statement);
+                } else {
+                    break;
+                }
+            }
+            if (!tokens.isEmpty() && tokens.peek().type == Type.EOL) {
+                tokens.remove();    // Skip that EOL
+            }
+            return line;
+	    });
 	}
 	
 	public Statement readStatement() {
@@ -57,15 +59,14 @@ public class Parser {
 		return statement;
 	}
 	
-	public int expectNumber() {
+	public Optional<Integer> expectNumber() {
 		Token c = tokens.remove();
 		while (c.type == Type.EOL) {
-			// Allow blank lines...
-			c = tokens.remove();
+		    return Optional.empty();
 		}
 		if (c.type != Type.NUMBER) {
 			throw new RuntimeException("Expected a number in line #" + c.line);
 		}
-		return c.number.intValue();
+		return Optional.of(c.number.intValue());
 	}
 }
