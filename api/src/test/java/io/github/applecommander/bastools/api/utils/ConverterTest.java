@@ -8,8 +8,10 @@ public class ConverterTest {
     @Test
     public void testToInteger() {
         assertEquals(0x1000, Converters.toInteger("0x1000").intValue());
+        assertEquals(0x1000, Converters.toInteger("0X1000").intValue());
         assertEquals(0x1000, Converters.toInteger("$1000").intValue());
         assertEquals(1000, Converters.toInteger("1000").intValue());
+        assertNull(Converters.toInteger(null));
     }
     
     @Test
@@ -20,6 +22,7 @@ public class ConverterTest {
         assertFalse(Converters.toBoolean("faLse"));
         assertFalse(Converters.toBoolean("No"));
         assertFalse(Converters.toBoolean("notreally"));
+        assertNull(Converters.toBoolean(null));
     }
     
     @Test
