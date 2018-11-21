@@ -19,7 +19,7 @@ To include in a Gradle project:
 ```
 dependencies {
     // ...
-    compile "net.sf.applecommander:bastools-api:0.2.0"
+    compile "net.sf.applecommander:bastools-api:0.3.0"
     // ...
 }
 ```
