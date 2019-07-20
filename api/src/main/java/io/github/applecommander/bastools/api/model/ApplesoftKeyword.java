@@ -71,6 +71,7 @@ public enum ApplesoftKeyword {
     DEF(0xB8, "DEF"), 
     POKE(0xB9, "POKE"), 
     PRINT(0xBA, "PRINT"), 
+    questionmark(0xBA, "?"), // Alternate form of PRINT
     CONT(0xBB, "CONT"), 
     LIST(0xBC, "LIST"), 
     CLEAR(0xBD, "CLEAR"), 
@@ -178,6 +179,7 @@ public enum ApplesoftKeyword {
 		tokenizer.resetSyntax();
 		tokenizer.wordChars('a', 'z');
 		tokenizer.wordChars('A', 'Z');
+		tokenizer.wordChars('?', '?');  // For '?' form of PRINT
 		tokenizer.wordChars('$', '$');	// Experiment to pull in string marker
 		tokenizer.wordChars('%', '%');	// Experiment to pull in integer marker
 		tokenizer.wordChars(128 + 32, 255);
