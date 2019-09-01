@@ -108,7 +108,12 @@ public class TokenReader {
 								.filter(t -> opt.get().parts.get(1).equals(t.text))
 							    .orElseThrow(() -> new IOException("Expecting: " + opt.get().parts));
 						}
-						return Optional.of(Token.keyword(line, opt.get()));
+						ApplesoftKeyword outKeyword = opt.get();
+						// Special case - canonicalize '?' alternate form of 'PRINT'
+						if (opt.filter(kw -> kw == ApplesoftKeyword.questionmark).isPresent()) {
+							outKeyword = ApplesoftKeyword.PRINT;
+						}
+						return Optional.of(Token.keyword(line, outKeyword));
 					}
 					// Check if we found a directive
 					if (tokenizer.sval.startsWith("$")) {
