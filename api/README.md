@@ -10,7 +10,7 @@ To include in a Maven project:
 <dependency>
   <groupId>net.sf.applecommander</groupId>
   <artifactId>bastools-api</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
 </dependency>
 ```
 
@@ -19,7 +19,7 @@ To include in a Gradle project:
 ```
 dependencies {
     // ...
-    compile "net.sf.applecommander:bastools-api:0.3.0"
+    compile "net.sf.applecommander:bastools-api:0.3.1"
     // ...
 }
 ```
