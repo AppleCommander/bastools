@@ -158,8 +158,18 @@ public class TokenReader {
 				        break;
 				    }
 				default:
-					throw new IOException(String.format(
-						"Unknown! ttype=%d, nval=%f, sval=%s\n", tokenizer.ttype, tokenizer.nval, tokenizer.sval));
+				    String message = String.format("Unknown or unexpected character '%c'", tokenizer.ttype);
+				    if (tokenizer.ttype == StreamTokenizer.TT_WORD) {
+				        message = String.format("Unknown or unexpected string '%s'", tokenizer.sval);
+				    } else if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
+				        message = String.format("Unknown or unexpected number %f", tokenizer.nval);
+				    } else if (tokenizer.ttype == StreamTokenizer.TT_EOF) {
+				        message = "Unexpected EOF";
+				    } else if (tokenizer.ttype == StreamTokenizer.TT_EOL) {
+				        message = "Unexpected EOL";
+				    }
+				    message += String.format(" found on line #%d", tokenizer.lineno());
+					throw new IOException(message);
 				}
 			}
 		}
