@@ -18,7 +18,12 @@ import io.github.applecommander.bastools.api.model.Token;
 /**
  * The TokenReader, given a text file, generates a series of Tokens (in the compiler sense, 
  * not AppleSoft) for the AppleSoft program.
- *  
+ * <p/>
+ * Note that this relies on the Java StreamTokenizer. The goal is to provide a more modern
+ * parsing of tokens (in which it succeeds), however, AppleSoft itself is dated and mixes with
+ * what a modern syntax would consist of. Specifically, the '#' is out of place as part of a
+ * token and not a syntax element. Hence there is some funny business embedded in the code.
+ * 
  * @author rob
  */
 public class TokenReader {
@@ -57,16 +62,16 @@ public class TokenReader {
 		return tokens;
 	}
 
-	public TokenReader(Reader reader) {
+	private TokenReader(Reader reader) {
 		this.reader = reader;
 		this.tokenizer = ApplesoftKeyword.tokenizer(reader);
 	}
 	
-	public boolean hasMore() {
+	private boolean hasMore() {
 		return hasMore;
 	}
 	
-	public Optional<Token> next(int depth) throws IOException {
+	private Optional<Token> next(int depth) throws IOException {
 		// A cheesy attempt to prevent too much looping...
 		if (depth > 0) {
 			if (this.needSyntheticEol) {
