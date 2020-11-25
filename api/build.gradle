@@ -14,7 +14,7 @@ jar {
   manifest {
     attributes(
       'Implementation-Title': 'B/BAS Tools API',
-      'Implementation-Version': "${version} (${new Date().format('yyyy-MM-dd HH:mm')})"
+      'Implementation-Version': "${project.version} (${new Date().format('yyyy-MM-dd HH:mm')})"
     )
   }
 }

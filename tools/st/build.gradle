@@ -14,14 +14,14 @@ bootJar {
   manifest {
     attributes(
       'Implementation-Title': 'Shape Tools CLI',
-      'Implementation-Version': "${version} (${new Date().format('yyyy-MM-dd HH:mm')})" 
+      'Implementation-Version': "${project.version} (${new Date().format('yyyy-MM-dd HH:mm')})" 
     )
   }
 }
 
 dependencies {
-    compile 'info.picocli:picocli:3.0.2'
-    compile 'net.sf.applecommander:applesingle-api:1.2.1'
-    compile 'net.sf.applecommander:AppleCommander:1.4.0'
-    compile project(':bastools-api')
+    implementation 'info.picocli:picocli:3.0.2'
+    implementation 'net.sf.applecommander:applesingle-api:1.2.1'
+    implementation 'net.sf.applecommander:AppleCommander:1.4.0'
+    implementation project(':bastools-api')
 }

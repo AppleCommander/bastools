@@ -14,13 +14,13 @@ bootJar {
   manifest {
     attributes(
       'Implementation-Title': 'BT CLI',
-      'Implementation-Version': "${version} (${new Date().format('yyyy-MM-dd HH:mm')})" 
+      'Implementation-Version': "${project.version} (${new Date().format('yyyy-MM-dd HH:mm')})" 
     )
   }
 }
 
 dependencies {
-    compile 'info.picocli:picocli:3.0.2'
-    compile 'net.sf.applecommander:applesingle-api:1.2.1'
-    compile project(':bastools-api')
+    implementation 'info.picocli:picocli:3.0.2'
+    implementation 'net.sf.applecommander:applesingle-api:1.2.1'
+    implementation project(':bastools-api')
 }
