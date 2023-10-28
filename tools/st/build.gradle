@@ -22,6 +22,6 @@ bootJar {
 dependencies {
     implementation 'info.picocli:picocli:3.0.2'
     implementation 'net.sf.applecommander:applesingle-api:1.2.2'
-    implementation 'net.sf.applecommander:AppleCommander:1.4.0'
+    implementation 'net.sf.applecommander:AppleCommander:1.8.0'
     implementation project(':bastools-api')
 }
