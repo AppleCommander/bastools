@@ -35,6 +35,8 @@ The framework allows embedding of directives.
 
 ### `$embed`
 
+> NOTE: It appears that DOS 3.3 _rewrites_ the resulting application and messes up the linked list of lines. ProDOS does not.
+
 `$embed` will allow a binary to be embedded within the resulting application and can move it to a destination in memory. Please note that once the application is loaded on the Apple II, the program cannot be altered as the computer will crash.  
 
 Options:
