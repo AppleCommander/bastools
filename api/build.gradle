@@ -1,10 +1,18 @@
-repositories {
-    jcenter()
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
 }
 
-apply plugin: 'java-library'
-apply plugin: 'maven'
-apply plugin: 'signing'
+ext.isSnapshotVersion = version.endsWith("SNAPSHOT")
+ext.isReleaseVersion = !ext.isSnapshotVersion
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
@@ -19,63 +27,69 @@ jar {
   }
 }
 
+javadoc {
+    title = "bastools ${version}"
+    source = sourceSets.main.allJava
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
 task javadocJar(type: Jar) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
-artifacts {
-    archives javadocJar, sourcesJar
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom {
+                groupId = "net.sf.applecommander"
+                artifactId = archivesBaseName
+                name = "B/BAS Tools (bastools)"
+                description = 'An Applesoft BASIC tools library.'
+                url = 'https://applecommander.github.io/'
+                licenses {
+                    license {
+                        name = 'The GNU General Public License (GPL) Version 3, 29 June 2007'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'robgreene'
+                        name = 'Rob Greene'
+                        email = 'robgreene@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/AppleCommander/bastools.git'
+                    developerConnection = 'scm:git:git@github.com:AppleCommander/bastools.git'
+                    url = 'https://github.com/AppleCommander/bastools'
+                }
+            }
+            repositories {
+                maven {
+                    def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    url = isSnapshotVersion ? snapshotsRepoUrl : releasesRepoUrl
+                    credentials {
+                        username = findProperty('ossrhUsername')
+                        password = findProperty('ossrhPassword')
+                    }
+                }
+            }
+        }
+    }
 }
 
 signing {
-    // Only sign if we're uploading...
-    required { gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
+    sign publishing.publications.mavenJava
 }
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
-      }
-
-      pom.project {
-        name archivesBaseName
-        packaging 'jar'
-        description 'An Applesoft BASIC tools library.'
-        url 'https://applecommander.github.io/'
-
-        scm {
-          url 'https://github.com/AppleCommander/bastools'
-        }
-
-        licenses {
-          license {
-            name 'The GNU General Public License (GPL) Version 3, 29 June 2007'
-            url 'https://www.gnu.org/licenses/gpl-3.0.html'
-          }
-        }
-
-        developers {
-          developer {
-            id 'robgreene'
-            email 'robgreene@gmail.com'
-          }
-        }
-      }
-    }
-  }
-}

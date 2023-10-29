@@ -1,12 +1,15 @@
 plugins {
-    id 'org.springframework.boot' version '2.0.2.RELEASE'
+    id 'org.springframework.boot' version "2.7.17"
+    id 'java'
+    id 'application'
 }
+
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
-
-apply plugin: 'application'
 
 mainClassName = "io.github.applecommander.bastools.tools.st.Main"
 
@@ -14,7 +17,7 @@ bootJar {
   manifest {
     attributes(
       'Implementation-Title': 'Shape Tools CLI',
-      'Implementation-Version': "${project.version} (${new Date().format('yyyy-MM-dd HH:mm')})" 
+      'Implementation-Version': "${project.version} (${new Date().format('yyyy-MM-dd HH:mm')})"
     )
   }
 }

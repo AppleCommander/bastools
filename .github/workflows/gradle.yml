@@ -35,7 +35,7 @@ jobs:
     - name: Collect artifacts
       run: |
         mkdir artifacts
-        cp $(find tools/ -name "bastools-*.jar") artifacts/
+        cp $(find tools/ -name "bastools-*.jar" -not -name "bastools-*-plain.jar") artifacts/
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
