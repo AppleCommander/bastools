@@ -37,6 +37,7 @@ public class EmbeddedBinaryDirective extends Directive {
 		byte[] bin = Files.readAllBytes(file.toPath());
 
 		CodeBuilder builder = new CodeBuilder();
+		CodeMark moveStart = new CodeMark();
 		CodeMark embeddedStart = new CodeMark();
 		CodeMark embeddedEnd = new CodeMark();
 		
@@ -48,7 +49,7 @@ public class EmbeddedBinaryDirective extends Directive {
 		
 		targetAddress.ifPresent(address -> {
 		    builder.basic()
-		           .CALL(embeddedStart)
+		           .CALL(moveStart)
 		           .endStatement();
 		    
     		Optional<Line> nextLine = line.nextLine();
@@ -64,8 +65,10 @@ public class EmbeddedBinaryDirective extends Directive {
 		builder.basic()
                .endLine();
 
+
 		targetAddress.ifPresent(address -> {
-		    builder.asm()
+			builder.set(moveStart)
+		           .asm()
                    .setAddress(embeddedStart, 0x3c)
                    .setAddress(embeddedEnd, 0x3e)
                    .setAddress(address, 0x42)
