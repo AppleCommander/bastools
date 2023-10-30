@@ -162,4 +162,4 @@ DOS 3.3 (but not ProDOS) seems to rewrite the application linked list when an Ap
 10 POKE 103,24:POKE 104,8:RUN
 ```
 
-This is a valid program that resets to Applesoft pointer to just after the current program and runs that other program.
+This is a valid program that resets the Applesoft pointer to just after the current program and runs that other program.
