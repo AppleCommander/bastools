@@ -9,14 +9,6 @@ Generally, the usage pattern is:
 ## Code snippets
 
 ```java
-Configuration config = Configuration.builder()
-        .sourceFile(this.sourceFile)
-        .build();
-```
-
-The `Configuration` class also allows the BASIC start address to be set (defaults to `0x801`), set the maximum line length (this is in bytes, and defaults to `255`, but feel free to experiment).  Some of the classes report output via the debug stream, which defaults to a simple null stream (no output) - replace with `System.out` or another `PrintStream`.
-
-```java
 Queue<Token> tokens = TokenReader.tokenize(config.sourceFile);
 ```
 
@@ -28,6 +20,21 @@ Program program = parser.parse();
 ```
 
 The `Program` is now the parsed version of the BASIC program.  Various `Visitor`s may be used to report, gather information, or manipulate the tree in various ways.
+
+```java
+Configuration config = Configuration.builder()
+        .sourceFile(this.sourceFile)
+        .build();
+```
+
+The `Configuration` class also allows the BASIC start address to be set (defaults to `0x801`), set the maximum line length (this is in bytes, and defaults to `255`, but feel free to experiment).  Some of the classes report output via the debug stream, which defaults to a simple null stream (no output) - replace with `System.out` or another `PrintStream`.
+
+```java
+ByteVisitor byteVisitor = Visitors.byteVisitor(config);
+byte[] programData = byteVisitor.dump(program);
+```
+
+Finally, the ByteVisitor will transform the program into the tokenized form.
 
 ## Directives
 
