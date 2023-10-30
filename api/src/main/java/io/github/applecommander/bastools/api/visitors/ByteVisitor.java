@@ -63,6 +63,7 @@ public class ByteVisitor implements Visitor {
 		ByteArrayOutputStream os = stack.peek();
 		os.write(0x00);
 		os.write(0x00);
+		this.address += 2;
 		return program;
 	}
 	

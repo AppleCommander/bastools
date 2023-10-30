@@ -1,47 +1,47 @@
 ## Usage
 
 ```shell
-$ bt
-Missing required parameter: <sourceFile>
+$ bt --help
 Usage: bt [-chOVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
-          [--stdout] [--tokens] [--variables]
-          [--max-line-length=<maxLineLength>] [-a=<address>] [-o=<outputFile>]
+          [--stdout] [--tokens] [--variables] [--wrapper] [-a=<address>]
+          [--max-line-length=<maxLineLength>] [-o=<outputFile>]
           [-f=<optimizations>[,<optimizations>...]]... <sourceFile>
 
 Transforms an AppleSoft program from text back to its tokenized state.
       <sourceFile>          AppleSoft BASIC program to process.
 
 Options:
-      --addresses           Dump line number addresses out.
-      --applesingle         Write output in AppleSingle format
-      --debug               Print debug output.
-      --list                List structure as bastools understands it.
-      --max-line-length=<maxLineLength>
-                            Maximum line length for generated lines.
-                              Default: 255
-      --pretty              Pretty print structure as bastools understands it.
-      --stdout              Send binary output to stdout.
-      --tokens              Dump token list to stdout for debugging.
-      --variables           Generate a variable report
   -a, --address=<address>   Base address for program
                               Default: 2049
-  -c, --copy                Generate a copy/paste form of output for testing in an
-                              emulator.
-  -f= <optimizations>[,<optimizations>...]
+      --addresses           Dump line number addresses out.
+      --applesingle         Write output in AppleSingle format
+  -c, --copy                Generate a copy/paste form of output for testing in
+                              an emulator.
+      --debug               Print debug output.
+  -f=<optimizations>[,<optimizations>...]
                             Enable specific optimizations.
                             * remove-empty-statements - Strip out all '::'-like
                               statements.
                             * remove-rem-statements - Remove all REM statements.
-                            * shorten-variable-names - Ensure all variables are 1 or
-                              2 characters long.
-                            * extract-constant-values - Assign all constant values
-                              first.
+                            * shorten-variable-names - Ensure all variables are
+                              1 or 2 characters long.
+                            * extract-constant-values - Assign all constant
+                              values first.
                             * merge-lines - Merge lines.
                             * renumber - Renumber program.
   -h, --help                Show this help message and exit.
+      --list                List structure as bastools understands it.
+      --max-line-length=<maxLineLength>
+                            Maximum line length for generated lines.
+                              Default: 255
   -o, --output=<outputFile> Write binary output to file.
   -O, --optimize            Apply all optimizations.
+      --pretty              Pretty print structure as bastools understands it.
+      --stdout              Send binary output to stdout.
+      --tokens              Dump token list to stdout for debugging.
   -V, --version             Print version information and exit.
+      --variables           Generate a variable report
+      --wrapper             Wrap the Applesoft program (DOS 3.3).
   -x, --hex                 Generate a binary hex dump for debugging.
 ```
 
@@ -153,3 +153,13 @@ demo.dsk /DEMO/
 ProDOS format; 139,264 bytes free; 4,096 bytes used.
 
 ```
+
+## Wrapping the application
+
+DOS 3.3 (but not ProDOS) seems to rewrite the application linked list when an Applesoft program is loaded; this rewrites the pointers and impacts any embedded (via `$embed`) machine code. With the wrapper, the application is "wrapped" with a startup Applesoft program that prevents the rewrite. The wrapper is just a simple program:
+
+```basic
+10 POKE 103,24:POKE 104,8:RUN
+```
+
+This is a valid program that resets to Applesoft pointer to just after the current program and runs that other program.

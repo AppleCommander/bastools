@@ -1,10 +1,6 @@
 package io.github.applecommander.bastools.tools.bt;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +70,9 @@ public class Main implements Callable<Void> {
 	
 	@Option(names = "--max-line-length", description = "Maximum line length for generated lines.", showDefaultValue = Visibility.ALWAYS)
 	private int maxLineLength = 255;
+
+	@Option(names = "--wrapper", description = "Wrap the Applesoft program (DOS 3.3).")
+	private boolean wrapProgram;
 	
 	@Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
 			"Enable specific optimizations.",
@@ -174,17 +173,34 @@ public class Main implements Callable<Void> {
 		}
 
 		ByteVisitor byteVisitor = Visitors.byteVisitor(config);
-		byte[] data = byteVisitor.dump(program);
+		byte[] wrapperData = new byte[0];
+		if (wrapProgram) {
+			Queue<Token> wrapperTokens = TokenReader.tokenize(new ByteArrayInputStream(
+					"10 POKE 103,24:POKE 104,8:RUN".getBytes()));
+			Parser wrapperParser = new Parser(wrapperTokens);
+			Program wrapperProgram = wrapperParser.parse();
+			wrapperData = byteVisitor.dump(wrapperProgram);
+		}
+
+		byte[] programData = byteVisitor.dump(program);
 		if (showLineAddresses) {
 			byteVisitor.getLineAddresses().forEach((l,a) -> System.out.printf("%5d ... $%04x\n", l, a));
 		}
+
+		// Merge both programs together. Note that wrapperData may be a 0 byte array.
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		output.write(wrapperData);
+		output.write(programData);
+		output.flush();
+		byte[] data = output.toByteArray();
+
 		if (hexFormat) {
 			HexDumper.standard().dump(address, data);
 		}
 		if (copyFormat) {
 			HexDumper.apple2().dump(address, data);
 		}
-		
+
 		saveResults(data);
 	}
 	
