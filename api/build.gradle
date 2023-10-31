@@ -51,7 +51,7 @@ publishing {
             artifact javadocJar
             pom {
                 groupId = "net.sf.applecommander"
-                artifactId = archivesBaseName
+                artifactId = "bastools-api"
                 name = "B/BAS Tools (bastools)"
                 description = 'An Applesoft BASIC tools library.'
                 url = 'https://applecommander.github.io/'
