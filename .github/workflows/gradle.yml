@@ -9,9 +9,9 @@ name: Build bt and st
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -28,16 +28,16 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-      with:
-        arguments: build
+      run: ./gradlew build
     - name: Collect artifacts
       run: |
         mkdir artifacts
         cp $(find tools/ -name "bastools-*.jar" -not -name "bastools-*-plain.jar") artifacts/
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  
       with:
         name: build-artifacts
         path: artifacts/
