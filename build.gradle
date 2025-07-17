@@ -1,7 +1,9 @@
 if (JavaVersion.current().isJava8Compatible()) {
   allprojects {
-    tasks.withType(Javadoc) {
-      options.addStringOption('Xdoclint:none', '-quiet')
+    tasks.withType(Javadoc).tap {
+      configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+      }
     }
   }
 }

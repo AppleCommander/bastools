@@ -24,3 +24,6 @@ bin/
 # Gradle extras
 .gradle/
 build/
+
+# IntelliJ
+.idea/

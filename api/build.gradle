@@ -7,8 +7,10 @@ plugins {
 ext.isSnapshotVersion = version.endsWith("SNAPSHOT")
 ext.isReleaseVersion = !ext.isSnapshotVersion
 
-sourceCompatibility = 11
-targetCompatibility = 11
+java {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+}
 
 repositories {
     mavenCentral()
@@ -33,12 +35,12 @@ javadoc {
     options.addStringOption('Xdoclint:none', '-quiet')
 }
 
-task javadocJar(type: Jar) {
+tasks.register('javadocJar', Jar) {
     archiveClassifier = 'javadoc'
     from javadoc
 }
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
