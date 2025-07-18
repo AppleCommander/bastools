@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version "2.7.17"
     id 'java'
     id 'application'
+    id 'org.graalvm.buildtools.native' version '0.10.6'
 }
 
 java {
@@ -11,6 +12,15 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': 'Shape Tools CLI',
+                'Implementation-Version': "${project.version} (${new Date().format('yyyy-MM-dd HH:mm')})"
+        )
+    }
 }
 
 application {
@@ -31,4 +41,14 @@ dependencies {
     implementation 'net.sf.applecommander:applesingle-api:1.2.2'
     implementation 'net.sf.applecommander:AppleCommander:1.9.0'
     implementation project(':bastools-api')
+}
+
+graalvmNative {
+    String osName = System.getProperty('os.name').toLowerCase().split()[0]
+    String osArch = System.getProperty('os.arch').toLowerCase().split()[0]
+    binaries {
+        named("main") {
+            imageName.set("st-${osName}-${osArch}-${project.version}")
+        }
+    }
 }
