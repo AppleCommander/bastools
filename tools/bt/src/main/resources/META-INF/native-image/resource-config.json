@@ -1,10 +1,11 @@
 {
-  "resources": {
-    "includes": [
-      {
-        "pattern": "META-INF/MANIFEST.MF"
-      }
-    ]
-  },
-  "bundles": []
+  "resources":{
+  "includes":[{
+    "pattern":"META-INF/MANIFEST.MF"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.lang.System$LoggerFinder\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.time.zone.ZoneRulesProvider\\E"
+  }]},
+  "bundles":[]
 }
