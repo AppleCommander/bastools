@@ -2,7 +2,7 @@ name: GraalVM Native Image builds
 on: [push, pull_request]
 jobs:
   build:
-    name: 'bt' and 'st' on ${{ matrix.os }}-${{ matrix.arch }}
+    name: bt and st on ${{ matrix.os }}-${{ matrix.arch }}
     runs-on: ${{ matrix.label  }}
     strategy:
       matrix:
