@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version "2.7.18"
     id 'java'
     id 'application'
-    id 'org.graalvm.buildtools.native' version '0.10.6'
+    id 'org.graalvm.buildtools.native' version '0.11.1'
 }
 
 java {
