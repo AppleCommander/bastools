@@ -2,6 +2,8 @@ package io.github.applecommander.bastools.api.model;
 
 import io.github.applecommander.bastools.api.Visitor;
 
+import java.util.Objects;
+
 /**
  * A Token in the classic compiler sense, in that this represents a component of the application.
  * 
@@ -75,8 +77,20 @@ public class Token {
 	public static Token directive(int line, String text) {
 		return new Token(line, Type.DIRECTIVE, null, null, text);
 	}
-	
-	public static enum Type {
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Token token = (Token) o;
+        return line == token.line && type == token.type && keyword == token.keyword && Objects.equals(number, token.number) && Objects.equals(text, token.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, type, keyword, number, text);
+    }
+
+    public static enum Type {
 		EOL, NUMBER, IDENT, COMMENT, STRING, KEYWORD, SYNTAX, DIRECTIVE
 	}
 }

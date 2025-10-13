@@ -106,26 +106,32 @@ public class TokenReader {
 						return Optional.of(Token.comment(line, sb.toString()));
 					}
 					// If we found an Applesoft token, handle it
+                    String sval = tokenizer.sval;
 					if (opt.isPresent()) {
+                        boolean good = true;
 						if (opt.get().parts.size() > 1) {
 							// Pull next token and see if it is the 2nd part ("PR#" == "PR", "#"; checking for the "#")
-							next(depth-1)
+                            // If not, drop into identifier routine
+							good = next(depth-1)
 								.filter(t -> opt.get().parts.get(1).equals(t.text))
-							    .orElseThrow(() -> new IOException("Expecting: " + opt.get().parts));
+                                .isPresent();
 						}
-						ApplesoftKeyword outKeyword = opt.get();
-						// Special case - canonicalize '?' alternate form of 'PRINT'
-						if (opt.filter(kw -> kw == ApplesoftKeyword.questionmark).isPresent()) {
-							outKeyword = ApplesoftKeyword.PRINT;
-						}
-						return Optional.of(Token.keyword(line, outKeyword));
+                        if (good) {
+                            ApplesoftKeyword outKeyword = opt.get();
+                            // Special case - canonicalize '?' alternate form of 'PRINT'
+                            if (opt.filter(kw -> kw == ApplesoftKeyword.questionmark).isPresent()) {
+                                outKeyword = ApplesoftKeyword.PRINT;
+                            }
+                            return Optional.of(Token.keyword(line, outKeyword));
+                        } else {
+                            tokenizer.pushBack();
+                        }
 					}
 					// Check if we found a directive
-					if (tokenizer.sval.startsWith("$")) {
+					if (sval.startsWith("$")) {
 						return Optional.of(Token.directive(line, tokenizer.sval));
 					}
 					// Found an identifier (A, A$, A%).  Test if it is an array ('A(', 'A$(', 'A%(').
-					String sval = tokenizer.sval;
 					tokenizer.nextToken();
 					if (tokenizer.ttype == '(') {
 						sval += (char)tokenizer.ttype;
