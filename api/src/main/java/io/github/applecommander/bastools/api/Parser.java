@@ -4,10 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 
-import io.github.applecommander.bastools.api.model.Line;
-import io.github.applecommander.bastools.api.model.Program;
-import io.github.applecommander.bastools.api.model.Statement;
-import io.github.applecommander.bastools.api.model.Token;
+import io.github.applecommander.bastools.api.model.*;
 import io.github.applecommander.bastools.api.model.Token.Type;
 
 /** 
@@ -50,10 +47,18 @@ public class Parser {
 	
 	public Statement readStatement() {
 		Statement statement = new Statement();
+        Token firstToken = null;
 		while (!tokens.isEmpty()) {
 			if (tokens.peek().type == Type.EOL) break;
 			Token t = tokens.remove();
 			if (t.type == Type.SYNTAX && ":".equals(t.text)) break;
+            if (firstToken == null) {
+                firstToken = t;
+            }
+            else if (firstToken.keyword == ApplesoftKeyword.DATA && t.keyword != null) {
+                // AppleSoft doesn't put actual keyword or tokens into data (beyond quotes or comma)
+                t = Token.ident(t.line, t.keyword.text);
+            }
 			statement.tokens.add(t);
 		}
 		return statement;
