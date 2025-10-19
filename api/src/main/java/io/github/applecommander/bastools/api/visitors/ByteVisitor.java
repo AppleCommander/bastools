@@ -18,9 +18,9 @@ import io.github.applecommander.bastools.api.model.Statement;
 import io.github.applecommander.bastools.api.model.Token;
 
 public class ByteVisitor implements Visitor {
-	private Stack<ByteArrayOutputStream> stack;
-	private Map<Integer,Integer> lineAddresses;
-	private Configuration config;
+	private final Stack<ByteArrayOutputStream> stack;
+	private final Map<Integer,Integer> lineAddresses;
+	private final Configuration config;
 	private int address;
 	private Directive currentDirective;
 	

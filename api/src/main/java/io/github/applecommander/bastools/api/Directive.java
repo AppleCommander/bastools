@@ -21,12 +21,12 @@ import io.github.applecommander.bastools.api.model.Token.Type;
 import io.github.applecommander.bastools.api.utils.Converters;
 
 public abstract class Directive {
-    private String directiveName;
+    private final String directiveName;
 	protected Configuration config;
 	protected OutputStream outputStream;
-	private List<Token> paramTokens = new ArrayList<>();
-	private Map<String,Expression> parameters = new TreeMap<>(String::compareToIgnoreCase);
-	private Set<String> parameterNames;
+	private final List<Token> paramTokens = new ArrayList<>();
+	private final Map<String,Expression> parameters = new TreeMap<>(String::compareToIgnoreCase);
+	private final Set<String> parameterNames;
 
 	protected Directive(String directiveName, Configuration config, OutputStream outputStream, String... parameterNames) {
 	    Objects.requireNonNull(directiveName);
@@ -200,8 +200,8 @@ public abstract class Directive {
 	    }
 	}
 	public interface Expression {
-	    public Optional<SimpleExpression> toSimpleExpression();
-	    public Optional<MapExpression> toMapExpression();
+	    Optional<SimpleExpression> toSimpleExpression();
+	    Optional<MapExpression> toMapExpression();
 	}
 	public static class SimpleExpression implements Expression {
 	    private final String value;

@@ -49,7 +49,7 @@ public class ShapeGenerator {
                 shapeConsumer = importer::process;
                 break;
             default:
-                if (line.length() == 0) {
+                if (line.isEmpty()) {
                     // do nothing
                 } else if (shapeConsumer != null) {
                     try {

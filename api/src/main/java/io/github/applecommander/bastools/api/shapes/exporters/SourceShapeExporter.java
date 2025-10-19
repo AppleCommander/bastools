@@ -18,7 +18,7 @@ import io.github.applecommander.bastools.api.shapes.VectorShape;
 
 public class SourceShapeExporter implements ShapeExporter {
     private BiConsumer<Shape,PrintWriter> formatFunction = this::exportShapeAsBitmap;
-    private ShapeExporter textExporter;
+    private final ShapeExporter textExporter;
     private boolean skipEmptyShapes;
     private boolean optimize;
 
@@ -93,7 +93,7 @@ public class SourceShapeExporter implements ShapeExporter {
     }
     
     public static class Builder {
-        private SourceShapeExporter exporter = new SourceShapeExporter();
+        private final SourceShapeExporter exporter = new SourceShapeExporter();
         
         public Builder bitmap() {
             exporter.formatFunction = exporter::exportShapeAsBitmap;
@@ -130,9 +130,9 @@ public class SourceShapeExporter implements ShapeExporter {
     }
     
     public static class PaddedOutputStream extends OutputStream {
-        private OutputStream wrappedStream;
+        private final OutputStream wrappedStream;
         private boolean needPadding = true;
-        private byte[] padding;
+        private final byte[] padding;
         
         public PaddedOutputStream(OutputStream outputStream, String padding) {
             Objects.requireNonNull(outputStream);

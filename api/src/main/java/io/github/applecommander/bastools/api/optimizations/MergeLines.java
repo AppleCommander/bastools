@@ -17,9 +17,9 @@ import io.github.applecommander.bastools.api.visitors.LineNumberTargetCollector;
 public class MergeLines extends BaseVisitor {
 	private Set<Integer> targets;
 	private Line mergeLine;
-	private ByteVisitor bv;
-	private int maxLineLength;
-	private PrintStream debugStream;
+	private final ByteVisitor bv;
+	private final int maxLineLength;
+	private final PrintStream debugStream;
 	
 	public MergeLines(Configuration config) {
 		this.maxLineLength = config.maxLineLength;

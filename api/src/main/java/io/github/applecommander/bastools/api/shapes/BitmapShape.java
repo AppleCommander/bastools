@@ -174,14 +174,14 @@ public class BitmapShape implements Shape {
      * Note that this class is setup to be dynamic in the chosen corner.
      */
     public static class SweepVectorization implements Supplier<VectorShape> {
-        private VectorCommand[] toOrigin;
+        private final VectorCommand[] toOrigin;
         private VectorCommand movement;
-        private VectorCommand next;
-        private Point point;
-        private BitmapShape bitmapShape;
-        private VectorShape vectorShape;
-        private int width;
-        private int height;
+        private final VectorCommand next;
+        private final Point point;
+        private final BitmapShape bitmapShape;
+        private final VectorShape vectorShape;
+        private final int width;
+        private final int height;
         
         /**
          * Create an instance of the sweep method.
@@ -270,9 +270,9 @@ public class BitmapShape implements Shape {
      * this much more straight-forward.
      */
     public static class EuclidianDistanceVectorization implements Supplier<VectorShape> {
-        private List<Point> points;
-        private BitmapShape bitmapShape;
-        private VectorShape vshape;
+        private final List<Point> points;
+        private final BitmapShape bitmapShape;
+        private final VectorShape vshape;
         
         public EuclidianDistanceVectorization(BitmapShape bitmapShape) {
             this.bitmapShape = bitmapShape;

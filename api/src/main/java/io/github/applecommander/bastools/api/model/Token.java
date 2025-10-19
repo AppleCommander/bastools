@@ -90,7 +90,7 @@ public class Token {
         return Objects.hash(line, type, keyword, number, text);
     }
 
-    public static enum Type {
+    public enum Type {
 		EOL, NUMBER, IDENT, COMMENT, STRING, KEYWORD, SYNTAX, DIRECTIVE
 	}
 }

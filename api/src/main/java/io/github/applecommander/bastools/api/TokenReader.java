@@ -30,8 +30,8 @@ public class TokenReader {
 	private boolean hasMore = true;
 	// Internal flag just in case we consume the EOL (see REM for instance)s
 	private boolean needSyntheticEol = false;
-	private Reader reader;
-	private StreamTokenizer tokenizer;
+	private final Reader reader;
+	private final StreamTokenizer tokenizer;
 
 	/** A handy method to generate a list of Tokens from a file name. */
 	public static Queue<Token> tokenize(String filename) throws FileNotFoundException, IOException {

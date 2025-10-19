@@ -9,7 +9,7 @@ import io.github.applecommander.bastools.api.model.Statement;
 import io.github.applecommander.bastools.api.model.Token;
 
 public class PrettyPrintVisitor implements Visitor {
-	private PrintStream printStream;
+	private final PrintStream printStream;
 	
 	public PrettyPrintVisitor(PrintBuilder builder) {
 		this.printStream = builder.getPrintStream();

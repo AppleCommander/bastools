@@ -13,19 +13,19 @@ import io.github.applecommander.bastools.api.model.Token;
  * @see Visitors
  */
 public interface Visitor {
-	default public Program visit(Program program) {
+	default Program visit(Program program) {
 		program.lines.forEach(l -> l.accept(this));
 		return program;
 	}
-	default public Line visit(Line line) {
+	default Line visit(Line line) {
 		line.statements.forEach(s -> s.accept(this));
 		return line;
 	}
-	default public Statement visit(Statement statement) {
+	default Statement visit(Statement statement) {
 		statement.tokens.forEach(t -> t.accept(this));
 		return statement;
 	}
-	default public Token visit(Token token) {
+	default Token visit(Token token) {
 		return token;
-	};
+	}
 }

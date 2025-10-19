@@ -13,7 +13,7 @@ import io.github.applecommander.bastools.api.model.Token;
 import io.github.applecommander.bastools.api.model.Token.Type;
 
 public class VariableReportVisitor implements Visitor {
-	private Map<String,SortedSet<Integer>> refs = new HashMap<>();
+	private final Map<String,SortedSet<Integer>> refs = new HashMap<>();
 	private int currentLineNumber = -1;
 	
 	@Override

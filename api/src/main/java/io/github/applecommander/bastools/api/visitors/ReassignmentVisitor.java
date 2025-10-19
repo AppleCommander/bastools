@@ -12,7 +12,7 @@ import io.github.applecommander.bastools.api.model.Token.Type;
 
 /** This is a mildly rewritable Visitor. */
 public class ReassignmentVisitor implements Visitor {
-	private Map<Integer,Integer> reassignments;
+	private final Map<Integer,Integer> reassignments;
 	private Program newProgram;
 	
 	public ReassignmentVisitor(Map<Integer,Integer> reassignments) {

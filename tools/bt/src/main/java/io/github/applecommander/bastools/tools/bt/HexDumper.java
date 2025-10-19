@@ -6,8 +6,8 @@ import java.util.function.BiConsumer;
 
 /** A slightly-configurable reusable hex dumping mechanism. */
 public class HexDumper {
-	private PrintStream ps = System.out;
-	private int lineWidth = 16;
+	private final PrintStream ps = System.out;
+	private final int lineWidth = 16;
 	private BiConsumer<Integer,Integer> printHeader;
 	private BiConsumer<Integer,byte[]> printLine;
 	

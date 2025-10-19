@@ -21,9 +21,9 @@ public enum Optimization {
 	MERGE_LINES(MergeLines::new),
 	RENUMBER(Renumber::new);
 	
-	private Function<Configuration,Visitor> factory;
+	private final Function<Configuration,Visitor> factory;
 	
-	private Optimization(Function<Configuration,Visitor> factory) {
+	Optimization(Function<Configuration, Visitor> factory) {
 		this.factory = factory;
 	}
 	

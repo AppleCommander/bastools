@@ -66,7 +66,7 @@ public class Parser {
 	
 	public Optional<Integer> expectNumber() {
 		Token c = tokens.remove();
-		while (c.type == Type.EOL) {
+		if (c.type == Type.EOL) {
 		    return Optional.empty();
 		}
 		if (c.type != Type.NUMBER) {

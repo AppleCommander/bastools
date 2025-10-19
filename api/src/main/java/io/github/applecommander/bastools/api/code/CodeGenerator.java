@@ -12,7 +12,7 @@ public interface CodeGenerator {
     /**
      * Generates code and writes the bytes into the given {@code OutputStream}.
      */
-    public void generate(GeneratorState state) throws IOException;
+    void generate(GeneratorState state) throws IOException;
     /**
      * Returns a composed {@code CodeGenerator} that performs, in sequence, this
      * operation followed by the {@code after} operation. If performing either
@@ -25,7 +25,7 @@ public interface CodeGenerator {
      * operation followed by the {@code after} operation
      * @throws NullPointerException if {@code after} is null
      */
-    public default CodeGenerator andThen(CodeGenerator after) {
+    default CodeGenerator andThen(CodeGenerator after) {
         Objects.requireNonNull(after);
         return (GeneratorState state) -> { generate(state); after.generate(state); };
     }

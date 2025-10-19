@@ -11,7 +11,7 @@ import io.github.applecommander.bastools.api.model.ApplesoftKeyword;
  * By no means is this complete, but is being built out as the need arises.
  */
 public class BasicBuilder {
-    private CodeBuilder builder;
+    private final CodeBuilder builder;
     public BasicBuilder(CodeBuilder builder) {
         Objects.requireNonNull(builder);
         this.builder = builder;

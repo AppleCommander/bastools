@@ -13,15 +13,15 @@ import io.github.applecommander.bastools.api.shapes.exporters.TextShapeExporter;
 
 public interface ShapeExporter {
     /** Export a single shape to the OutputStream. */
-    public void export(Shape shape, OutputStream outputStream) throws IOException;
+    void export(Shape shape, OutputStream outputStream) throws IOException;
     /** Export a single shape to the File. */
-    public default void export(Shape shape, File file) throws IOException {
+    default void export(Shape shape, File file) throws IOException {
         Objects.requireNonNull(shape);
         Objects.requireNonNull(file);
         export(shape, file.toPath());
     }
     /** Export a single shape to the Path. */
-    public default void export(Shape shape, Path path) throws IOException {
+    default void export(Shape shape, Path path) throws IOException {
         Objects.requireNonNull(shape);
         Objects.requireNonNull(path);
         try (OutputStream outputStream = Files.newOutputStream(path)) {
@@ -30,15 +30,15 @@ public interface ShapeExporter {
     }
 
     /** Export the entire shape table to the OutputStream. */
-    public void export(ShapeTable shapeTable, OutputStream outputStream) throws IOException;
+    void export(ShapeTable shapeTable, OutputStream outputStream) throws IOException;
     /** Export the entire shape table to the File. */
-    public default void export(ShapeTable shapeTable, File file) throws IOException {
+    default void export(ShapeTable shapeTable, File file) throws IOException {
         Objects.requireNonNull(shapeTable);
         Objects.requireNonNull(file);
         export(shapeTable, file.toPath());
     }
     /** Export the entire shape table to the Path. */
-    public default void export(ShapeTable shapeTable, Path path) throws IOException {
+    default void export(ShapeTable shapeTable, Path path) throws IOException {
         Objects.requireNonNull(shapeTable);
         Objects.requireNonNull(path);
         try (OutputStream outputStream = Files.newOutputStream(path)) {
@@ -46,13 +46,13 @@ public interface ShapeExporter {
         }
     }
     
-    public static TextShapeExporter.Builder text() {
+    static TextShapeExporter.Builder text() {
         return new TextShapeExporter.Builder();
     }
-    public static ImageShapeExporter.Builder image() {
+    static ImageShapeExporter.Builder image() {
         return new ImageShapeExporter.Builder();
     }
-    public static SourceShapeExporter.Builder source() {
+    static SourceShapeExporter.Builder source() {
         return new SourceShapeExporter.Builder();
     }
 }

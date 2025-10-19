@@ -19,7 +19,7 @@ import java.util.HashMap;
  */
 public class CodeMark {
     private static final int LOOP_MAX = 10;
-    private HashMap<Integer,Integer> loopCounter = new HashMap<>();
+    private final HashMap<Integer,Integer> loopCounter = new HashMap<>();
     private int address;
     
     public int getAddress() {

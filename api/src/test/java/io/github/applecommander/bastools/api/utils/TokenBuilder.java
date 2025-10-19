@@ -8,7 +8,7 @@ import io.github.applecommander.bastools.api.model.Token;
 
 public class TokenBuilder {
     private int lineNumber;
-    private Queue<Token> tokens = new LinkedList<Token>();
+    private final Queue<Token> tokens = new LinkedList<Token>();
     
     public static TokenBuilder builder() {
         return new TokenBuilder();

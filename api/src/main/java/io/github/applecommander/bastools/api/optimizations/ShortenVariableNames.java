@@ -19,8 +19,8 @@ import io.github.applecommander.bastools.api.visitors.VariableCollectorVisitor;
  * however.
  */
 public class ShortenVariableNames extends BaseVisitor {
-    private Configuration config;
-    private VariableNameGenerator variableGenerator = new VariableNameGenerator();
+    private final Configuration config;
+    private final VariableNameGenerator variableGenerator = new VariableNameGenerator();
     
     public ShortenVariableNames(Configuration config) {
         this.config = config;

@@ -20,7 +20,7 @@ public enum VectorCommand {
 	public final boolean vertical;
 	public final boolean horizontal;
 
-	private VectorCommand() {
+	VectorCommand() {
 		this.plot = (this.ordinal() & 0b100) != 0;
 		// up    0b00
 		// right 0b01

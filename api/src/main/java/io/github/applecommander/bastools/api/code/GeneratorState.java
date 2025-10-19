@@ -10,7 +10,7 @@ import java.io.IOException;
 public class GeneratorState {
     private final int startAddress;
     private boolean markMoved = false;
-    private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     public GeneratorState(int startAddress) { 
         this.startAddress = startAddress;

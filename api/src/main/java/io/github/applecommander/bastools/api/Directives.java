@@ -12,7 +12,7 @@ import io.github.applecommander.bastools.api.directives.HexDirective;
 public class Directives {
 	private Directives() { /* Prevent construction. */ }
 	
-	private static Map<String,Class<? extends Directive>> DIRECTIVES = 
+	private static final Map<String,Class<? extends Directive>> DIRECTIVES =
 		new TreeMap<String,Class<? extends Directive>>(String.CASE_INSENSITIVE_ORDER) {
 			private static final long serialVersionUID = -8111460701487331592L;
 

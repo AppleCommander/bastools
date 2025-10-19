@@ -34,9 +34,9 @@ public class ExtractConstantValues extends BaseVisitor {
 			ApplesoftKeyword.GOTO, ApplesoftKeyword.GOSUB, ApplesoftKeyword.THEN);
 	
 	// Map keyed by value (Double isn't a good key, using a String of the number) and pointing to replacement variable name
-	private Map<String,String> map = new HashMap<>();
+	private final Map<String,String> map = new HashMap<>();
 	
-	private VariableNameGenerator variableGenerator = new VariableNameGenerator();
+	private final VariableNameGenerator variableGenerator = new VariableNameGenerator();
 	private Set<String> existingVariables;
 	private Function<Token,Token> consumer = this::nullTransformation;
 	

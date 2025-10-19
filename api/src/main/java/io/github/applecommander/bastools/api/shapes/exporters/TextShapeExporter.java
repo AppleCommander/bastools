@@ -158,10 +158,10 @@ public class TextShapeExporter implements ShapeExporter {
         private final char dividerRightEdge;
         private final char dividerMiddle;
         
-        private BorderStrategy(char horizontalLine, char verticalLine, char topLeftCorner, char topRightCorner,
-                char bottomLeftCorner, char bottomRightCorner, char topDivider, char bottomDivider,
-                char dividerVerticalLine, char dividerHorizontalLine, char dividerLeftEdge, char dividerRightEdge,
-                char dividerMiddle) {
+        BorderStrategy(char horizontalLine, char verticalLine, char topLeftCorner, char topRightCorner,
+                       char bottomLeftCorner, char bottomRightCorner, char topDivider, char bottomDivider,
+                       char dividerVerticalLine, char dividerHorizontalLine, char dividerLeftEdge, char dividerRightEdge,
+                       char dividerMiddle) {
             this.horizontalLine = horizontalLine;
             this.verticalLine = verticalLine;
             this.topLeftCorner = topLeftCorner;
@@ -228,7 +228,7 @@ public class TextShapeExporter implements ShapeExporter {
     }
     
     public static class Builder {
-        private TextShapeExporter textShapeExporter = new TextShapeExporter();
+        private final TextShapeExporter textShapeExporter = new TextShapeExporter();
         
         public Builder maxWidth(int maxWidth) {
             textShapeExporter.maxWidth = maxWidth;

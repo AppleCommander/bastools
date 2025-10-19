@@ -16,7 +16,7 @@ import io.github.applecommander.bastools.api.model.Token;
  * applied at the end of the program visit. 
  */
 public class BaseVisitor implements Visitor {
-	protected Map<Integer,Integer> reassignments = new HashMap<>();
+	protected final Map<Integer,Integer> reassignments = new HashMap<>();
 	protected Program newProgram;
 	
 	@Override

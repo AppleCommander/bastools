@@ -10,7 +10,7 @@ import io.github.applecommander.bastools.api.model.Token;
 import io.github.applecommander.bastools.api.model.Token.Type;
 
 public class LineNumberTargetCollector implements Visitor {
-	private Set<Integer> targets = new TreeSet<>();
+	private final Set<Integer> targets = new TreeSet<>();
 	
 	public Set<Integer> getTargets() {
 		return targets;

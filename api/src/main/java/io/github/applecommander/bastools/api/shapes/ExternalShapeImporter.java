@@ -23,7 +23,7 @@ import io.github.applecommander.bastools.api.utils.Converters;
  * </pre>
  */
 public class ExternalShapeImporter {
-    private ShapeTable destination;
+    private final ShapeTable destination;
     private String firstShapeLabel;
     private Function<String,ShapeTable> importer = this::importShapeTableFromBinary;
     private IntStream intStream = null;

@@ -23,7 +23,7 @@ import io.github.applecommander.bastools.api.shapes.ShapeTable;
 public class ImageShapeExporter implements ShapeExporter {
     private int maxWidth = 1024;
     private int pixelSize = 4;
-    private int padding = 2;
+    private final int padding = 2;
     private boolean border = true;
     private boolean skipEmptyShapes;
     private String imageFormat = "PNG";
@@ -110,7 +110,7 @@ public class ImageShapeExporter implements ShapeExporter {
     }
 
     public static class Builder {
-        private ImageShapeExporter shapeExporter = new ImageShapeExporter();
+        private final ImageShapeExporter shapeExporter = new ImageShapeExporter();
         
         public Builder maxWidth(int maxWidth) {
             shapeExporter.maxWidth = maxWidth;

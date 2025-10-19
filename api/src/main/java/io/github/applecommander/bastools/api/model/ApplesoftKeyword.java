@@ -137,9 +137,9 @@ public enum ApplesoftKeyword {
 	 * Indicates that this needs _just_ a closing right parenthesis since the 
 	 * opening left parenthesis is included in the token 
 	 */
-	public boolean needsRParen;
+	public final boolean needsRParen;
 	
-	private ApplesoftKeyword(int code, String text) {
+	ApplesoftKeyword(int code, String text) {
 		this.code = code;
 		this.text = text;
 		
@@ -148,14 +148,11 @@ public enum ApplesoftKeyword {
 			List<String> list = new ArrayList<>();
 			StreamTokenizer t = tokenizer(new StringReader(text));
 			while (t.nextToken() != StreamTokenizer.TT_EOF) {
-				switch (t.ttype) {
-				case StreamTokenizer.TT_WORD:
-					list.add(t.sval);
-					break;
-				default:
-					list.add(String.format("%c", t.ttype));
-					break;
-				}
+                if (t.ttype == StreamTokenizer.TT_WORD) {
+                    list.add(t.sval);
+                } else {
+                    list.add(String.format("%c", t.ttype));
+                }
 			}
 			this.parts = Collections.unmodifiableList(list);
 			this.needsRParen = parts.contains("(");

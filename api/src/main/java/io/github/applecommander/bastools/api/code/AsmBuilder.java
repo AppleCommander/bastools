@@ -9,7 +9,7 @@ import java.util.Objects;
  * By no means is this complete, but is being built out as the need arises.
  */
 public class AsmBuilder {
-    private CodeBuilder builder;
+    private final CodeBuilder builder;
     
     public AsmBuilder(CodeBuilder builder) {
         Objects.requireNonNull(builder);
