@@ -8,6 +8,7 @@ repositories {
 
 dependencies {
     implementation project(':bastools-tools:bastools-tools-bt')
+    implementation project(':bastools-tools:bastools-tools-st')
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

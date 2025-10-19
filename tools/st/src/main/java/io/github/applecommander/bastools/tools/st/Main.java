@@ -42,9 +42,11 @@ public class Main implements Runnable {
     private static boolean debugFlag;
     
     public static void main(String[] args) {
+        // The CLI unit test library throws an exception when 'System.exit' is called;
+        // so we cannot have the 'System.exit' call in the try-catch block!
+        int exitCode = 0;
         try {
-            int exitCode = new CommandLine(new Main()).execute(args);
-            System.exit(exitCode);
+            exitCode = new CommandLine(new Main()).execute(args);
         } catch (Throwable t) {
             if (Main.debugFlag) {
                 t.printStackTrace(System.err);
@@ -56,12 +58,13 @@ public class Main implements Runnable {
                 }
                 System.err.printf("Error: %s\n", Optional.ofNullable(message).orElse("An error occurred."));
             }
-            System.exit(1);
+            exitCode = 1;
         }
+        System.exit(exitCode);
     }
     
     @Override
     public void run() {
-        CommandLine.usage(this, System.out);
+        CommandLine.usage(this, System.err);
     }
 }
