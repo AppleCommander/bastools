@@ -195,7 +195,7 @@ public enum ApplesoftKeyword {
 	public static Optional<ApplesoftKeyword> find(String value) {
 		Objects.requireNonNull(value);
 		for (ApplesoftKeyword kw : values()) {
-			if (value.equalsIgnoreCase(kw.parts.get(0))) {
+			if (value.equalsIgnoreCase(kw.parts.getFirst())) {
 				return Optional.of(kw);
 			}
 		}

@@ -83,7 +83,7 @@ public class ExtractConstantValues extends BaseVisitor {
 		// Bypass if there were no constants
 		if (line.statements.isEmpty()) return;
 		// setup a renumber of lines that interfere if we have any
-		if (program.lines.get(0).lineNumber == 0) {
+		if (program.lines.getFirst().lineNumber == 0) {
 			// start with line #0 should become line #1
 			super.reassignments.put(0, 1);
 			// chase it to the end!
@@ -92,7 +92,7 @@ public class ExtractConstantValues extends BaseVisitor {
 				   .filter(super.reassignments::containsValue)
 				   .forEach(n -> super.reassignments.put(n, n+1));
 		}
-		program.lines.add(0, line);
+		program.lines.addFirst(line);
 	}
 	private Line generateLine0(Program program) {
 		Line line = new Line(0, program);
@@ -114,7 +114,7 @@ public class ExtractConstantValues extends BaseVisitor {
 	public Statement visit(Statement statement) {
 		try {
 			if (!statement.tokens.isEmpty()) {
-				Token t = statement.tokens.get(0);
+				Token t = statement.tokens.getFirst();
 				// Assignment
 				if (t.type == Token.Type.IDENT) {
 					this.consumer = this::numberToIdentTransformation;

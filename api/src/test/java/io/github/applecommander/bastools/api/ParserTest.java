@@ -36,8 +36,8 @@ public class ParserTest {
         Parser parser = new Parser(tokens);
         Program program = parser.parse();
         assertEquals(1, program.lines.size());
-        assertEquals(1, program.lines.get(0).statements.size());
-        Statement statement = program.lines.get(0).statements.get(0);
+        assertEquals(1, program.lines.getFirst().statements.size());
+        Statement statement = program.lines.getFirst().statements.getFirst();
         assertEquals(3, statement.tokens.size());
         assertEquals(ApplesoftKeyword.DATA, statement.tokens.get(0).keyword);
         // In this case, the "-" is treated as text
@@ -55,8 +55,8 @@ public class ParserTest {
         Parser parser = new Parser(tokens);
         Program program = parser.parse();
         assertEquals(1, program.lines.size());
-        assertEquals(1, program.lines.get(0).statements.size());
-        Statement statement = program.lines.get(0).statements.get(0);
+        assertEquals(1, program.lines.getFirst().statements.size());
+        Statement statement = program.lines.getFirst().statements.getFirst();
         assertEquals(4, statement.tokens.size());
         assertEquals(Token.Type.IDENT, statement.tokens.get(0).type);
         assertEquals(ApplesoftKeyword.eq, statement.tokens.get(1).keyword);

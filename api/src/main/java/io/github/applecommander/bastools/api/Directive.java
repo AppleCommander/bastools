@@ -120,7 +120,7 @@ public abstract class Directive {
 	    }
 	}
 	private Expression buildExpression() {
-	    Token t = paramTokens.get(0);
+	    Token t = paramTokens.getFirst();
 	    if ("(".equals(t.text)) {
 	        requireSyntaxToken("(");
 	        Expression expr = buildMapExpression();
@@ -131,7 +131,7 @@ public abstract class Directive {
 	    }
 	}
 	private Expression buildSimpleExpression() {
-	    Token t = paramTokens.remove(0);
+	    Token t = paramTokens.removeFirst();
 	    return new SimpleExpression(t.asString());
 	}
 	private Expression buildMapExpression() {
@@ -152,7 +152,7 @@ public abstract class Directive {
 	}
 	
 	private Token requireToken(Type... types) {
-		Token t = paramTokens.remove(0);
+		Token t = paramTokens.removeFirst();
 		boolean matches = false;
 		for (Type type : types) {
 			matches |= type == t.type;
@@ -183,7 +183,7 @@ public abstract class Directive {
 	private boolean checkSyntaxToken(String syntax) {
 	    if (paramTokens.isEmpty()) return false;
         Type tokenType = ApplesoftKeyword.find(syntax).map(t -> Type.KEYWORD).orElse(Type.SYNTAX);
-        Token token = paramTokens.get(0);
+        Token token = paramTokens.getFirst();
         return tokenType == token.type && syntax.equals(token.text);
 	}
 	

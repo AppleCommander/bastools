@@ -70,7 +70,7 @@ public class ShapesTest {
                 .moveDown().plotDown().plotDown().plotDown()
                 .moveLeft().plotLeft();
       
-        Shape s = st.shapes.get(0);
+        Shape s = st.shapes.getFirst();
         assertNotNull(s);
         assertEquals(expected.vectors, s.toVector().vectors);
     }
@@ -81,7 +81,7 @@ public class ShapesTest {
         
         BitmapShape expected = plotStandardBoxShape();
         
-        Shape s = st.shapes.get(0);
+        Shape s = st.shapes.getFirst();
         assertEquals(expected.grid, s.toBitmap().grid);
     }
     
@@ -109,7 +109,7 @@ public class ShapesTest {
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().noBorder().build();
-        exp.export(st.shapes.get(0), outputStream);
+        exp.export(st.shapes.getFirst(), outputStream);
         String actual = outputStream.toString();
         
         assertEquals(expected, actual);
@@ -131,7 +131,7 @@ public class ShapesTest {
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
-        exp.export(st.shapes.get(0), outputStream);
+        exp.export(st.shapes.getFirst(), outputStream);
         String actual = outputStream.toString();
         
         assertEquals(expected, actual);
@@ -142,9 +142,9 @@ public class ShapesTest {
         ShapeTable st = readStandardShapeTable();
         
         // Simulate 4 of these identical shapes by adding 3 more
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
         
         final String oneExpectedRow = """
             .XXX. .XXX.
@@ -168,9 +168,9 @@ public class ShapesTest {
         ShapeTable st = readStandardShapeTable();
         
         // Simulate 4 of these identical shapes by adding 3 more
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
         
         final String divider = "+-----+-----+\n";
         final String oneExpectedRow = divider

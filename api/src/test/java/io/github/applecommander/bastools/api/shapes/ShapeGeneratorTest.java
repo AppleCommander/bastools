@@ -27,7 +27,7 @@ public class ShapeGeneratorTest {
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/box-bitmap.st"));
         assertShapeIsBox(st);
         // Unable to test vectors for bitmaps
-        assertEquals("label-bitmap", st.shapes.get(0).toBitmap().label);
+        assertEquals("label-bitmap", st.shapes.getFirst().toBitmap().label);
     }
 
     public void assertShapeIsBox(ShapeTable st) throws IOException {
@@ -44,7 +44,7 @@ public class ShapeGeneratorTest {
             +-----+
             """;
 
-        assertShapeMatches(expected, st.shapes.get(0));
+        assertShapeMatches(expected, st.shapes.getFirst());
     }
     
     public void assertShapeBoxVectors(ShapeTable st, String label) {
@@ -59,7 +59,7 @@ public class ShapeGeneratorTest {
                 .moveDown().plotDown().plotDown().plotDown()
                 .moveLeft().plotLeft();
       
-        Shape shape = st.shapes.get(0);
+        Shape shape = st.shapes.getFirst();
         assertNotNull(shape);
         assertTrue(shape instanceof VectorShape);
         VectorShape vshape = shape.toVector();
@@ -88,7 +88,7 @@ public class ShapeGeneratorTest {
         assertEquals(1, st.shapes.size());
 
         // Verify we read the shape correctly...
-        Shape shape = st.shapes.get(0);
+        Shape shape = st.shapes.getFirst();
         assertNotNull(shape);
         assertShapeMatches(mouse, shape);
         
@@ -123,7 +123,7 @@ public class ShapeGeneratorTest {
         assertEquals(1, st.shapes.size());
 
         // Verify we read the shape correctly...
-        Shape shape = st.shapes.get(0);
+        Shape shape = st.shapes.getFirst();
         assertNotNull(shape);
         assertShapeMatches(robot, shape);
         

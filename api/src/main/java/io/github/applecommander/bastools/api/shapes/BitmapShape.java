@@ -44,7 +44,7 @@ public class BitmapShape implements Shape {
     public void insertColumn() {
         origin.x++;
         for (List<Boolean> row : grid) {
-            row.add(0, Boolean.FALSE);
+            row.addFirst(Boolean.FALSE);
         }
     }
     public void addColumn() {
@@ -54,7 +54,7 @@ public class BitmapShape implements Shape {
     }
     public void insertRow() {
         origin.y++;
-        grid.add(0, newRow(getWidth()));
+        grid.addFirst(newRow(getWidth()));
     }
     public void addRow() {
         grid.add(newRow(getWidth()));
@@ -93,7 +93,7 @@ public class BitmapShape implements Shape {
         return grid.size(); 
     }
     public int getWidth() {
-        return grid.isEmpty() ? 0 : grid.get(0).size();
+        return grid.isEmpty() ? 0 : grid.getFirst().size();
     }
     
     public void plot(int x, int y) {
