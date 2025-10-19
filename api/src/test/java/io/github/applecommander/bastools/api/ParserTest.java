@@ -11,8 +11,6 @@ import io.github.applecommander.bastools.api.model.Program;
 import io.github.applecommander.bastools.api.model.Token;
 import io.github.applecommander.bastools.api.utils.TokenBuilder;
 
-import javax.xml.crypto.Data;
-
 import static org.junit.Assert.assertEquals;
 
 public class ParserTest {

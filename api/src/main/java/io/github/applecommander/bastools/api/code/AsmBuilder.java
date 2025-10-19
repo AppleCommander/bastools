@@ -30,12 +30,12 @@ public class AsmBuilder {
         return this;
     }
     /** Generate a "LDA #value" in the output stream. */
-    public AsmBuilder lda(int value) throws IOException {
+    public AsmBuilder lda(int value) {
         builder.add(state -> internalLDA(state, value));
         return this;
     }
     /** Generate a "STA address" in the output stream. */
-    public AsmBuilder sta(int address) throws IOException {
+    public AsmBuilder sta(int address) {
         builder.add(state -> internalSTA(state, address));
         return this;
     }

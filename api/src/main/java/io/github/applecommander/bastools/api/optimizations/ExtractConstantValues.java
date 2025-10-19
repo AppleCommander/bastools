@@ -22,7 +22,7 @@ import io.github.applecommander.bastools.api.visitors.VariableCollectorVisitor;
  */
 public class ExtractConstantValues extends BaseVisitor {
 	/** These trigger the start of a replacement range.  Note the special logic for assignments. */
-	public static List<ApplesoftKeyword> TARGET_STARTS = Arrays.asList(
+	public static final List<ApplesoftKeyword> TARGET_STARTS = Arrays.asList(
 			ApplesoftKeyword.FOR, ApplesoftKeyword.CALL, ApplesoftKeyword.PLOT, ApplesoftKeyword.HLIN, 
 			ApplesoftKeyword.VLIN, ApplesoftKeyword.HCOLOR, ApplesoftKeyword.HPLOT, ApplesoftKeyword.DRAW, 
 			ApplesoftKeyword.XDRAW, ApplesoftKeyword.HTAB, ApplesoftKeyword.SCALE, ApplesoftKeyword.COLOR, 
@@ -30,7 +30,7 @@ public class ExtractConstantValues extends BaseVisitor {
 			ApplesoftKeyword.LET, ApplesoftKeyword.IF, ApplesoftKeyword.ON, ApplesoftKeyword.WAIT, 
 			ApplesoftKeyword.POKE);
 	/** These trigger the end of a replacement range.  End of statement is always an end. */
-	public static List<ApplesoftKeyword> TARGET_ENDS = Arrays.asList(
+	public static final List<ApplesoftKeyword> TARGET_ENDS = Arrays.asList(
 			ApplesoftKeyword.GOTO, ApplesoftKeyword.GOSUB, ApplesoftKeyword.THEN);
 	
 	// Map keyed by value (Double isn't a good key, using a String of the number) and pointing to replacement variable name

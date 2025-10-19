@@ -33,7 +33,7 @@ public class Configuration {
 		private int maxLineLength = 255;
 		private PrintStream debugStream = new PrintStream(new OutputStream() {
 				@Override
-				public void write(int b) throws IOException {
+				public void write(int b) {
 					// Do nothing
 				}
 			});

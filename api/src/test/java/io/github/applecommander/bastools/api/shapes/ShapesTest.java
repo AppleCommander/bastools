@@ -86,7 +86,7 @@ public class ShapesTest {
     }
     
     @Test
-    public void testToVectorFromBitmap() throws IOException {
+    public void testToVectorFromBitmap() {
         BitmapShape bitmapShape = plotStandardBoxShape();
         
         VectorShape vectorShape = bitmapShape.toVector();
@@ -108,7 +108,7 @@ public class ShapesTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().noBorder().build();
         exp.export(st.shapes.get(0), outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
         
         assertEquals(expected, actual);
     }
@@ -128,7 +128,7 @@ public class ShapesTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
         exp.export(st.shapes.get(0), outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
         
         assertEquals(expected, actual);
     }
@@ -152,7 +152,7 @@ public class ShapesTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().maxWidth(12).noBorder().build();
         exp.export(st, outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
 
         assertEquals(expected, actual);
     }
@@ -178,7 +178,7 @@ public class ShapesTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().maxWidth(12).asciiTextBorder().build();
         exp.export(st, outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
         
         assertEquals(expected, actual);
     }

@@ -82,7 +82,7 @@ public class ShapeTable {
         List<byte[]> data = this.shapes.stream()
                                        .map(Shape::toVector)
                                        .map(VectorShape::toBytes)
-                                       .collect(Collectors.toList());
+                                       .toList();
         // Build offset table
         int offset = 2 + 2*data.size();
         for (byte[] d : data) {
@@ -98,7 +98,7 @@ public class ShapeTable {
     public void write(File file) throws IOException {
         Objects.requireNonNull(file);
         try (OutputStream outputStream = new FileOutputStream(file)) {
-            write(file);
+            write(outputStream);
         }
     }
     public void write(Path path) throws IOException {

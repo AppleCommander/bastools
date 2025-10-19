@@ -1,7 +1,6 @@
 package io.github.applecommander.bastools.api.shapes;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -54,6 +53,6 @@ public class ShapeWriteAndReadTests {
     public String format(ShapeTable st) throws IOException {
         ByteArrayOutputStream text = new ByteArrayOutputStream();
         textExporter.export(st, text);
-        return new String(text.toByteArray());
+        return text.toString();
     }
 }

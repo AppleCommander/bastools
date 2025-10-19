@@ -48,7 +48,7 @@ public class TextShapeExporter implements ShapeExporter {
         List<BitmapShape> blist = shapeTable.shapes.stream()
                                                    .filter(this::displayThisShape)
                                                    .map(Shape::toBitmap)
-                                                   .collect(Collectors.toList());
+                                                   .toList();
         int width = blist.stream().mapToInt(BitmapShape::getWidth).max().getAsInt();
         int height = blist.stream().mapToInt(BitmapShape::getHeight).max().getAsInt();
 

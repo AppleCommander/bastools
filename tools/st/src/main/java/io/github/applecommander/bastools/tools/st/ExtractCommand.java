@@ -78,7 +78,7 @@ public class ExtractCommand implements Callable<Void> {
         } else {
             List<Integer> outOfRange = shapeNums.stream()
                                                 .filter(n -> n > shapeTable.shapes.size())
-                                                .collect(Collectors.toList());
+                                                .toList();
             if (!outOfRange.isEmpty()) {
                 throw new IOException("Invalid shape numbers: " + outOfRange);
             }

@@ -92,7 +92,7 @@ public class Main implements Callable<Void> {
 	private static boolean debugFlag;
 	private PrintStream debug = new PrintStream(new OutputStream() {
 			@Override
-			public void write(int b) throws IOException {
+			public void write(int b) {
 				// Do nothing
 			}
 		});
@@ -100,7 +100,7 @@ public class Main implements Callable<Void> {
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
 	private File sourceFile;
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) {
 		try {
 			int exitCode = new CommandLine(new Main()).execute(args);
 			System.exit(exitCode);
@@ -120,7 +120,7 @@ public class Main implements Callable<Void> {
 	}
 	
 	@Override
-	public Void call() throws FileNotFoundException, IOException {
+	public Void call() throws IOException {
 		if (checkParameters()) {
 			Configuration.Builder builder = Configuration.builder()
 					.maxLineLength(this.maxLineLength)
@@ -152,7 +152,7 @@ public class Main implements Callable<Void> {
 	}
 	
 	/** General CLI processing. */
-	public void process(Configuration config) throws FileNotFoundException, IOException {
+	public void process(Configuration config) throws IOException {
 		Queue<Token> tokens = TokenReader.tokenize(sourceFile);
 		if (showTokens) {
 			tokens.forEach(t -> System.out.printf("%s%s", t, t.type == Type.EOL ? "\n" : ", "));

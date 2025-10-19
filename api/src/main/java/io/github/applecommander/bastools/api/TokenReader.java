@@ -34,13 +34,13 @@ public class TokenReader {
 	private final StreamTokenizer tokenizer;
 
 	/** A handy method to generate a list of Tokens from a file name. */
-	public static Queue<Token> tokenize(String filename) throws FileNotFoundException, IOException {
+	public static Queue<Token> tokenize(String filename) throws IOException {
 		try (FileReader fileReader = new FileReader(filename)) {
 			return tokenize(fileReader);
 		}
 	}
 	/** A handy method to generate a list of Tokens from a file. */
-	public static Queue<Token> tokenize(File file) throws FileNotFoundException, IOException {
+	public static Queue<Token> tokenize(File file) throws IOException {
 		try (FileReader fileReader = new FileReader(file)) {
 			return tokenize(fileReader);
 		}

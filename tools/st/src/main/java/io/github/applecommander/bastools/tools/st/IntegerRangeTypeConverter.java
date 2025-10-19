@@ -7,7 +7,7 @@ import picocli.CommandLine.ITypeConverter;
 
 public class IntegerRangeTypeConverter implements ITypeConverter<List<Integer>> {
     @Override
-    public List<Integer> convert(String value) throws Exception {
+    public List<Integer> convert(String value) {
         List<Integer> list = new ArrayList<>();
         String[] parts = value.split(",");
         for (String part : parts) {

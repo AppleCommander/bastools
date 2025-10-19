@@ -1,7 +1,6 @@
 package io.github.applecommander.bastools.api.shapes;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -132,7 +131,7 @@ public class ShapeGeneratorTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
         exp.export(shape, outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
         assertEquals(expected, actual);
     }
 }

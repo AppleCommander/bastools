@@ -28,14 +28,14 @@ public class SourceShapeExporter implements ShapeExporter {
     }
     
     @Override
-    public void export(Shape shape, OutputStream outputStream) throws IOException {
+    public void export(Shape shape, OutputStream outputStream) {
         PrintWriter pw = new PrintWriter(outputStream);
         formatFunction.accept(shape, pw);
         pw.flush();
     }
 
     @Override
-    public void export(ShapeTable shapeTable, OutputStream outputStream) throws IOException {
+    public void export(ShapeTable shapeTable, OutputStream outputStream) {
         PrintWriter pw = new PrintWriter(outputStream);
         shapeTable.shapes.stream()
                          .filter(this::displayThisShape)
@@ -52,7 +52,7 @@ public class SourceShapeExporter implements ShapeExporter {
             pw.printf(".bitmap\n");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             textExporter.export(shape, new PaddedOutputStream(os, "  "));
-            pw.print(new String(os.toByteArray()));
+            pw.print(os.toString());
             pw.printf("\n");
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);

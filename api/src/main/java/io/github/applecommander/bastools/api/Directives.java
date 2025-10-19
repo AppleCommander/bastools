@@ -1,6 +1,7 @@
 package io.github.applecommander.bastools.api;
 
 import java.io.OutputStream;
+import java.io.Serial;
 import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,7 +15,8 @@ public class Directives {
 	
 	private static final Map<String,Class<? extends Directive>> DIRECTIVES =
 		new TreeMap<String,Class<? extends Directive>>(String.CASE_INSENSITIVE_ORDER) {
-			private static final long serialVersionUID = -8111460701487331592L;
+			@Serial
+            private static final long serialVersionUID = -8111460701487331592L;
 
 			{
 				put(EmbeddedBinaryDirective.NAME, EmbeddedBinaryDirective.class);

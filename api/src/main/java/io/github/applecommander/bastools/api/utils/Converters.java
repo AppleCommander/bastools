@@ -52,7 +52,7 @@ public class Converters {
                 stream = IntStream.concat(stream, IntStream.rangeClosed(low, high));
             } else {
                 stream = IntStream.concat(stream, 
-                        Arrays.asList(range.split(",")).stream().mapToInt(Integer::parseInt));
+                        Arrays.stream(range.split(",")).mapToInt(Integer::parseInt));
             }
         }
         return stream;

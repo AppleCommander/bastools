@@ -129,7 +129,7 @@ public class GenerateCommand implements Callable<Void> {
 	    // Get shape metadata
         List<BitmapShape> blist = shapeTable.shapes.stream()
                                                    .map(Shape::toBitmap)
-                                                   .collect(Collectors.toList());
+                                                   .toList();
         int width = blist.stream().mapToInt(BitmapShape::getWidth).max().getAsInt();
         int height = blist.stream().mapToInt(BitmapShape::getHeight).max().getAsInt();
         

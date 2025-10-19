@@ -76,7 +76,7 @@ public class EmbeddedShapeTable extends Directive {
         // We need to terminate a binary embedded line with some mechanism of skipping the binary content.
         Optional<Line> nextLineOpt = line.nextLine();
         nextLineOpt.ifPresent(nextLine -> basic.GOTO(nextLine.lineNumber));
-        if (!nextLineOpt.isPresent()) basic.RETURN();
+        if (nextLineOpt.isEmpty()) basic.RETURN();
 
         // End line and inject binary content
         basic.endLine().set(shapeTableStart);

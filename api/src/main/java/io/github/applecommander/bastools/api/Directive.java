@@ -22,8 +22,8 @@ import io.github.applecommander.bastools.api.utils.Converters;
 
 public abstract class Directive {
     private final String directiveName;
-	protected Configuration config;
-	protected OutputStream outputStream;
+	protected final Configuration config;
+	protected final OutputStream outputStream;
 	private final List<Token> paramTokens = new ArrayList<>();
 	private final Map<String,Expression> parameters = new TreeMap<>(String::compareToIgnoreCase);
 	private final Set<String> parameterNames;

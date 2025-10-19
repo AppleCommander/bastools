@@ -6,7 +6,7 @@ import picocli.CommandLine.ITypeConverter;
 /** Add support for lower-case Optimization flags. */
 public class OptimizationTypeConverter implements ITypeConverter<Optimization> {
 	@Override
-	public Optimization convert(String value) throws Exception {
+	public Optimization convert(String value) {
 		try {
 			return Optimization.valueOf(value);
 		} catch (IllegalArgumentException ex) {
