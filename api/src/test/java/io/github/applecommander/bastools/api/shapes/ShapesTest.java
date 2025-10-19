@@ -99,11 +99,13 @@ public class ShapesTest {
     public void testTextShapeExporterNoBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
-        final String expected = ".XXX.\n"
-                              + "X...X\n"
-                              + "X.+.X\n"
-                              + "X...X\n"
-                              + ".XXX.\n";
+        final String expected = """
+            .XXX.
+            X...X
+            X.+.X
+            X...X
+            .XXX.
+            """;
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().noBorder().build();
@@ -117,13 +119,15 @@ public class ShapesTest {
     public void testTextShapeExporterAsciiBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
-        final String expected = "+-----+\n"
-                              + "|.XXX.|\n"
-                              + "|X...X|\n"
-                              + "|X.+.X|\n"
-                              + "|X...X|\n"
-                              + "|.XXX.|\n"
-                              + "+-----+\n";
+        final String expected = """
+            +-----+
+            |.XXX.|
+            |X...X|
+            |X.+.X|
+            |X...X|
+            |.XXX.|
+            +-----+
+            """;
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
@@ -142,11 +146,13 @@ public class ShapesTest {
         st.shapes.add(st.shapes.get(0));
         st.shapes.add(st.shapes.get(0));
         
-        final String oneExpectedRow = ".XXX. .XXX.\n"
-                                    + "X...X X...X\n"
-                                    + "X.+.X X.+.X\n"
-                                    + "X...X X...X\n"
-                                    + ".XXX. .XXX.\n";
+        final String oneExpectedRow = """
+            .XXX. .XXX.
+            X...X X...X
+            X.+.X X.+.X
+            X...X X...X
+            .XXX. .XXX.
+            """;
         String expected = oneExpectedRow + "\n" + oneExpectedRow;
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

@@ -34,13 +34,15 @@ public class ShapeGeneratorTest {
         assertNotNull(st);
         assertEquals(1, st.shapes.size());
         
-        final String expected = "+-----+\n"
-                              + "|.XXX.|\n"
-                              + "|X...X|\n"
-                              + "|X.+.X|\n"
-                              + "|X...X|\n"
-                              + "|.XXX.|\n"
-                              + "+-----+\n";
+        final String expected = """
+            +-----+
+            |.XXX.|
+            |X...X|
+            |X.+.X|
+            |X...X|
+            |.XXX.|
+            +-----+
+            """;
 
         assertShapeMatches(expected, st.shapes.get(0));
     }
@@ -67,17 +69,19 @@ public class ShapeGeneratorTest {
     
     @Test
     public void testMouseShape() throws IOException {
-        final String mouse = "+--------------+\n" 
-                           + "|..........*X..|\n"  
-                           + "|....XXXX.XX...|\n"  
-                           + "|...XXXXXXXX...|\n"
-                           + "|.XXXXXXXXXXX..|\n"
-                           + "|XX.XXXXXXX.XX.|\n"
-                           + "|X...XXXXXXXXXX|\n"
-                           + "|XX............|\n"
-                           + "|.XXX.XX.......|\n"
-                           + "|...XXX........|\n"
-                           + "+--------------+\n";
+        final String mouse = """
+            +--------------+
+            |..........*X..|
+            |....XXXX.XX...|
+            |...XXXXXXXX...|
+            |.XXXXXXXXXXX..|
+            |XX.XXXXXXX.XX.|
+            |X...XXXXXXXXXX|
+            |XX............|
+            |.XXX.XX.......|
+            |...XXX........|
+            +--------------+
+            """;
 
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/mouse-bitmap.st"));
         assertNotNull(st);
@@ -96,21 +100,23 @@ public class ShapeGeneratorTest {
     
     @Test
     public void testRobotShape() throws IOException {
-        final String robot = "+-------------+\n"
-                           + "|....XXXXX...+|\n" 
-                           + "|XXXXX...XX...|\n" 
-                           + "|....XXXXX....|\n" 
-                           + "|.............|\n" 
-                           + "|..XX..XXX....|\n" 
-                           + "|...XX.XXX....|\n" 
-                           + "|...XX.XXXX...|\n" 
-                           + "|..XX.XXXXX...|\n" 
-                           + "|....XXXXXX...|\n" 
-                           + "|.XXXXXXXXXXX.|\n" 
-                           + "|XX.........XX|\n" 
-                           + "|XX.........XX|\n" 
-                           + "|.XXXXXXXXXXX.|\n" 
-                           + "+-------------+\n";
+        final String robot = """
+            +-------------+
+            |....XXXXX...+|
+            |XXXXX...XX...|
+            |....XXXXX....|
+            |.............|
+            |..XX..XXX....|
+            |...XX.XXX....|
+            |...XX.XXXX...|
+            |..XX.XXXXX...|
+            |....XXXXXX...|
+            |.XXXXXXXXXXX.|
+            |XX.........XX|
+            |XX.........XX|
+            |.XXXXXXXXXXX.|
+            +-------------+
+            """;
 
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/robot-bitmap.st"));
         assertNotNull(st);
