@@ -49,7 +49,7 @@ import picocli.CommandLine.Parameters;
 		optionListHeading = "%nOptions:%n",
 		name = "bt", mixinStandardHelpOptions = true, 
 		versionProvider = VersionProvider.class)
-public class Main implements Callable<Void> {
+public class Main implements Callable<Integer> {
 	private static final int BAS = 0xfc;
 	
 	@Option(names = { "-o", "--output" }, description = "Write binary output to file.")
@@ -118,9 +118,11 @@ public class Main implements Callable<Void> {
 	private File sourceFile;
 	
 	public static void main(String[] args) {
+		// The CLI unit test library throws an exception when 'System.exit' is called;
+		// so we cannot have the 'System.exit' call in the try-catch block!
+		int exitCode = 0;
 		try {
-			int exitCode = new CommandLine(new Main()).execute(args);
-			System.exit(exitCode);
+			exitCode = new CommandLine(new Main()).execute(args);
 		} catch (Throwable t) {
 			if (Main.debugFlag) {
 				t.printStackTrace(System.err);
@@ -132,12 +134,13 @@ public class Main implements Callable<Void> {
 				}
 				System.err.printf("Error: %s\n", Optional.ofNullable(message).orElse("An error occurred."));
 			}
-			System.exit(1);
+			exitCode = 1;
 		}
+		System.exit(exitCode);
 	}
 	
 	@Override
-	public Void call() throws IOException {
+	public Integer call() throws IOException {
 		if (checkParameters()) {
 			Configuration.Builder builder = Configuration.builder()
 					.maxLineLength(this.maxLineLength)
@@ -147,7 +150,7 @@ public class Main implements Callable<Void> {
 			process(builder.build());
 		}
 		
-		return null;		// To satisfy object "Void"
+		return 0;
 	}
 	
 	/** A basic test to ensure parameters are somewhat sane. */
