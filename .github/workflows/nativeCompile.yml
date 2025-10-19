@@ -38,7 +38,12 @@ jobs:
       # Therefore, we try to find runners that fit our targets (see above).
       - name: Build 'bt' and 'st'
         run: ./gradlew nativeCompile
-      
+
+      - name: Run CLTH tests
+        if: ${{ matrix.os != 'windows' }}
+        shell: bash
+        run: ./scripts/run-clth-tests.sh
+
       - name: Upload 'bt' binary
         uses: actions/upload-artifact@v4
         with:

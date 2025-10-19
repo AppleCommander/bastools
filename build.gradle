@@ -3,8 +3,8 @@ plugins {
 }
 
 ext {
-  isSnapshotVersion = version.endsWith("SNAPSHOT")
-  isReleaseVersion = !ext.isSnapshotVersion
+  // Dependency versions
+  clthVersion = "2.0"
 }
 
 java {

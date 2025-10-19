@@ -2,6 +2,7 @@ commands:
   st:
     main-class: io.github.applecommander.bastools.tools.st.Main
     system-exit: yes
+    executable: tools/st/build/native/nativeCompile/st-*
 
 files:
   workfile:

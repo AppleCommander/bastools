@@ -4,6 +4,11 @@ plugins {
     id 'signing'
 }
 
+ext {
+    isSnapshotVersion = version.endsWith("SNAPSHOT")
+    isReleaseVersion = !ext.isSnapshotVersion
+}
+
 repositories {
     mavenCentral()
 }

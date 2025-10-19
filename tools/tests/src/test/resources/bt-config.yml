@@ -2,6 +2,7 @@ commands:
   bt:
     main-class: io.github.applecommander.bastools.tools.bt.Main
     system-exit: yes
+    executable:  tools/bt/build/native/nativeCompile/bt-*
 
 files:
   helloWorld:
