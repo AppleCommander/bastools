@@ -4,14 +4,6 @@ plugins {
     id 'signing'
 }
 
-ext.isSnapshotVersion = version.endsWith("SNAPSHOT")
-ext.isReleaseVersion = !ext.isSnapshotVersion
-
-java {
-    sourceCompatibility = '21'
-    targetCompatibility = '21'
-}
-
 repositories {
     mavenCentral()
 }
