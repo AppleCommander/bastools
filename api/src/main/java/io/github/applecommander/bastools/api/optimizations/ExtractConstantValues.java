@@ -90,7 +90,7 @@ public class ExtractConstantValues extends BaseVisitor {
 			program.lines.stream()
 				   .map(Line::getLineNumber)
 				   .filter(super.reassignments::containsValue)
-				   .forEach(n -> { super.reassignments.put(n, n+1); });
+				   .forEach(n -> super.reassignments.put(n, n+1));
 		}
 		program.lines.add(0, line);
 	}

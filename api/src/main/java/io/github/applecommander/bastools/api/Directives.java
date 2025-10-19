@@ -14,16 +14,16 @@ public class Directives {
 	private Directives() { /* Prevent construction. */ }
 	
 	private static final Map<String,Class<? extends Directive>> DIRECTIVES =
-		new TreeMap<String,Class<? extends Directive>>(String.CASE_INSENSITIVE_ORDER) {
-			@Serial
+        new TreeMap<>(String.CASE_INSENSITIVE_ORDER) {
+            @Serial
             private static final long serialVersionUID = -8111460701487331592L;
 
-			{
-				put(EmbeddedBinaryDirective.NAME, EmbeddedBinaryDirective.class);
-				put(HexDirective.NAME, HexDirective.class);
-				put(EmbeddedShapeTable.NAME, EmbeddedShapeTable.class);
-			}
-		};
+            {
+                put(EmbeddedBinaryDirective.NAME, EmbeddedBinaryDirective.class);
+                put(HexDirective.NAME, HexDirective.class);
+                put(EmbeddedShapeTable.NAME, EmbeddedShapeTable.class);
+            }
+        };
 
 	public static Directive find(String text, Configuration config, OutputStream outputStream) {
 		if (DIRECTIVES.containsKey(text)) {

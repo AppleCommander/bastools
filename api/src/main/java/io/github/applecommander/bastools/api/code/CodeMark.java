@@ -32,7 +32,7 @@ public class CodeMark {
      */
     public boolean update(GeneratorState state) {
         int currentAddress = state.currentAddress();
-        loopCounter.merge(currentAddress, 1, (a,b) -> a+b);
+        loopCounter.merge(currentAddress, 1, Integer::sum);
         if (loopCounter.get(currentAddress) > LOOP_MAX) {
             StringBuilder sb = new StringBuilder();
             sb.append("A circular pattern in a dynamic address was discovered!\n");

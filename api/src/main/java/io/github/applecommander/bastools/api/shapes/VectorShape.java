@@ -119,7 +119,7 @@ public class VectorShape implements Shape {
 	    @Override
 	    public String apply(String shortCommands) {
             Matcher matcher = pattern.matcher(shortCommands);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             while (matcher.find()) {
                 matcher.appendReplacement(sb, fn.apply(matcher.group(1)));
             }

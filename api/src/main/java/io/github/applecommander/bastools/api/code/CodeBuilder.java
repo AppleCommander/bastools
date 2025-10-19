@@ -48,8 +48,6 @@ public class CodeBuilder {
     }
     /** Add a {@code byte[]} to this stream. */
     public CodeBuilder addBinary(byte[] data) {
-        return add(state -> {
-                state.write(data);
-            });
+        return add(state -> state.write(data));
     }
 }

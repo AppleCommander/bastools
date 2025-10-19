@@ -151,31 +151,24 @@ public class ExtractCommand implements Callable<Void> {
                                     .build();
             break;
         case "source":
-            switch (codeStyle) {
-            case "bitmap":
-                exporter = ShapeExporter.source()
-                                        .bitmap()
-                                        .skipEmptyShapes(skipEmptyShapesFlag)
-                                        .optimize(optimize)
-                                        .build();
-                break;
-            case "short":
-                exporter = ShapeExporter.source()
-                                        .shortCommands()
-                                        .skipEmptyShapes(skipEmptyShapesFlag)
-                                        .optimize(optimize)
-                                        .build();
-                break;
-            case "long":
-                exporter = ShapeExporter.source()
-                                        .longCommands()
-                                        .skipEmptyShapes(skipEmptyShapesFlag)
-                                        .optimize(optimize)
-                                        .build();
-                break;
-            default:
-                throw new IOException("Please select a valid code style");
-            }
+            exporter = switch (codeStyle) {
+                case "bitmap" -> ShapeExporter.source()
+                    .bitmap()
+                    .skipEmptyShapes(skipEmptyShapesFlag)
+                    .optimize(optimize)
+                    .build();
+                case "short" -> ShapeExporter.source()
+                    .shortCommands()
+                    .skipEmptyShapes(skipEmptyShapesFlag)
+                    .optimize(optimize)
+                    .build();
+                case "long" -> ShapeExporter.source()
+                    .longCommands()
+                    .skipEmptyShapes(skipEmptyShapesFlag)
+                    .optimize(optimize)
+                    .build();
+                default -> throw new IOException("Please select a valid code style");
+            };
             break;
         default:
             throw new IOException("Please select a valid output format");

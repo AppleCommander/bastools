@@ -245,22 +245,13 @@ public class BitmapShape implements Shape {
         
         public boolean onOrAtEdge(VectorCommand vector) {
             // No clever way to do this?
-            switch (vector) {
-            case MOVE_DOWN:
-            case PLOT_DOWN:
-                return point.y >= height;
-            case MOVE_UP:
-            case PLOT_UP:
-                return point.y < 0;
-            case MOVE_LEFT:
-            case PLOT_LEFT:
-                return point.x < 0;
-            case MOVE_RIGHT:
-            case PLOT_RIGHT:
-                return point.x >= width;
-            default:
-                throw new RuntimeException("Unexpected vector: " + vector);
-            }
+            return switch (vector) {
+                case MOVE_DOWN, PLOT_DOWN -> point.y >= height;
+                case MOVE_UP, PLOT_UP -> point.y < 0;
+                case MOVE_LEFT, PLOT_LEFT -> point.x < 0;
+                case MOVE_RIGHT, PLOT_RIGHT -> point.x >= width;
+                default -> throw new RuntimeException("Unexpected vector: " + vector);
+            };
         }
     }
 

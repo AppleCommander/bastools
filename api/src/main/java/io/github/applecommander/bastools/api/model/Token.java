@@ -28,28 +28,20 @@ public class Token {
 	}
 	@Override
 	public String toString() {
-		switch (type) {
-		case EOL:
-			return type.toString();
-		case KEYWORD:
-			return keyword.toString();
-		case NUMBER:
-			return String.format("%s(%f)", type, number);
-		default:
-			return String.format("%s(%s)", type, text);
-		}
+        return switch (type) {
+            case EOL -> type.toString();
+            case KEYWORD -> keyword.toString();
+            case NUMBER -> String.format("%s(%f)", type, number);
+            default -> String.format("%s(%s)", type, text);
+        };
 	}
 	public String asString() {
-	    switch (type) {
-	    case EOL:
-	        return "\n";
-	    case KEYWORD:
-	        return keyword.toString();
-	    case NUMBER:
-	        return number.toString();
-        default:
-            return text;
-	    }
+        return switch (type) {
+            case EOL -> "\n";
+            case KEYWORD -> keyword.toString();
+            case NUMBER -> number.toString();
+            default -> text;
+        };
 	}
 	
 	public static Token eol(int line) {
