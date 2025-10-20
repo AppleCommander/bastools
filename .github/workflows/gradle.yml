@@ -10,6 +10,8 @@ name: Build bt and st
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - '*'
   pull_request:
     branches: [ "main" ]
 
