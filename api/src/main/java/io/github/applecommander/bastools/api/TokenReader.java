@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api;
 
 import java.io.File;
@@ -30,17 +47,17 @@ public class TokenReader {
 	private boolean hasMore = true;
 	// Internal flag just in case we consume the EOL (see REM for instance)s
 	private boolean needSyntheticEol = false;
-	private Reader reader;
-	private StreamTokenizer tokenizer;
+	private final Reader reader;
+	private final StreamTokenizer tokenizer;
 
 	/** A handy method to generate a list of Tokens from a file name. */
-	public static Queue<Token> tokenize(String filename) throws FileNotFoundException, IOException {
+	public static Queue<Token> tokenize(String filename) throws IOException {
 		try (FileReader fileReader = new FileReader(filename)) {
 			return tokenize(fileReader);
 		}
 	}
 	/** A handy method to generate a list of Tokens from a file. */
-	public static Queue<Token> tokenize(File file) throws FileNotFoundException, IOException {
+	public static Queue<Token> tokenize(File file) throws IOException {
 		try (FileReader fileReader = new FileReader(file)) {
 			return tokenize(fileReader);
 		}

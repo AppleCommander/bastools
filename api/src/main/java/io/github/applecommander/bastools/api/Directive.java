@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api;
 
 import java.io.IOException;
@@ -21,12 +38,12 @@ import io.github.applecommander.bastools.api.model.Token.Type;
 import io.github.applecommander.bastools.api.utils.Converters;
 
 public abstract class Directive {
-    private String directiveName;
-	protected Configuration config;
-	protected OutputStream outputStream;
-	private List<Token> paramTokens = new ArrayList<>();
-	private Map<String,Expression> parameters = new TreeMap<>(String::compareToIgnoreCase);
-	private Set<String> parameterNames;
+    private final String directiveName;
+	protected final Configuration config;
+	protected final OutputStream outputStream;
+	private final List<Token> paramTokens = new ArrayList<>();
+	private final Map<String,Expression> parameters = new TreeMap<>(String::compareToIgnoreCase);
+	private final Set<String> parameterNames;
 
 	protected Directive(String directiveName, Configuration config, OutputStream outputStream, String... parameterNames) {
 	    Objects.requireNonNull(directiveName);
@@ -120,7 +137,7 @@ public abstract class Directive {
 	    }
 	}
 	private Expression buildExpression() {
-	    Token t = paramTokens.get(0);
+	    Token t = paramTokens.getFirst();
 	    if ("(".equals(t.text)) {
 	        requireSyntaxToken("(");
 	        Expression expr = buildMapExpression();
@@ -131,7 +148,7 @@ public abstract class Directive {
 	    }
 	}
 	private Expression buildSimpleExpression() {
-	    Token t = paramTokens.remove(0);
+	    Token t = paramTokens.removeFirst();
 	    return new SimpleExpression(t.asString());
 	}
 	private Expression buildMapExpression() {
@@ -152,7 +169,7 @@ public abstract class Directive {
 	}
 	
 	private Token requireToken(Type... types) {
-		Token t = paramTokens.remove(0);
+		Token t = paramTokens.removeFirst();
 		boolean matches = false;
 		for (Type type : types) {
 			matches |= type == t.type;
@@ -183,7 +200,7 @@ public abstract class Directive {
 	private boolean checkSyntaxToken(String syntax) {
 	    if (paramTokens.isEmpty()) return false;
         Type tokenType = ApplesoftKeyword.find(syntax).map(t -> Type.KEYWORD).orElse(Type.SYNTAX);
-        Token token = paramTokens.get(0);
+        Token token = paramTokens.getFirst();
         return tokenType == token.type && syntax.equals(token.text);
 	}
 	
@@ -200,8 +217,8 @@ public abstract class Directive {
 	    }
 	}
 	public interface Expression {
-	    public Optional<SimpleExpression> toSimpleExpression();
-	    public Optional<MapExpression> toMapExpression();
+	    Optional<SimpleExpression> toSimpleExpression();
+	    Optional<MapExpression> toMapExpression();
 	}
 	public static class SimpleExpression implements Expression {
 	    private final String value;

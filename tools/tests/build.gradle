@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':bastools-tools:bastools-tools-bt')
+    implementation project(':bastools-tools:bastools-tools-st')
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation "io.github.a2geek:clth:$clthVersion"
+}
+
+test {
+    useJUnitPlatform()
+
+    def junit5SystemExit = configurations.testRuntimeClasspath.files
+            .find { it.name.contains('junit5-system-exit') }
+    jvmArgumentProviders.add({["-javaagent:$junit5SystemExit"]} as CommandLineArgumentProvider)
+}

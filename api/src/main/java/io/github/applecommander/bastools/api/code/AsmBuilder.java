@@ -1,6 +1,22 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.code;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -9,7 +25,7 @@ import java.util.Objects;
  * By no means is this complete, but is being built out as the need arises.
  */
 public class AsmBuilder {
-    private CodeBuilder builder;
+    private final CodeBuilder builder;
     
     public AsmBuilder(CodeBuilder builder) {
         Objects.requireNonNull(builder);
@@ -30,12 +46,12 @@ public class AsmBuilder {
         return this;
     }
     /** Generate a "LDA #value" in the output stream. */
-    public AsmBuilder lda(int value) throws IOException {
+    public AsmBuilder lda(int value) {
         builder.add(state -> internalLDA(state, value));
         return this;
     }
     /** Generate a "STA address" in the output stream. */
-    public AsmBuilder sta(int address) throws IOException {
+    public AsmBuilder sta(int address) {
         builder.add(state -> internalSTA(state, address));
         return this;
     }

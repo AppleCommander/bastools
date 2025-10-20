@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.shapes.exporters;
 
 import java.io.ByteArrayOutputStream;
@@ -18,7 +35,7 @@ import io.github.applecommander.bastools.api.shapes.VectorShape;
 
 public class SourceShapeExporter implements ShapeExporter {
     private BiConsumer<Shape,PrintWriter> formatFunction = this::exportShapeAsBitmap;
-    private ShapeExporter textExporter;
+    private final ShapeExporter textExporter;
     private boolean skipEmptyShapes;
     private boolean optimize;
 
@@ -28,14 +45,14 @@ public class SourceShapeExporter implements ShapeExporter {
     }
     
     @Override
-    public void export(Shape shape, OutputStream outputStream) throws IOException {
+    public void export(Shape shape, OutputStream outputStream) {
         PrintWriter pw = new PrintWriter(outputStream);
         formatFunction.accept(shape, pw);
         pw.flush();
     }
 
     @Override
-    public void export(ShapeTable shapeTable, OutputStream outputStream) throws IOException {
+    public void export(ShapeTable shapeTable, OutputStream outputStream) {
         PrintWriter pw = new PrintWriter(outputStream);
         shapeTable.shapes.stream()
                          .filter(this::displayThisShape)
@@ -52,7 +69,7 @@ public class SourceShapeExporter implements ShapeExporter {
             pw.printf(".bitmap\n");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             textExporter.export(shape, new PaddedOutputStream(os, "  "));
-            pw.print(new String(os.toByteArray()));
+            pw.print(os.toString());
             pw.printf("\n");
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
@@ -93,7 +110,7 @@ public class SourceShapeExporter implements ShapeExporter {
     }
     
     public static class Builder {
-        private SourceShapeExporter exporter = new SourceShapeExporter();
+        private final SourceShapeExporter exporter = new SourceShapeExporter();
         
         public Builder bitmap() {
             exporter.formatFunction = exporter::exportShapeAsBitmap;
@@ -130,9 +147,9 @@ public class SourceShapeExporter implements ShapeExporter {
     }
     
     public static class PaddedOutputStream extends OutputStream {
-        private OutputStream wrappedStream;
+        private final OutputStream wrappedStream;
         private boolean needPadding = true;
-        private byte[] padding;
+        private final byte[] padding;
         
         public PaddedOutputStream(OutputStream outputStream, String padding) {
             Objects.requireNonNull(outputStream);

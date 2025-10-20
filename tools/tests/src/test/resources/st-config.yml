@@ -1,0 +1,49 @@
+commands:
+  st:
+    main-class: io.github.applecommander.bastools.tools.st.Main
+    system-exit: yes
+    executable: tools/st/build/native/nativeCompile/st-*
+
+files:
+  workfile:
+    type: temporary
+    prefix: shape
+    suffix: .bin
+
+tests:
+  - name: Forms of help
+    steps:
+      - command: st --help
+        criteria:
+          match: contains
+        stdout: "Usage: st"
+      - command: st
+        criteria:
+          match: contains
+        stderr: "Usage: st"
+  - name: Generate and consume shape ala Applesoft BASIC Programmer's Reference Manual
+    steps:
+      - command: st generate -o $workfile --stdin
+        stdin: |
+          .long label-long
+              movedown 2
+              plotleft 2
+              moveup
+              plotup 3
+              moveright
+              plotright 3
+              movedown
+              plotdown 3
+              moveleft
+              plotleft
+      - command: st extract --stdout $workfile
+        criteria:
+          whitespace: trim
+        stdout: |
+          +-----+
+          |.XXX.|
+          |X...X|
+          |X.+.X|
+          |X...X|
+          |.XXX.|
+          +-----+

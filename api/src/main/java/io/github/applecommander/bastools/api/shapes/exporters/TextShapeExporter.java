@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.shapes.exporters;
 
 import java.io.OutputStream;
@@ -48,7 +65,7 @@ public class TextShapeExporter implements ShapeExporter {
         List<BitmapShape> blist = shapeTable.shapes.stream()
                                                    .filter(this::displayThisShape)
                                                    .map(Shape::toBitmap)
-                                                   .collect(Collectors.toList());
+                                                   .toList();
         int width = blist.stream().mapToInt(BitmapShape::getWidth).max().getAsInt();
         int height = blist.stream().mapToInt(BitmapShape::getHeight).max().getAsInt();
 
@@ -158,10 +175,10 @@ public class TextShapeExporter implements ShapeExporter {
         private final char dividerRightEdge;
         private final char dividerMiddle;
         
-        private BorderStrategy(char horizontalLine, char verticalLine, char topLeftCorner, char topRightCorner,
-                char bottomLeftCorner, char bottomRightCorner, char topDivider, char bottomDivider,
-                char dividerVerticalLine, char dividerHorizontalLine, char dividerLeftEdge, char dividerRightEdge,
-                char dividerMiddle) {
+        BorderStrategy(char horizontalLine, char verticalLine, char topLeftCorner, char topRightCorner,
+                       char bottomLeftCorner, char bottomRightCorner, char topDivider, char bottomDivider,
+                       char dividerVerticalLine, char dividerHorizontalLine, char dividerLeftEdge, char dividerRightEdge,
+                       char dividerMiddle) {
             this.horizontalLine = horizontalLine;
             this.verticalLine = verticalLine;
             this.topLeftCorner = topLeftCorner;
@@ -228,7 +245,7 @@ public class TextShapeExporter implements ShapeExporter {
     }
     
     public static class Builder {
-        private TextShapeExporter textShapeExporter = new TextShapeExporter();
+        private final TextShapeExporter textShapeExporter = new TextShapeExporter();
         
         public Builder maxWidth(int maxWidth) {
             textShapeExporter.maxWidth = maxWidth;

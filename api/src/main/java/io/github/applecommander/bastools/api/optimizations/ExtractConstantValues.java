@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.optimizations;
 
 import java.util.Arrays;
@@ -22,7 +39,7 @@ import io.github.applecommander.bastools.api.visitors.VariableCollectorVisitor;
  */
 public class ExtractConstantValues extends BaseVisitor {
 	/** These trigger the start of a replacement range.  Note the special logic for assignments. */
-	public static List<ApplesoftKeyword> TARGET_STARTS = Arrays.asList(
+	public static final List<ApplesoftKeyword> TARGET_STARTS = Arrays.asList(
 			ApplesoftKeyword.FOR, ApplesoftKeyword.CALL, ApplesoftKeyword.PLOT, ApplesoftKeyword.HLIN, 
 			ApplesoftKeyword.VLIN, ApplesoftKeyword.HCOLOR, ApplesoftKeyword.HPLOT, ApplesoftKeyword.DRAW, 
 			ApplesoftKeyword.XDRAW, ApplesoftKeyword.HTAB, ApplesoftKeyword.SCALE, ApplesoftKeyword.COLOR, 
@@ -30,13 +47,13 @@ public class ExtractConstantValues extends BaseVisitor {
 			ApplesoftKeyword.LET, ApplesoftKeyword.IF, ApplesoftKeyword.ON, ApplesoftKeyword.WAIT, 
 			ApplesoftKeyword.POKE);
 	/** These trigger the end of a replacement range.  End of statement is always an end. */
-	public static List<ApplesoftKeyword> TARGET_ENDS = Arrays.asList(
+	public static final List<ApplesoftKeyword> TARGET_ENDS = Arrays.asList(
 			ApplesoftKeyword.GOTO, ApplesoftKeyword.GOSUB, ApplesoftKeyword.THEN);
 	
 	// Map keyed by value (Double isn't a good key, using a String of the number) and pointing to replacement variable name
-	private Map<String,String> map = new HashMap<>();
+	private final Map<String,String> map = new HashMap<>();
 	
-	private VariableNameGenerator variableGenerator = new VariableNameGenerator();
+	private final VariableNameGenerator variableGenerator = new VariableNameGenerator();
 	private Set<String> existingVariables;
 	private Function<Token,Token> consumer = this::nullTransformation;
 	
@@ -83,16 +100,16 @@ public class ExtractConstantValues extends BaseVisitor {
 		// Bypass if there were no constants
 		if (line.statements.isEmpty()) return;
 		// setup a renumber of lines that interfere if we have any
-		if (program.lines.get(0).lineNumber == 0) {
+		if (program.lines.getFirst().lineNumber == 0) {
 			// start with line #0 should become line #1
 			super.reassignments.put(0, 1);
 			// chase it to the end!
 			program.lines.stream()
 				   .map(Line::getLineNumber)
 				   .filter(super.reassignments::containsValue)
-				   .forEach(n -> { super.reassignments.put(n, n+1); });
+				   .forEach(n -> super.reassignments.put(n, n+1));
 		}
-		program.lines.add(0, line);
+		program.lines.addFirst(line);
 	}
 	private Line generateLine0(Program program) {
 		Line line = new Line(0, program);
@@ -114,7 +131,7 @@ public class ExtractConstantValues extends BaseVisitor {
 	public Statement visit(Statement statement) {
 		try {
 			if (!statement.tokens.isEmpty()) {
-				Token t = statement.tokens.get(0);
+				Token t = statement.tokens.getFirst();
 				// Assignment
 				if (t.type == Token.Type.IDENT) {
 					this.consumer = this::numberToIdentTransformation;

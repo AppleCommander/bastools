@@ -4,12 +4,9 @@ plugins {
     id 'signing'
 }
 
-ext.isSnapshotVersion = version.endsWith("SNAPSHOT")
-ext.isReleaseVersion = !ext.isSnapshotVersion
-
-java {
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
+ext {
+    isSnapshotVersion = version.endsWith("SNAPSHOT")
+    isReleaseVersion = !ext.isSnapshotVersion
 }
 
 repositories {

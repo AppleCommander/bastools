@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.shapes;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -70,7 +87,7 @@ public class ShapesTest {
                 .moveDown().plotDown().plotDown().plotDown()
                 .moveLeft().plotLeft();
       
-        Shape s = st.shapes.get(0);
+        Shape s = st.shapes.getFirst();
         assertNotNull(s);
         assertEquals(expected.vectors, s.toVector().vectors);
     }
@@ -81,12 +98,12 @@ public class ShapesTest {
         
         BitmapShape expected = plotStandardBoxShape();
         
-        Shape s = st.shapes.get(0);
+        Shape s = st.shapes.getFirst();
         assertEquals(expected.grid, s.toBitmap().grid);
     }
     
     @Test
-    public void testToVectorFromBitmap() throws IOException {
+    public void testToVectorFromBitmap() {
         BitmapShape bitmapShape = plotStandardBoxShape();
         
         VectorShape vectorShape = bitmapShape.toVector();
@@ -99,16 +116,18 @@ public class ShapesTest {
     public void testTextShapeExporterNoBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
-        final String expected = ".XXX.\n"
-                              + "X...X\n"
-                              + "X.+.X\n"
-                              + "X...X\n"
-                              + ".XXX.\n";
+        final String expected = """
+            .XXX.
+            X...X
+            X.+.X
+            X...X
+            .XXX.
+            """;
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().noBorder().build();
-        exp.export(st.shapes.get(0), outputStream);
-        String actual = new String(outputStream.toByteArray());
+        exp.export(st.shapes.getFirst(), outputStream);
+        String actual = outputStream.toString();
         
         assertEquals(expected, actual);
     }
@@ -117,18 +136,20 @@ public class ShapesTest {
     public void testTextShapeExporterAsciiBorder() throws IOException {
         ShapeTable st = readStandardShapeTable();
         
-        final String expected = "+-----+\n"
-                              + "|.XXX.|\n"
-                              + "|X...X|\n"
-                              + "|X.+.X|\n"
-                              + "|X...X|\n"
-                              + "|.XXX.|\n"
-                              + "+-----+\n";
+        final String expected = """
+            +-----+
+            |.XXX.|
+            |X...X|
+            |X.+.X|
+            |X...X|
+            |.XXX.|
+            +-----+
+            """;
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
-        exp.export(st.shapes.get(0), outputStream);
-        String actual = new String(outputStream.toByteArray());
+        exp.export(st.shapes.getFirst(), outputStream);
+        String actual = outputStream.toString();
         
         assertEquals(expected, actual);
     }
@@ -138,21 +159,23 @@ public class ShapesTest {
         ShapeTable st = readStandardShapeTable();
         
         // Simulate 4 of these identical shapes by adding 3 more
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
         
-        final String oneExpectedRow = ".XXX. .XXX.\n"
-                                    + "X...X X...X\n"
-                                    + "X.+.X X.+.X\n"
-                                    + "X...X X...X\n"
-                                    + ".XXX. .XXX.\n";
+        final String oneExpectedRow = """
+            .XXX. .XXX.
+            X...X X...X
+            X.+.X X.+.X
+            X...X X...X
+            .XXX. .XXX.
+            """;
         String expected = oneExpectedRow + "\n" + oneExpectedRow;
         
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().maxWidth(12).noBorder().build();
         exp.export(st, outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
 
         assertEquals(expected, actual);
     }
@@ -162,9 +185,9 @@ public class ShapesTest {
         ShapeTable st = readStandardShapeTable();
         
         // Simulate 4 of these identical shapes by adding 3 more
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
-        st.shapes.add(st.shapes.get(0));
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
+        st.shapes.add(st.shapes.getFirst());
         
         final String divider = "+-----+-----+\n";
         final String oneExpectedRow = divider
@@ -178,7 +201,7 @@ public class ShapesTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().maxWidth(12).asciiTextBorder().build();
         exp.export(st, outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
         
         assertEquals(expected, actual);
     }

@@ -5,11 +5,6 @@ plugins {
     id 'org.graalvm.buildtools.native' version '0.10.6'
 }
 
-java {
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
-}
-
 repositories {
     mavenCentral()
 }

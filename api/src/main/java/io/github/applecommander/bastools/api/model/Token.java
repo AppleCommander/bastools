@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.model;
 
 import io.github.applecommander.bastools.api.Visitor;
@@ -28,28 +45,20 @@ public class Token {
 	}
 	@Override
 	public String toString() {
-		switch (type) {
-		case EOL:
-			return type.toString();
-		case KEYWORD:
-			return keyword.toString();
-		case NUMBER:
-			return String.format("%s(%f)", type, number);
-		default:
-			return String.format("%s(%s)", type, text);
-		}
+        return switch (type) {
+            case EOL -> type.toString();
+            case KEYWORD -> keyword.toString();
+            case NUMBER -> String.format("%s(%f)", type, number);
+            default -> String.format("%s(%s)", type, text);
+        };
 	}
 	public String asString() {
-	    switch (type) {
-	    case EOL:
-	        return "\n";
-	    case KEYWORD:
-	        return keyword.toString();
-	    case NUMBER:
-	        return number.toString();
-        default:
-            return text;
-	    }
+        return switch (type) {
+            case EOL -> "\n";
+            case KEYWORD -> keyword.toString();
+            case NUMBER -> number.toString();
+            default -> text;
+        };
 	}
 	
 	public static Token eol(int line) {
@@ -90,7 +99,7 @@ public class Token {
         return Objects.hash(line, type, keyword, number, text);
     }
 
-    public static enum Type {
+    public enum Type {
 		EOL, NUMBER, IDENT, COMMENT, STRING, KEYWORD, SYNTAX, DIRECTIVE
 	}
 }

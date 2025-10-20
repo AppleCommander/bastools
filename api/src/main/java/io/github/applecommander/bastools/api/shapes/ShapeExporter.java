@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.shapes;
 
 import java.io.File;
@@ -13,15 +30,15 @@ import io.github.applecommander.bastools.api.shapes.exporters.TextShapeExporter;
 
 public interface ShapeExporter {
     /** Export a single shape to the OutputStream. */
-    public void export(Shape shape, OutputStream outputStream) throws IOException;
+    void export(Shape shape, OutputStream outputStream) throws IOException;
     /** Export a single shape to the File. */
-    public default void export(Shape shape, File file) throws IOException {
+    default void export(Shape shape, File file) throws IOException {
         Objects.requireNonNull(shape);
         Objects.requireNonNull(file);
         export(shape, file.toPath());
     }
     /** Export a single shape to the Path. */
-    public default void export(Shape shape, Path path) throws IOException {
+    default void export(Shape shape, Path path) throws IOException {
         Objects.requireNonNull(shape);
         Objects.requireNonNull(path);
         try (OutputStream outputStream = Files.newOutputStream(path)) {
@@ -30,15 +47,15 @@ public interface ShapeExporter {
     }
 
     /** Export the entire shape table to the OutputStream. */
-    public void export(ShapeTable shapeTable, OutputStream outputStream) throws IOException;
+    void export(ShapeTable shapeTable, OutputStream outputStream) throws IOException;
     /** Export the entire shape table to the File. */
-    public default void export(ShapeTable shapeTable, File file) throws IOException {
+    default void export(ShapeTable shapeTable, File file) throws IOException {
         Objects.requireNonNull(shapeTable);
         Objects.requireNonNull(file);
         export(shapeTable, file.toPath());
     }
     /** Export the entire shape table to the Path. */
-    public default void export(ShapeTable shapeTable, Path path) throws IOException {
+    default void export(ShapeTable shapeTable, Path path) throws IOException {
         Objects.requireNonNull(shapeTable);
         Objects.requireNonNull(path);
         try (OutputStream outputStream = Files.newOutputStream(path)) {
@@ -46,13 +63,13 @@ public interface ShapeExporter {
         }
     }
     
-    public static TextShapeExporter.Builder text() {
+    static TextShapeExporter.Builder text() {
         return new TextShapeExporter.Builder();
     }
-    public static ImageShapeExporter.Builder image() {
+    static ImageShapeExporter.Builder image() {
         return new ImageShapeExporter.Builder();
     }
-    public static SourceShapeExporter.Builder source() {
+    static SourceShapeExporter.Builder source() {
         return new SourceShapeExporter.Builder();
     }
 }

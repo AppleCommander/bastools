@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.tools.st;
 
 import java.io.IOException;
@@ -78,7 +95,7 @@ public class ExtractCommand implements Callable<Void> {
         } else {
             List<Integer> outOfRange = shapeNums.stream()
                                                 .filter(n -> n > shapeTable.shapes.size())
-                                                .collect(Collectors.toList());
+                                                .toList();
             if (!outOfRange.isEmpty()) {
                 throw new IOException("Invalid shape numbers: " + outOfRange);
             }
@@ -151,31 +168,24 @@ public class ExtractCommand implements Callable<Void> {
                                     .build();
             break;
         case "source":
-            switch (codeStyle) {
-            case "bitmap":
-                exporter = ShapeExporter.source()
-                                        .bitmap()
-                                        .skipEmptyShapes(skipEmptyShapesFlag)
-                                        .optimize(optimize)
-                                        .build();
-                break;
-            case "short":
-                exporter = ShapeExporter.source()
-                                        .shortCommands()
-                                        .skipEmptyShapes(skipEmptyShapesFlag)
-                                        .optimize(optimize)
-                                        .build();
-                break;
-            case "long":
-                exporter = ShapeExporter.source()
-                                        .longCommands()
-                                        .skipEmptyShapes(skipEmptyShapesFlag)
-                                        .optimize(optimize)
-                                        .build();
-                break;
-            default:
-                throw new IOException("Please select a valid code style");
-            }
+            exporter = switch (codeStyle) {
+                case "bitmap" -> ShapeExporter.source()
+                    .bitmap()
+                    .skipEmptyShapes(skipEmptyShapesFlag)
+                    .optimize(optimize)
+                    .build();
+                case "short" -> ShapeExporter.source()
+                    .shortCommands()
+                    .skipEmptyShapes(skipEmptyShapesFlag)
+                    .optimize(optimize)
+                    .build();
+                case "long" -> ShapeExporter.source()
+                    .longCommands()
+                    .skipEmptyShapes(skipEmptyShapesFlag)
+                    .optimize(optimize)
+                    .build();
+                default -> throw new IOException("Please select a valid code style");
+            };
             break;
         default:
             throw new IOException("Please select a valid output format");

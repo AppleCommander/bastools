@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.shapes;
 
 import java.io.File;
@@ -82,7 +99,7 @@ public class ShapeTable {
         List<byte[]> data = this.shapes.stream()
                                        .map(Shape::toVector)
                                        .map(VectorShape::toBytes)
-                                       .collect(Collectors.toList());
+                                       .toList();
         // Build offset table
         int offset = 2 + 2*data.size();
         for (byte[] d : data) {
@@ -98,7 +115,7 @@ public class ShapeTable {
     public void write(File file) throws IOException {
         Objects.requireNonNull(file);
         try (OutputStream outputStream = new FileOutputStream(file)) {
-            write(file);
+            write(outputStream);
         }
     }
     public void write(Path path) throws IOException {

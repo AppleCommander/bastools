@@ -1,9 +1,11 @@
 include 'api'
 include 'tools:bt'
 include 'tools:st'
+include 'tools:tests'
 
 rootProject.name = 'bastools'
 project(":api").name = 'bastools-api'
 project(":tools").name = 'bastools-tools'
 project(":tools:bt").name = 'bastools-tools-bt'
 project(":tools:st").name = 'bastools-tools-st'
+project(":tools:tests").name = 'bastools-tools-tests'

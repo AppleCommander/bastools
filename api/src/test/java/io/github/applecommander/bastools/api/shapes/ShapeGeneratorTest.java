@@ -1,7 +1,23 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.shapes;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,22 +44,24 @@ public class ShapeGeneratorTest {
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/box-bitmap.st"));
         assertShapeIsBox(st);
         // Unable to test vectors for bitmaps
-        assertEquals("label-bitmap", st.shapes.get(0).toBitmap().label);
+        assertEquals("label-bitmap", st.shapes.getFirst().toBitmap().label);
     }
 
     public void assertShapeIsBox(ShapeTable st) throws IOException {
         assertNotNull(st);
         assertEquals(1, st.shapes.size());
         
-        final String expected = "+-----+\n"
-                              + "|.XXX.|\n"
-                              + "|X...X|\n"
-                              + "|X.+.X|\n"
-                              + "|X...X|\n"
-                              + "|.XXX.|\n"
-                              + "+-----+\n";
+        final String expected = """
+            +-----+
+            |.XXX.|
+            |X...X|
+            |X.+.X|
+            |X...X|
+            |.XXX.|
+            +-----+
+            """;
 
-        assertShapeMatches(expected, st.shapes.get(0));
+        assertShapeMatches(expected, st.shapes.getFirst());
     }
     
     public void assertShapeBoxVectors(ShapeTable st, String label) {
@@ -58,7 +76,7 @@ public class ShapeGeneratorTest {
                 .moveDown().plotDown().plotDown().plotDown()
                 .moveLeft().plotLeft();
       
-        Shape shape = st.shapes.get(0);
+        Shape shape = st.shapes.getFirst();
         assertNotNull(shape);
         assertTrue(shape instanceof VectorShape);
         VectorShape vshape = shape.toVector();
@@ -68,24 +86,26 @@ public class ShapeGeneratorTest {
     
     @Test
     public void testMouseShape() throws IOException {
-        final String mouse = "+--------------+\n" 
-                           + "|..........*X..|\n"  
-                           + "|....XXXX.XX...|\n"  
-                           + "|...XXXXXXXX...|\n"
-                           + "|.XXXXXXXXXXX..|\n"
-                           + "|XX.XXXXXXX.XX.|\n"
-                           + "|X...XXXXXXXXXX|\n"
-                           + "|XX............|\n"
-                           + "|.XXX.XX.......|\n"
-                           + "|...XXX........|\n"
-                           + "+--------------+\n";
+        final String mouse = """
+            +--------------+
+            |..........*X..|
+            |....XXXX.XX...|
+            |...XXXXXXXX...|
+            |.XXXXXXXXXXX..|
+            |XX.XXXXXXX.XX.|
+            |X...XXXXXXXXXX|
+            |XX............|
+            |.XXX.XX.......|
+            |...XXX........|
+            +--------------+
+            """;
 
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/mouse-bitmap.st"));
         assertNotNull(st);
         assertEquals(1, st.shapes.size());
 
         // Verify we read the shape correctly...
-        Shape shape = st.shapes.get(0);
+        Shape shape = st.shapes.getFirst();
         assertNotNull(shape);
         assertShapeMatches(mouse, shape);
         
@@ -97,28 +117,30 @@ public class ShapeGeneratorTest {
     
     @Test
     public void testRobotShape() throws IOException {
-        final String robot = "+-------------+\n"
-                           + "|....XXXXX...+|\n" 
-                           + "|XXXXX...XX...|\n" 
-                           + "|....XXXXX....|\n" 
-                           + "|.............|\n" 
-                           + "|..XX..XXX....|\n" 
-                           + "|...XX.XXX....|\n" 
-                           + "|...XX.XXXX...|\n" 
-                           + "|..XX.XXXXX...|\n" 
-                           + "|....XXXXXX...|\n" 
-                           + "|.XXXXXXXXXXX.|\n" 
-                           + "|XX.........XX|\n" 
-                           + "|XX.........XX|\n" 
-                           + "|.XXXXXXXXXXX.|\n" 
-                           + "+-------------+\n";
+        final String robot = """
+            +-------------+
+            |....XXXXX...+|
+            |XXXXX...XX...|
+            |....XXXXX....|
+            |.............|
+            |..XX..XXX....|
+            |...XX.XXX....|
+            |...XX.XXXX...|
+            |..XX.XXXXX...|
+            |....XXXXXX...|
+            |.XXXXXXXXXXX.|
+            |XX.........XX|
+            |XX.........XX|
+            |.XXXXXXXXXXX.|
+            +-------------+
+            """;
 
         ShapeTable st = ShapeGenerator.generate(getClass().getResourceAsStream("/robot-bitmap.st"));
         assertNotNull(st);
         assertEquals(1, st.shapes.size());
 
         // Verify we read the shape correctly...
-        Shape shape = st.shapes.get(0);
+        Shape shape = st.shapes.getFirst();
         assertNotNull(shape);
         assertShapeMatches(robot, shape);
         
@@ -132,7 +154,7 @@ public class ShapeGeneratorTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ShapeExporter exp = ShapeExporter.text().asciiTextBorder().build();
         exp.export(shape, outputStream);
-        String actual = new String(outputStream.toByteArray());
+        String actual = outputStream.toString();
         assertEquals(expected, actual);
     }
 }

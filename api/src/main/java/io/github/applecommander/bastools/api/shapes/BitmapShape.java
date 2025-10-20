@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.shapes;
 
 import java.awt.Point;
@@ -44,7 +61,7 @@ public class BitmapShape implements Shape {
     public void insertColumn() {
         origin.x++;
         for (List<Boolean> row : grid) {
-            row.add(0, Boolean.FALSE);
+            row.addFirst(Boolean.FALSE);
         }
     }
     public void addColumn() {
@@ -54,7 +71,7 @@ public class BitmapShape implements Shape {
     }
     public void insertRow() {
         origin.y++;
-        grid.add(0, newRow(getWidth()));
+        grid.addFirst(newRow(getWidth()));
     }
     public void addRow() {
         grid.add(newRow(getWidth()));
@@ -93,7 +110,7 @@ public class BitmapShape implements Shape {
         return grid.size(); 
     }
     public int getWidth() {
-        return grid.isEmpty() ? 0 : grid.get(0).size();
+        return grid.isEmpty() ? 0 : grid.getFirst().size();
     }
     
     public void plot(int x, int y) {
@@ -174,14 +191,14 @@ public class BitmapShape implements Shape {
      * Note that this class is setup to be dynamic in the chosen corner.
      */
     public static class SweepVectorization implements Supplier<VectorShape> {
-        private VectorCommand[] toOrigin;
+        private final VectorCommand[] toOrigin;
         private VectorCommand movement;
-        private VectorCommand next;
-        private Point point;
-        private BitmapShape bitmapShape;
-        private VectorShape vectorShape;
-        private int width;
-        private int height;
+        private final VectorCommand next;
+        private final Point point;
+        private final BitmapShape bitmapShape;
+        private final VectorShape vectorShape;
+        private final int width;
+        private final int height;
         
         /**
          * Create an instance of the sweep method.
@@ -245,22 +262,13 @@ public class BitmapShape implements Shape {
         
         public boolean onOrAtEdge(VectorCommand vector) {
             // No clever way to do this?
-            switch (vector) {
-            case MOVE_DOWN:
-            case PLOT_DOWN:
-                return point.y >= height;
-            case MOVE_UP:
-            case PLOT_UP:
-                return point.y < 0;
-            case MOVE_LEFT:
-            case PLOT_LEFT:
-                return point.x < 0;
-            case MOVE_RIGHT:
-            case PLOT_RIGHT:
-                return point.x >= width;
-            default:
-                throw new RuntimeException("Unexpected vector: " + vector);
-            }
+            return switch (vector) {
+                case MOVE_DOWN, PLOT_DOWN -> point.y >= height;
+                case MOVE_UP, PLOT_UP -> point.y < 0;
+                case MOVE_LEFT, PLOT_LEFT -> point.x < 0;
+                case MOVE_RIGHT, PLOT_RIGHT -> point.x >= width;
+                default -> throw new RuntimeException("Unexpected vector: " + vector);
+            };
         }
     }
 
@@ -270,9 +278,9 @@ public class BitmapShape implements Shape {
      * this much more straight-forward.
      */
     public static class EuclidianDistanceVectorization implements Supplier<VectorShape> {
-        private List<Point> points;
-        private BitmapShape bitmapShape;
-        private VectorShape vshape;
+        private final List<Point> points;
+        private final BitmapShape bitmapShape;
+        private final VectorShape vshape;
         
         public EuclidianDistanceVectorization(BitmapShape bitmapShape) {
             this.bitmapShape = bitmapShape;

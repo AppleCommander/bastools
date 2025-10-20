@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.api.model;
 
 import java.io.IOException;
@@ -137,9 +154,9 @@ public enum ApplesoftKeyword {
 	 * Indicates that this needs _just_ a closing right parenthesis since the 
 	 * opening left parenthesis is included in the token 
 	 */
-	public boolean needsRParen;
+	public final boolean needsRParen;
 	
-	private ApplesoftKeyword(int code, String text) {
+	ApplesoftKeyword(int code, String text) {
 		this.code = code;
 		this.text = text;
 		
@@ -148,14 +165,11 @@ public enum ApplesoftKeyword {
 			List<String> list = new ArrayList<>();
 			StreamTokenizer t = tokenizer(new StringReader(text));
 			while (t.nextToken() != StreamTokenizer.TT_EOF) {
-				switch (t.ttype) {
-				case StreamTokenizer.TT_WORD:
-					list.add(t.sval);
-					break;
-				default:
-					list.add(String.format("%c", t.ttype));
-					break;
-				}
+                if (t.ttype == StreamTokenizer.TT_WORD) {
+                    list.add(t.sval);
+                } else {
+                    list.add(String.format("%c", t.ttype));
+                }
 			}
 			this.parts = Collections.unmodifiableList(list);
 			this.needsRParen = parts.contains("(");
@@ -198,7 +212,7 @@ public enum ApplesoftKeyword {
 	public static Optional<ApplesoftKeyword> find(String value) {
 		Objects.requireNonNull(value);
 		for (ApplesoftKeyword kw : values()) {
-			if (value.equalsIgnoreCase(kw.parts.get(0))) {
+			if (value.equalsIgnoreCase(kw.parts.getFirst())) {
 				return Optional.of(kw);
 			}
 		}

@@ -1,3 +1,20 @@
+/*
+ * bastools
+ * Copyright (C) 2025  Robert Greene
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.applecommander.bastools.tools.bt;
 
 import java.io.*;
@@ -32,7 +49,7 @@ import picocli.CommandLine.Parameters;
 		optionListHeading = "%nOptions:%n",
 		name = "bt", mixinStandardHelpOptions = true, 
 		versionProvider = VersionProvider.class)
-public class Main implements Callable<Void> {
+public class Main implements Callable<Integer> {
 	private static final int BAS = 0xfc;
 	
 	@Option(names = { "-o", "--output" }, description = "Write binary output to file.")
@@ -92,7 +109,7 @@ public class Main implements Callable<Void> {
 	private static boolean debugFlag;
 	private PrintStream debug = new PrintStream(new OutputStream() {
 			@Override
-			public void write(int b) throws IOException {
+			public void write(int b) {
 				// Do nothing
 			}
 		});
@@ -100,10 +117,12 @@ public class Main implements Callable<Void> {
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
 	private File sourceFile;
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) {
+		// The CLI unit test library throws an exception when 'System.exit' is called;
+		// so we cannot have the 'System.exit' call in the try-catch block!
+		int exitCode = 0;
 		try {
-			int exitCode = new CommandLine(new Main()).execute(args);
-			System.exit(exitCode);
+			exitCode = new CommandLine(new Main()).execute(args);
 		} catch (Throwable t) {
 			if (Main.debugFlag) {
 				t.printStackTrace(System.err);
@@ -115,12 +134,13 @@ public class Main implements Callable<Void> {
 				}
 				System.err.printf("Error: %s\n", Optional.ofNullable(message).orElse("An error occurred."));
 			}
-			System.exit(1);
+			exitCode = 1;
 		}
+		System.exit(exitCode);
 	}
 	
 	@Override
-	public Void call() throws FileNotFoundException, IOException {
+	public Integer call() throws IOException {
 		if (checkParameters()) {
 			Configuration.Builder builder = Configuration.builder()
 					.maxLineLength(this.maxLineLength)
@@ -130,7 +150,7 @@ public class Main implements Callable<Void> {
 			process(builder.build());
 		}
 		
-		return null;		// To satisfy object "Void"
+		return 0;
 	}
 	
 	/** A basic test to ensure parameters are somewhat sane. */
@@ -152,7 +172,7 @@ public class Main implements Callable<Void> {
 	}
 	
 	/** General CLI processing. */
-	public void process(Configuration config) throws FileNotFoundException, IOException {
+	public void process(Configuration config) throws IOException {
 		Queue<Token> tokens = TokenReader.tokenize(sourceFile);
 		if (showTokens) {
 			tokens.forEach(t -> System.out.printf("%s%s", t, t.type == Type.EOL ? "\n" : ", "));
