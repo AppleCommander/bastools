@@ -3,29 +3,29 @@
   "name":"groovy.lang.Closure"
 },
 {
-  "name":"io.github.applecommander.bastools.api.directives.EmbeddedBinaryDirective",
-  "methods":[{"name":"<init>","parameterTypes":["io.github.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
+  "name":"org.applecommander.bastools.api.directives.EmbeddedBinaryDirective",
+  "methods":[{"name":"<init>","parameterTypes":["org.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
 },
 {
-  "name":"io.github.applecommander.bastools.api.directives.EmbeddedShapeTable",
-  "methods":[{"name":"<init>","parameterTypes":["io.github.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
+  "name":"org.applecommander.bastools.api.directives.EmbeddedShapeTable",
+  "methods":[{"name":"<init>","parameterTypes":["org.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.bt.IntegerTypeConverter",
+  "name":"org.applecommander.bastools.tools.bt.IntegerTypeConverter",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.bt.Main",
+  "name":"org.applecommander.bastools.tools.bt.Main",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.bt.OptimizationTypeConverter",
+  "name":"org.applecommander.bastools.tools.bt.OptimizationTypeConverter",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.bt.VersionProvider",
+  "name":"org.applecommander.bastools.tools.bt.VersionProvider",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]

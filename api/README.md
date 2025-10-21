@@ -8,9 +8,9 @@ To include in a Maven project:
 
 ```xml
 <dependency>
-  <groupId>net.sf.applecommander</groupId>
+  <groupId>org.applecommander</groupId>
   <artifactId>bastools-api</artifactId>
-  <version>0.3.1</version>
+  <version>5.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -19,14 +19,14 @@ To include in a Gradle project:
 ```
 dependencies {
     // ...
-    compile "net.sf.applecommander:bastools-api:0.3.1"
+    compile "org.applecommander:bastools-api:5.0-SNAPSHOT"
     // ...
 }
 ```
 
 ## API descriptions
 
-Currently the API is broken into the following sections:
+The API is broken into the following sections:
 
 * [BASIC Tokenizer](README-TOKENIZER.md)
 * [Shape Tooling](README-SHAPES.md)

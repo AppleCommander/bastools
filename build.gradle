@@ -7,9 +7,9 @@ ext {
   clthVersion = "2.0"
 }
 
-java {
-  sourceCompatibility = 21
-  targetCompatibility = 21
+subprojects {
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
 }
 
 if (JavaVersion.current().isJava8Compatible()) {

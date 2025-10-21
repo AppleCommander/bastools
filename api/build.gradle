@@ -49,7 +49,7 @@ publishing {
             artifact sourcesJar
             artifact javadocJar
             pom {
-                groupId = "net.sf.applecommander"
+                groupId = "org.applecommander"
                 artifactId = "bastools-api"
                 name = "B/BAS Tools (bastools)"
                 description = 'An Applesoft BASIC tools library.'

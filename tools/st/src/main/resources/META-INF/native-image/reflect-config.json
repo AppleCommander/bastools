@@ -3,29 +3,29 @@
   "name":"groovy.lang.Closure"
 },
 {
-  "name":"io.github.applecommander.bastools.tools.st.ExtractCommand",
+  "name":"org.applecommander.bastools.tools.st.ExtractCommand",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.st.GenerateCommand",
+  "name":"org.applecommander.bastools.tools.st.GenerateCommand",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.st.IntegerRangeTypeConverter",
+  "name":"org.applecommander.bastools.tools.st.IntegerRangeTypeConverter",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.st.Main",
+  "name":"org.applecommander.bastools.tools.st.Main",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
 },
 {
-  "name":"io.github.applecommander.bastools.tools.st.VersionProvider",
+  "name":"org.applecommander.bastools.tools.st.VersionProvider",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }]
