@@ -1,6 +1,6 @@
 commands:
   bt:
-    main-class: io.github.applecommander.bastools.tools.bt.Main
+    main-class: org.applecommander.bastools.tools.bt.Main
     system-exit: yes
     executable:  tools/bt/build/native/nativeCompile/bt-*
 

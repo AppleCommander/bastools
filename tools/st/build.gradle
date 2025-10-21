@@ -19,7 +19,7 @@ jar {
 }
 
 application {
-    mainClass = "io.github.applecommander.bastools.tools.st.Main"
+    mainClass = "org.applecommander.bastools.tools.st.Main"
 }
 
 bootJar {
