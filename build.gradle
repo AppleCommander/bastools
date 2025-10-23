@@ -4,7 +4,7 @@ plugins {
 
 ext {
   // Dependency versions
-  clthVersion = "2.0"
+  clthVersion = "2.1"
 }
 
 subprojects {
