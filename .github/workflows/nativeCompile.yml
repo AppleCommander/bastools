@@ -49,6 +49,9 @@ jobs:
       # Therefore, we try to find runners that fit our targets (see above).
       - name: Build 'bt' and 'st'
         run: ./gradlew nativeCompile
+        env:
+          # Needed for Windows; not an issue for other OSes
+          GRADLE_OPTS: -Djava.io.tmpdir=${{ runner.temp }}
 
       - name: Run CLTH tests
         if: ${{ matrix.os != 'windows' }}
