@@ -61,8 +61,8 @@ public class VariableReportVisitor implements Visitor {
 	
 	@Override
 	public Token visit(Token token) {
-		if (token.type == Type.IDENT) {
-			refs.merge(token.text, 
+		if (token.type() == Type.IDENT) {
+			refs.merge(token.text(),
 					new TreeSet<>(Arrays.asList(currentLineNumber)), 
 					(a,b) -> { a.addAll(b); return a; });
 		}

@@ -76,15 +76,15 @@ public class ReassignmentVisitor implements Visitor {
 		for (Token t : statement.tokens) {
 			Token newToken = t;
 			if (trigger || then) {
-				if (t.type == Type.NUMBER && reassignments.containsKey(t.number.intValue())) {
-					newToken = Token.number(t.line, reassignments.get(t.number.intValue()).doubleValue());
+				if (t.type() == Type.NUMBER && reassignments.containsKey(t.number().intValue())) {
+					newToken = Token.number(t.line(), reassignments.get(t.number().intValue()).doubleValue());
 				}
 				then = false;
 			}
 			if (!trigger) {
-				trigger = t.keyword == ApplesoftKeyword.GOSUB || t.keyword == ApplesoftKeyword.GOTO 
-                    || t.keyword == ApplesoftKeyword.LIST || t.keyword == ApplesoftKeyword.RUN;
-				then = t.keyword == ApplesoftKeyword.THEN;
+				trigger = t.keyword() == ApplesoftKeyword.GOSUB || t.keyword() == ApplesoftKeyword.GOTO
+                    || t.keyword() == ApplesoftKeyword.LIST || t.keyword() == ApplesoftKeyword.RUN;
+				then = t.keyword() == ApplesoftKeyword.THEN;
 			}
 			newStatement.tokens.add(newToken);
 		}

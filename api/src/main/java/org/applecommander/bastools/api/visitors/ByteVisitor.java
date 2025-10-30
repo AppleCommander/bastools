@@ -132,41 +132,41 @@ public class ByteVisitor implements Visitor {
 		}
 		try {
 			ByteArrayOutputStream os = stack.peek();
-			switch (token.type) {
+			switch (token.type()) {
 			case COMMENT:
 				os.write(ApplesoftKeyword.REM.code);
-				os.write(token.text.getBytes());
+				os.write(token.text().getBytes());
 				break;
 			case EOL:
 				os.write(0x00);
 				break;
 			case IDENT:
-				os.write(token.text.getBytes());
+				os.write(token.text().getBytes());
 				break;
 			case KEYWORD:
-				os.write(token.keyword.code);
+				os.write(token.keyword().code);
 				break;
 			case DIRECTIVE:
-				currentDirective = Directives.find(token.text, config, os);
+				currentDirective = Directives.find(token.text(), config, os);
 				break;
 			case NUMBER:
-				if (Math.rint(token.number) == token.number) {
-					os.write(Integer.toString(token.number.intValue()).getBytes());
+				if (Math.rint(token.number()) == token.number()) {
+					os.write(Integer.toString(token.number().intValue()).getBytes());
 				} else {
-					os.write(Double.toString(token.number).getBytes());
+					os.write(Double.toString(token.number()).getBytes());
 				}
 				break;
 			case STRING:
 				os.write('"');
-				os.write(token.text.getBytes());
+				os.write(token.text().getBytes());
 				os.write('"');
 				break;
 			case SYNTAX:
-				Optional<ApplesoftKeyword> opt = ApplesoftKeyword.find(token.text);
+				Optional<ApplesoftKeyword> opt = ApplesoftKeyword.find(token.text());
 				if (opt.isPresent()) {
 					os.write(opt.get().code);
 				} else {
-					os.write(token.text.getBytes());
+					os.write(token.text().getBytes());
 				}
 				break;
 			}

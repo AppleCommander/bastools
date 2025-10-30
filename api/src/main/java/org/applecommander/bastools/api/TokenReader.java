@@ -129,7 +129,7 @@ public class TokenReader {
 							// Pull next token and see if it is the 2nd part ("PR#" == "PR", "#"; checking for the "#")
                             // If not, drop into identifier routine
 							good = next(depth-1)
-								.filter(t -> opt.get().parts.get(1).equals(t.text))
+								.filter(t -> opt.get().parts.get(1).equals(t.text()))
                                 .isPresent();
 						}
                         if (good) {

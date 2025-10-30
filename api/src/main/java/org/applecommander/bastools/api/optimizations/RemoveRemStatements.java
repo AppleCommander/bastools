@@ -29,6 +29,6 @@ public class RemoveRemStatements extends BaseVisitor {
 	
 	@Override
 	public Statement visit(Statement statement) {
-		return statement.tokens.getFirst().type == Type.COMMENT ? null : statement;
+		return statement.tokens.getFirst().type() == Type.COMMENT ? null : statement;
 	}
 }

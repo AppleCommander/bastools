@@ -69,7 +69,7 @@ public class ShortenVariableNames extends BaseVisitor {
 
     @Override
     public Statement visit(Statement statement) {
-        if (statement.tokens.getFirst().type == Type.DIRECTIVE) {
+        if (statement.tokens.getFirst().type() == Type.DIRECTIVE) {
             return statement;
         }
         return super.visit(statement);
@@ -77,8 +77,8 @@ public class ShortenVariableNames extends BaseVisitor {
 
     @Override
     public Token visit(Token token) {
-        if (token.type == Type.IDENT) {
-            return Token.ident(token.line, config.variableReplacements.get(token.text));
+        if (token.type() == Type.IDENT) {
+            return Token.ident(token.line(), config.variableReplacements.get(token.text()));
         }
         return super.visit(token);
     }

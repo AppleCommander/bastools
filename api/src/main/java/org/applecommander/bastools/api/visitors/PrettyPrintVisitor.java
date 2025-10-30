@@ -49,31 +49,31 @@ public class PrettyPrintVisitor implements Visitor {
 	}
 	@Override
 	public Token visit(Token token) {
-		switch (token.type) {
+		switch (token.type()) {
 		case EOL:
 			printStream.print("<EOL>");
 			break;
 		case COMMENT:
-			printStream.printf(" REM %s", token.text);
+			printStream.printf(" REM %s", token.text());
 			break;
 		case STRING:
-			printStream.printf("\"%s\"", token.text);
+			printStream.printf("\"%s\"", token.text());
 			break;
 		case KEYWORD:
-			printStream.printf(" %s ", token.keyword.text);
+			printStream.printf(" %s ", token.keyword().text);
 			break;
 		case IDENT:
 		case SYNTAX:
-			printStream.print(token.text);
+			printStream.print(token.text());
 			break;
 		case DIRECTIVE:
-			printStream.printf("%s ", token.text);
+			printStream.printf("%s ", token.text());
 			break;
 		case NUMBER:
-			if (Math.rint(token.number) == token.number) {
-				printStream.print(token.number.intValue());
+			if (Math.rint(token.number()) == token.number()) {
+				printStream.print(token.number().intValue());
 			} else {
-				printStream.print(token.number);
+				printStream.print(token.number());
 			}
 			break;
 		}

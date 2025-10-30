@@ -118,7 +118,7 @@ public abstract class Directive {
      * (probably EOL) to prevent loss of information. 
      */
 	public void append(Token token) {
-	    if (token.type == Type.EOL) {
+	    if (token.type() == Type.EOL) {
 	        while (!paramTokens.isEmpty()) {
     	        String name = requireIdentToken();
     	        if (!parameterNames.contains(name)) {
@@ -138,7 +138,7 @@ public abstract class Directive {
 	}
 	private Expression buildExpression() {
 	    Token t = paramTokens.getFirst();
-	    if ("(".equals(t.text)) {
+	    if ("(".equals(t.text())) {
 	        requireSyntaxToken("(");
 	        Expression expr = buildMapExpression();
 	        requireSyntaxToken(")");
@@ -172,25 +172,25 @@ public abstract class Directive {
 		Token t = paramTokens.removeFirst();
 		boolean matches = false;
 		for (Type type : types) {
-			matches |= type == t.type;
+			matches |= type == t.type();
 		}
 		if (!matches) {
 		    String message = String.format("Expecting a token type of %s but found %s instead", 
-		            Arrays.asList(types), t.type);
+		            Arrays.asList(types), t.type());
 			throw new IllegalArgumentException(message);
 		}
 		return t;
 	}
 	private String requireIdentToken() {
 		Token t = requireToken(Type.IDENT, Type.KEYWORD);
-		return t.text;
+		return t.text();
 	}
 	private void requireSyntaxToken(String syntax) {
 	    try {
     	    Type tokenType = ApplesoftKeyword.find(syntax).map(t -> Type.KEYWORD).orElse(Type.SYNTAX);
     	    Token token = requireToken(tokenType);
-    	    if (!syntax.equals(token.text)) {
-    	        String message = String.format("Expecting '%s' but found '%s' instead", syntax, token.text);
+    	    if (!syntax.equals(token.text())) {
+    	        String message = String.format("Expecting '%s' but found '%s' instead", syntax, token.text());
     	        throw new RuntimeException(message);
     	    }
 	    } catch (IllegalArgumentException ex) {
@@ -201,7 +201,7 @@ public abstract class Directive {
 	    if (paramTokens.isEmpty()) return false;
         Type tokenType = ApplesoftKeyword.find(syntax).map(t -> Type.KEYWORD).orElse(Type.SYNTAX);
         Token token = paramTokens.getFirst();
-        return tokenType == token.type && syntax.equals(token.text);
+        return tokenType == token.type() && syntax.equals(token.text());
 	}
 	
 	/** Write directive contents to output file. Note that address is adjusted for the line header already. */

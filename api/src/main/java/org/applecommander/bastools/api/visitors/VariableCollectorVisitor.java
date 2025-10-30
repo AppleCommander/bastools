@@ -33,8 +33,8 @@ public class VariableCollectorVisitor implements Visitor {
 	
 	@Override
 	public Token visit(Token token) {
-		if (token.type == Type.IDENT) {
-			variableNames.add(token.text);
+		if (token.type() == Type.IDENT) {
+			variableNames.add(token.text());
 		}
 		return Visitor.super.visit(token);
 	}

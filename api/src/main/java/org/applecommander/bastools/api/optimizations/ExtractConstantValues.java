@@ -66,7 +66,7 @@ public class ExtractConstantValues extends BaseVisitor {
 	}
 	/** Collect a map of constant values and the new variable name to be used. */
 	public Token numberToIdentTransformation(Token token) {
-		String key = token.number.toString();
+		String key = token.number().toString();
 		// New entry, create it
 		if (!map.containsKey(key)) {
 			String varName = null;
@@ -78,7 +78,7 @@ public class ExtractConstantValues extends BaseVisitor {
 		}
 		// Existing (or NEW!) entry, swap to that variable.
 		if (map.containsKey(key)) {
-			return Token.ident(token.line, map.get(key));
+			return Token.ident(token.line(), map.get(key));
 		}
 		return token;
 	}
@@ -133,11 +133,11 @@ public class ExtractConstantValues extends BaseVisitor {
 			if (!statement.tokens.isEmpty()) {
 				Token t = statement.tokens.getFirst();
 				// Assignment
-				if (t.type == Token.Type.IDENT) {
+				if (t.type() == Token.Type.IDENT) {
 					this.consumer = this::numberToIdentTransformation;
 				}
 				// Assignment with LET
-				if (t.type == Token.Type.KEYWORD && t.keyword == ApplesoftKeyword.LET) {
+				if (t.type() == Token.Type.KEYWORD && t.keyword() == ApplesoftKeyword.LET) {
 					this.consumer = this::numberToIdentTransformation;
 				}
 			}
@@ -149,11 +149,11 @@ public class ExtractConstantValues extends BaseVisitor {
 	
 	@Override
 	public Token visit(Token token) {
-		switch (token.type) {
+		switch (token.type()) {
 		case KEYWORD:
-			if (TARGET_STARTS.contains(token.keyword)) {
+			if (TARGET_STARTS.contains(token.keyword())) {
 				this.consumer = this::numberToIdentTransformation;
-			} else if (TARGET_ENDS.contains(token.keyword)) {
+			} else if (TARGET_ENDS.contains(token.keyword())) {
 				this.consumer = this::nullTransformation;
 			}
 			break;

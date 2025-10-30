@@ -88,11 +88,11 @@ public class MergeLines extends BaseVisitor {
 		// Includes directives.
 		for (Statement s : line.statements) {
 			for (Token t : s.tokens) {
-				boolean terminal = t.keyword == ApplesoftKeyword.IF || t.type == Type.COMMENT /* REM */
-						|| t.keyword == ApplesoftKeyword.GOTO || t.keyword == ApplesoftKeyword.END
-						|| t.keyword == ApplesoftKeyword.RESUME || t.keyword == ApplesoftKeyword.RETURN
-						|| t.keyword == ApplesoftKeyword.STOP
-						|| t.type == Type.DIRECTIVE;
+				boolean terminal = t.keyword() == ApplesoftKeyword.IF || t.type() == Type.COMMENT /* REM */
+						|| t.keyword() == ApplesoftKeyword.GOTO || t.keyword() == ApplesoftKeyword.END
+						|| t.keyword() == ApplesoftKeyword.RESUME || t.keyword() == ApplesoftKeyword.RETURN
+						|| t.keyword() == ApplesoftKeyword.STOP
+						|| t.type() == Type.DIRECTIVE;
 				if (terminal) return true;
 			}
 		}
