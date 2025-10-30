@@ -27,11 +27,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 
 import io.github.applecommander.applesingle.AppleSingle;
-import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Optimization;
-import org.applecommander.bastools.api.Parser;
-import org.applecommander.bastools.api.TokenReader;
-import org.applecommander.bastools.api.Visitors;
+import org.applecommander.bastools.api.*;
 import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
@@ -113,6 +109,9 @@ public class Main implements Callable<Integer> {
 				// Do nothing
 			}
 		});
+
+    @Option(names = "--tokenizer", description = "Select tokenizer (modern, classic)")
+    private String tokenizer = "modern";
 	
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
 	private File sourceFile;
@@ -173,9 +172,13 @@ public class Main implements Callable<Integer> {
 	
 	/** General CLI processing. */
 	public void process(Configuration config) throws IOException {
-		Queue<Token> tokens = TokenReader.tokenize(sourceFile);
+		Queue<Token> tokens = switch (tokenizer) {
+            case "modern" -> TokenReader.tokenize(sourceFile);
+            case "classic" -> ClassicTokenReader.tokenize(sourceFile);
+            default -> throw new RuntimeException("Unknown tokenizer: " + tokenizer);
+        };
 		if (showTokens) {
-			tokens.forEach(t -> System.out.printf("%s%s", t, t.type == Type.EOL ? "\n" : ", "));
+			tokens.forEach(t -> System.out.printf("%s%s", t, t.type() == Type.EOL ? "\n" : ", "));
 		}
 		Parser parser = new Parser(tokens);
 		Program program = parser.parse();
