@@ -2,6 +2,7 @@ package org.applecommander.bastools.api;
 
 import org.applecommander.bastools.api.model.ApplesoftKeyword;
 import org.applecommander.bastools.api.model.Token;
+import org.applecommander.bastools.api.model.Tokens;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,11 +15,12 @@ public class ClassicTokenReaderTest {
     @Test
     public void testSimple() throws IOException {
         testCode("10 TEXT:HOME",
-            Token.number(1, 10.0, "10"),
-            Token.keyword(1, ApplesoftKeyword.TEXT),
-            Token.syntax(1, ':'),
-            Token.keyword(1, ApplesoftKeyword.HOME),
-            Token.eol(1));
+            Tokens.builder()
+                .number("10")
+                    .keyword(ApplesoftKeyword.TEXT)
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.HOME)
+                .end());
     }
 
     @Test
@@ -30,52 +32,54 @@ public class ClassicTokenReaderTest {
                 50 C = -.250
                 60 D = -0.70
                 """,
-            Token.number(1, 10.0, "10"),
-            Token.keyword(1, ApplesoftKeyword.PRINT),
-            Token.string(1, "\"MATHING\""),
-            Token.eol(1),
-            Token.number(2, 30.0, "30"),
-            Token.ident(2, "A"),
-            Token.syntax(4, '='),
-            Token.number(2, 0.4, ".4"),
-            Token.eol(2),
-            Token.number(3, 40.0, "40"),
-            Token.ident(3, "B"),
-            Token.syntax(3, '='),
-            Token.number(3, 0.6, "0.6000"),
-            Token.eol(3),
-            Token.number(4, 50.0, "50"),
-            Token.ident(4, "C"),
-            Token.syntax(4, '='),
-            Token.keyword(4, ApplesoftKeyword.sub),
-            Token.number(4, 0.25, ".250"),
-            Token.eol(4),
-            Token.number(5, 60.0, "60"),
-            Token.ident(5, "D"),
-            Token.syntax(5, '='),
-            Token.keyword(5, ApplesoftKeyword.sub),
-            Token.number(5, 0.7, "0.70"),
-            Token.eol(5));
+            Tokens.builder()
+                .number("10")
+                    .keyword(ApplesoftKeyword.PRINT)
+                    .string("\"MATHING\"")
+                    .nextLine()
+                .number("30")
+                    .ident("A")
+                    .syntax('=')
+                    .number(".4")
+                    .nextLine()
+                .number("40")
+                    .ident("B")
+                    .syntax('=')
+                    .number("0.6000")
+                    .nextLine()
+                .number("50")
+                    .ident("C")
+                    .syntax('=')
+                    .keyword(ApplesoftKeyword.sub)
+                    .number(".250")
+                    .nextLine()
+                .number("60")
+                    .ident("D")
+                    .syntax('=')
+                    .keyword(ApplesoftKeyword.sub)
+                    .number("0.70")
+                .end());
     }
 
     @Test
     public void preserveNumbers49b() throws IOException {
         testCode("100 CI = 11 * I1 + .4 / I8 - 16 * .50",
-                Token.number(1, 100.0, "100"),
-                Token.ident(1, "CI"),
-                Token.syntax(1, '='),
-                Token.number(1, 11.0, "11"),
-                Token.keyword(1, ApplesoftKeyword.mul),
-                Token.ident(1, "I1"),
-                Token.keyword(1, ApplesoftKeyword.add),
-                Token.number(1, 0.4, ".4"),
-                Token.keyword(1, ApplesoftKeyword.div),
-                Token.ident(1, "I8"),
-                Token.keyword(1, ApplesoftKeyword.sub),
-                Token.number(1, 16.0, "16"),
-                Token.keyword(1, ApplesoftKeyword.mul),
-                Token.number(1, 0.5, ".50"),
-                Token.eol(1));
+                Tokens.builder()
+                    .number("100")
+                        .ident("CI")
+                        .syntax('=')
+                        .number("11")
+                        .keyword(ApplesoftKeyword.mul)
+                        .ident("I1")
+                        .keyword(ApplesoftKeyword.add)
+                        .number(".4")
+                        .keyword(ApplesoftKeyword.div)
+                        .ident("I8")
+                        .keyword(ApplesoftKeyword.sub)
+                        .number("16")
+                        .keyword(ApplesoftKeyword.mul)
+                        .number(".50")
+                    .end());
     }
 
     public void testCode(String code, Token... expectedTokens) throws IOException {
