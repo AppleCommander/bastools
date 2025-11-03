@@ -165,13 +165,32 @@ public class ClassicTokenReaderTest {
     }
 
     @Test
-    public void testIssue48() throws IOException {
+    public void testIssue48DATA() throws IOException {
         testCode("70 DATA 0,- 5,3,0,- 100,60,- 40,1,0,1",
             Tokens.builder()
                 .number("70")
                     .keyword(ApplesoftKeyword.DATA)
                     // EVERYTHING AFTER DATA IS PRESERVED AS-IS (until ':' or end of line)
                     .string(" 0,- 5,3,0,- 100,60,- 40,1,0,1")
+                .end());
+    }
+
+    @Test
+    public void testREM() throws IOException {
+        testCode("""
+                    10 TEXT:HOME:REM SOME:COMMENT
+                    20 END
+                    """,
+            Tokens.builder()
+                .number("10")
+                    .keyword(ApplesoftKeyword.TEXT)
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.HOME)
+                    .syntax(':')
+                    .comment(" SOME:COMMENT")
+                    .nextLine()
+                .number("20")
+                    .keyword(ApplesoftKeyword.END)
                 .end());
     }
 

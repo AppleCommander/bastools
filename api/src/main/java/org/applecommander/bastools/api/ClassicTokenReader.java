@@ -44,7 +44,7 @@ public class ClassicTokenReader {
         private final LinkedList<Token> tokens;
         private boolean dataFlag = false;
         private boolean quoteFlag = false;
-
+        private boolean remFlag = false;
 
         private LinePopulator(int lineNo, LinkedList<Token> tokens) {
             this.lineNo = lineNo;
@@ -57,12 +57,12 @@ public class ClassicTokenReader {
             int i = 0;
             while (i < line.length()) {
                 char ch = line.charAt(i);
-                if (ch == ' ' && !dataFlag && !quoteFlag) {
+                if (ch == ' ' && !dataFlag && !quoteFlag && !remFlag) {
                     i++;
                     continue;
                 }
 
-                if (ch == ':') {
+                if (ch == ':' && !remFlag) {
                     dataFlag = false;
                     quoteFlag = false;
                     emitSyntax(ch);
@@ -70,7 +70,7 @@ public class ClassicTokenReader {
                     continue;
                 }
 
-                if (ch == '"' && !dataFlag) {
+                if (ch == '"' && !dataFlag && !remFlag) {
                     // We don't store the quote (because original token reader does not so the tooling synthesizes it for us)
                     quoteFlag = !quoteFlag;
                     i++;
@@ -85,6 +85,12 @@ public class ClassicTokenReader {
 
                 if (dataFlag) {
                     emitData(ch);
+                    i++;
+                    continue;
+                }
+
+                if (remFlag) {
+                    emitComment(ch);
                     i++;
                     continue;
                 }
@@ -106,6 +112,7 @@ public class ClassicTokenReader {
                     else {
                         // Need to set some flags. Note we assume it's a keyword due to the return code
                         dataFlag = tokens.getLast().keyword() == ApplesoftKeyword.DATA;
+                        remFlag = tokens.getLast().keyword() == ApplesoftKeyword.REM;
                     }
                     i += n;
                     continue;
@@ -179,6 +186,15 @@ public class ClassicTokenReader {
         private void emitData(char ch) {
             String data = extendString(ch, Token.Type.DATA);
             tokens.add(Token.data(lineNo, data));
+        }
+        private void emitComment(char ch) {
+            // Special: COMMENT essentially includes the REM (from "modern" parser) so we need to remove it
+            if (!tokens.isEmpty() && tokens.getLast().type() == Token.Type.KEYWORD
+                    && tokens.getLast().keyword() == ApplesoftKeyword.REM) {
+                tokens.removeLast();
+            }
+            String comment = extendString(ch, Token.Type.COMMENT);
+            tokens.add(Token.comment(lineNo, comment));
         }
         private void emitKeyword(ApplesoftKeyword kw) {
             tokens.add(Token.keyword(lineNo, kw));

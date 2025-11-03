@@ -51,6 +51,7 @@ public record Token(int line, Type type, ApplesoftKeyword keyword, Double number
                     yield number.toString();
                 }
             }
+            case COMMENT -> String.format("REM %s", text);
             default -> text;
         };
     }

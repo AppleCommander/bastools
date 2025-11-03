@@ -41,6 +41,10 @@ public class Tokens {
             tokens.add(Token.syntax(lineNo, ch));
             return this;
         }
+        public Builder comment(String comment) {
+            tokens.add(Token.comment(lineNo, comment));
+            return this;
+        }
         public Builder nextLine() {
             tokens.add(Token.eol(lineNo));
             Builder b = new Builder(lineNo + 1);
