@@ -175,6 +175,55 @@ public class ClassicTokenReaderTest {
                 .end());
     }
 
+    @Test
+    public void testIssue47a() throws IOException {
+        testCode("10 OUT=40:IN=10",
+            Tokens.builder()
+                .number("10")
+                    .ident("OUT")
+                    .syntax('=')
+                    .number("40")
+                    .syntax(':')
+                    .ident("IN")
+                    .syntax('=')
+                    .number("10")
+                .end());
+    }
+
+    @Test
+    public void testIssue47b() throws IOException {
+        testCode("""
+                20 INQ = 767
+                30 IN = IN + 1
+                40 CALL IN
+                50 PRINT PEEK(IN)
+                """,
+                Tokens.builder()
+                    .number("20")
+                        .ident("INQ")
+                        .syntax('=')
+                        .number("767")
+                        .nextLine()
+                    .number("30")
+                        .ident("IN")
+                        .syntax('=')
+                        .ident("IN")
+                        .syntax('+')
+                        .number("1")
+                        .nextLine()
+                    .number("40")
+                        .keyword(ApplesoftKeyword.CALL)
+                        .ident("IN")
+                        .nextLine()
+                    .number("50")
+                        .keyword(ApplesoftKeyword.PRINT)
+                        .keyword(ApplesoftKeyword.PEEK)
+                        .syntax('(')
+                        .ident("IN")
+                        .syntax(')')
+                    .end());
+    }
+
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);
         Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));
