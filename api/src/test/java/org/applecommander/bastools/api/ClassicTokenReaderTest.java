@@ -35,7 +35,7 @@ public class ClassicTokenReaderTest {
             Tokens.builder()
                 .number("10")
                     .keyword(ApplesoftKeyword.PRINT)
-                    .string("\"MATHING\"")
+                    .string("MATHING")
                     .nextLine()
                 .number("30")
                     .ident("A")
@@ -81,6 +81,67 @@ public class ClassicTokenReaderTest {
                         .number(".50")
                     .end());
     }
+
+    @Test
+    public void testHires() throws IOException {
+        testCode("""
+                1000 hgr : hcolor= 3
+                1010 xdraw c1 at 100,10
+                1020 hplot 0,0
+                """,
+                Tokens.builder()
+                    .number("1000")
+                        .keyword(ApplesoftKeyword.HGR)
+                        .syntax(':')
+                        .keyword(ApplesoftKeyword.HCOLOR)
+                        .number("3")
+                        .nextLine()
+                    .number("1010")
+                        .keyword(ApplesoftKeyword.XDRAW)
+                        .ident("C1")
+                        .keyword(ApplesoftKeyword.AT)
+                        .number("100")
+                        .syntax(',')
+                        .number("10")
+                        .nextLine()
+                    .number("1020")
+                        .keyword(ApplesoftKeyword.HPLOT)
+                        .number("0")
+                        .syntax(',')
+                        .number("0")
+                    .end());
+    }
+
+    @Test
+    public void testATcombinations() throws IOException {
+        testCode("""
+                10 A=ATN(0):HLIN 1,2 AT 3:FOR I=A TO N
+                """,
+                Tokens.builder()
+                .number("10")
+                    .ident("A")
+                    .syntax('=')
+                    .keyword(ApplesoftKeyword.ATN)
+                    .syntax('(')
+                    .number("0")
+                    .syntax(')')
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.HLIN)
+                    .number("1")
+                    .syntax(',')
+                    .number("2")
+                    .keyword(ApplesoftKeyword.AT)
+                    .number("3")
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.FOR)
+                    .ident("I")
+                    .syntax('=')
+                    .ident("A")
+                    .keyword(ApplesoftKeyword.TO)
+                    .ident("N")
+                .end());
+    }
+
 
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);

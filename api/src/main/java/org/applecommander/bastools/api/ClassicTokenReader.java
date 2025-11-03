@@ -33,125 +33,161 @@ public class ClassicTokenReader {
             String line = lineNumberReader.readLine();
             int lineNo = lineNumberReader.getLineNumber();
             if (line == null) break;
-            populateLine(lineNo, tokens, line);
+            new LinePopulator(lineNo, tokens).populate(line);
             tokens.add(Token.eol(lineNo));
         }
         return tokens;
     }
 
-    private static void populateLine(final int lineNo, final LinkedList<Token> tokens, final String line) throws IOException {
-        PushbackReader reader = new PushbackReader(new StringReader(line));
+    static class LinePopulator {
+        private final int lineNo;
+        private final LinkedList<Token> tokens;
+        private boolean dataFlag = false;
+        private boolean quoteFlag = false;
 
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            int ch = reader.read();
-            if (Character.isDigit(ch)) {
-                sb.append((char)ch);
-            }
-            else {
-                reader.unread(ch);
-                break;
-            }
+
+        private LinePopulator(int lineNo, LinkedList<Token> tokens) {
+            this.lineNo = lineNo;
+            this.tokens = tokens;
         }
-        if (sb.isEmpty()) return;
-        tokens.add(Token.number(lineNo, Double.valueOf(sb.toString()), sb.toString()));
 
-        Mode mode = Mode.START;
-        sb.setLength(0);
-        while (true) {
-            int ch = reader.read();
-            boolean endOfStatement = (ch == ':' && mode.in(Mode.START, Mode.DATA, Mode.TOKEN)) || (ch == -1);
-            if (endOfStatement && !sb.isEmpty()) {
-                switch (mode) {
-                    case START -> tokens.add(Token.syntax(lineNo, sb.charAt(0)));
-                    case QUOTE, DATA -> tokens.add(Token.string(lineNo, sb.toString()));
-                    case REM -> tokens.add(Token.comment(lineNo, sb.toString()));
-                    case TOKEN -> mode = parseToken(lineNo, tokens, sb);
-                    case NUMBER -> tokens.add(Token.number(lineNo, Double.valueOf(sb.toString()), sb.toString()));
+        // Inspired by: https://github.com/KrisKennaway/bastoken/blob/master/bastoken.py
+        // and referenced with: https://6502disassembly.com/a2-rom/Applesoft.html#SymPARSE
+        public void populate(final String line) {
+            int i = 0;
+            while (i < line.length()) {
+                char ch = line.charAt(i);
+                if (ch == ' ' && !dataFlag && !quoteFlag) {
+                    i++;
+                    continue;
                 }
-                sb.setLength(0);
-            }
-            if (ch == -1) break;
 
-            if (endOfStatement) {
-                tokens.add(Token.syntax(lineNo, ch));
-                continue;
-            }
+                if (ch == ':') {
+                    dataFlag = false;
+                    quoteFlag = false;
+                    emitSyntax(ch);
+                    i++;
+                    continue;
+                }
 
-            switch (mode) {
-                case START -> {
-                    if (Character.isWhitespace(ch)) continue;
-                    sb.append((char)ch);
-                    if (ch == '"') {
-                        mode = Mode.QUOTE;
+                if (ch == '"' && !dataFlag) {
+                    // We don't store the quote (because original token reader does not so the tooling synthesizes it for us)
+                    quoteFlag = !quoteFlag;
+                    i++;
+                    continue;
+                }
+
+                if (quoteFlag || dataFlag) {
+                    emitString(ch);
+                    i++;
+                    continue;
+                }
+
+                if (ch == '?') {
+                    emitKeyword(ApplesoftKeyword.PRINT);
+                    i++;
+                    continue;
+                }
+
+                // Keyword handling
+                if (Character.isLetter(ch)) {
+                    int n = handleKeyword(i, line);
+                    if (n == -1) {
+                        // No keyword found, must be identifier
+                        emitIdent(ch);
+                        n = 1;
                     }
-                    else if (Character.isDigit(ch) || ch == '.') {
-                        mode = Mode.NUMBER;
+                    i += n;
+                    continue;
+                }
+
+                // Special handling of digits - we might be handing a variable like "A9", so we detect that...
+                if (Character.isDigit(ch)) {
+                    if (!tokens.isEmpty() && tokens.getLast().type() == Token.Type.IDENT) {
+                        emitIdent(ch);
                     }
                     else {
-                        mode = parseToken(lineNo, tokens, sb);
+                        emitNumber(ch);
                     }
                 }
-                case QUOTE -> {
-                    sb.append((char)ch);
-                    if (ch == '"') {
-                        tokens.add(Token.string(lineNo, sb.toString()));
-                        sb.setLength(0);
-                        mode = Mode.START;
-                    }
+                // A "." at this point is expected to be a number
+                else if (ch == '.') {
+                    emitNumber(ch);
                 }
-                case DATA, REM -> sb.append((char) ch);
-                case TOKEN -> {
-                    if (Character.isWhitespace(ch)) continue;
-                    sb.append((char) ch);
-                    mode = parseToken(lineNo, tokens, sb);
+                // Else assume we've got general syntax character
+                else {
+                    emitSyntax(ch);
                 }
-                case NUMBER -> {
-                    if (Character.isDigit(ch) || ch == '.') {
-                        sb.append((char)ch);
-                    }
-                    else {
-                        tokens.add(Token.number(lineNo, Double.valueOf(sb.toString()), sb.toString()));
-                        sb.setLength(0);
-                        reader.unread(ch);
-                        mode = Mode.START;
-                    }
-                }
+                i++;
             }
         }
-    }
 
-    private static Mode parseToken(final int lineNo, final LinkedList<Token> tokens, final StringBuilder sb) {
-        Optional<ApplesoftKeyword> found = Arrays.stream(ApplesoftKeyword.values())
-                .filter(kw -> {
-                    final var kwtxt = kw.text.toUpperCase();
-                    final var sbtxt = sb.toString().toUpperCase();
-                    return sbtxt.endsWith(kwtxt);
-                })
-                .findAny();
-        Mode mode = Mode.TOKEN;
-        if (found.isPresent()) {
-            ApplesoftKeyword kw = found.get();
-            int n = sb.length() - kw.text.length();
-            if (n > 0) {
-                tokens.add(Token.ident(lineNo, sb.substring(0, n)));
+        public int handleKeyword(final int base, final String line) {
+            for (ApplesoftKeyword kw : ApplesoftKeyword.values()) {
+                int lookahead_idx = base;
+                int token_idx = 0;
+                while (lookahead_idx < line.length() && token_idx < kw.text.length()) {
+                    char ch = line.charAt(lookahead_idx);
+                    if (ch == ' ') {
+                        lookahead_idx++;
+                        continue;
+                    }
+                    if (Character.toUpperCase(ch) != kw.text.charAt(token_idx)) {
+                        break;
+                    }
+                    if (token_idx == kw.text.length() - 1) {
+                        // Figure out AT/ATN/A TO
+                        if (kw == ApplesoftKeyword.AT && lookahead_idx+1 < line.length()) {
+                            char nextCh = Character.toUpperCase(line.charAt(lookahead_idx+1));
+                            if (nextCh == 'N') {
+                                lookahead_idx++;
+                                kw = ApplesoftKeyword.ATN;
+                            }
+                            else if (nextCh == 'O') {
+                                emitIdent('A');
+                                lookahead_idx++;
+                                kw = ApplesoftKeyword.TO;
+                            }
+                        }
+                        emitKeyword(kw);
+                        return lookahead_idx - base + 1;
+                    }
+                    lookahead_idx++;
+                    token_idx++;
+                }
             }
+            return -1;
+        }
+
+        private void emitSyntax(char ch) {
+            tokens.add(Token.syntax(lineNo, ch));
+        }
+        private void emitString(char ch) {
+            String str = extendString(ch, Token.Type.STRING);
+            tokens.add(Token.string(lineNo, str));
+        }
+        private void emitKeyword(ApplesoftKeyword kw) {
             tokens.add(Token.keyword(lineNo, kw));
-            sb.setLength(0);
-            mode = switch (kw) {
-                case REM -> Mode.REM;
-                case DATA -> Mode.DATA;
-                default -> Mode.START;
-            };
         }
-        return mode;
-    }
-
-    private enum Mode {
-        START, QUOTE, DATA, REM, NUMBER, TOKEN;
-
-        public boolean in(Mode... modes) {
-            return Set.of(modes).contains(this);
+        private void emitNumber(char ch) {
+            String num = extendString(ch, Token.Type.NUMBER);
+            double value = 0.0;
+            if (!".".equals(num)) {
+                value = Double.parseDouble(num);
+            }
+            tokens.add(Token.number(lineNo, value, num));
+        }
+        private void emitIdent(char ch) {
+            String name = extendString(ch, Token.Type.IDENT);
+            tokens.add(Token.ident(lineNo, name));
+        }
+        private String extendString(final char ch, final Token.Type ttype) {
+            String str = Character.toString(ch);
+            if (!tokens.isEmpty() && tokens.getLast().type() == ttype) {
+                str = tokens.getLast().text() + ch;
+                tokens.removeLast();
+            }
+            return str;
         }
     }
 }
