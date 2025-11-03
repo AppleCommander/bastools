@@ -56,6 +56,9 @@ public class PrettyPrintVisitor implements Visitor {
 		case COMMENT:
 			printStream.printf(" REM %s", token.text());
 			break;
+        case DATA:
+            printStream.print(token.text());
+            break;
 		case STRING:
 			printStream.printf("\"%s\"", token.text());
 			break;

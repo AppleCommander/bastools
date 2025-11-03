@@ -118,30 +118,62 @@ public class ClassicTokenReaderTest {
                 10 A=ATN(0):HLIN 1,2 AT 3:FOR I=A TO N
                 """,
                 Tokens.builder()
-                .number("10")
-                    .ident("A")
-                    .syntax('=')
-                    .keyword(ApplesoftKeyword.ATN)
-                    .syntax('(')
-                    .number("0")
-                    .syntax(')')
-                    .syntax(':')
-                    .keyword(ApplesoftKeyword.HLIN)
-                    .number("1")
-                    .syntax(',')
-                    .number("2")
-                    .keyword(ApplesoftKeyword.AT)
-                    .number("3")
-                    .syntax(':')
-                    .keyword(ApplesoftKeyword.FOR)
-                    .ident("I")
-                    .syntax('=')
-                    .ident("A")
-                    .keyword(ApplesoftKeyword.TO)
-                    .ident("N")
-                .end());
+                    .number("10")
+                        .ident("A")
+                        .syntax('=')
+                        .keyword(ApplesoftKeyword.ATN)
+                        .syntax('(')
+                        .number("0")
+                        .syntax(')')
+                        .syntax(':')
+                        .keyword(ApplesoftKeyword.HLIN)
+                        .number("1")
+                        .syntax(',')
+                        .number("2")
+                        .keyword(ApplesoftKeyword.AT)
+                        .number("3")
+                        .syntax(':')
+                        .keyword(ApplesoftKeyword.FOR)
+                        .ident("I")
+                        .syntax('=')
+                        .ident("A")
+                        .keyword(ApplesoftKeyword.TO)
+                        .ident("N")
+                    .end());
     }
 
+    @Test
+    public void doesThisActuallyResolveAppleCommanderIssue43() throws IOException {
+        testCode("""
+                0FORX=1TO100:?X:NEXTX
+                """,
+                Tokens.builder()
+                    .number("0")
+                        .keyword(ApplesoftKeyword.FOR)
+                        .ident("X")
+                        .syntax('=')
+                        .number("1")
+                        .keyword(ApplesoftKeyword.TO)
+                        .number("100")
+                        .syntax(':')
+                        .keyword(ApplesoftKeyword.PRINT)
+                        .ident("X")
+                        .syntax(':')
+                        .keyword(ApplesoftKeyword.NEXT)
+                        .ident("X")
+                    .end());
+    }
+
+    @Test
+    public void testIssue48() throws IOException {
+        testCode("70 DATA 0,- 5,3,0,- 100,60,- 40,1,0,1",
+            Tokens.builder()
+                .number("70")
+                    .keyword(ApplesoftKeyword.DATA)
+                    // EVERYTHING AFTER DATA IS PRESERVED AS-IS (until ':' or end of line)
+                    .string(" 0,- 5,3,0,- 100,60,- 40,1,0,1")
+                .end());
+    }
 
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);

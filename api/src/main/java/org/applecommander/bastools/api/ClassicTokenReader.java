@@ -77,8 +77,14 @@ public class ClassicTokenReader {
                     continue;
                 }
 
-                if (quoteFlag || dataFlag) {
+                if (quoteFlag) {
                     emitString(ch);
+                    i++;
+                    continue;
+                }
+
+                if (dataFlag) {
+                    emitData(ch);
                     i++;
                     continue;
                 }
@@ -96,6 +102,10 @@ public class ClassicTokenReader {
                         // No keyword found, must be identifier
                         emitIdent(ch);
                         n = 1;
+                    }
+                    else {
+                        // Need to set some flags. Note we assume it's a keyword due to the return code
+                        dataFlag = tokens.getLast().keyword() == ApplesoftKeyword.DATA;
                     }
                     i += n;
                     continue;
@@ -165,6 +175,10 @@ public class ClassicTokenReader {
         private void emitString(char ch) {
             String str = extendString(ch, Token.Type.STRING);
             tokens.add(Token.string(lineNo, str));
+        }
+        private void emitData(char ch) {
+            String data = extendString(ch, Token.Type.DATA);
+            tokens.add(Token.data(lineNo, data));
         }
         private void emitKeyword(ApplesoftKeyword kw) {
             tokens.add(Token.keyword(lineNo, kw));

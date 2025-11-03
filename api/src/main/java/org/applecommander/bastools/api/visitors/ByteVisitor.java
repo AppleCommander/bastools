@@ -140,7 +140,7 @@ public class ByteVisitor implements Visitor {
 			case EOL:
 				os.write(0x00);
 				break;
-			case IDENT:
+			case IDENT, DATA:
 				os.write(token.text().getBytes());
 				break;
 			case KEYWORD:
@@ -156,7 +156,7 @@ public class ByteVisitor implements Visitor {
 					os.write(Double.toString(token.number()).getBytes());
 				}
 				break;
-			case STRING:
+            case STRING:
 				os.write('"');
 				os.write(token.text().getBytes());
 				os.write('"');

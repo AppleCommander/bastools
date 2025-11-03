@@ -21,6 +21,10 @@ public class Tokens {
             tokens.add(Token.number(lineNo, Double.valueOf(value), value));
             return this;
         }
+        public Builder data(String data) {
+            tokens.add(Token.data(lineNo, data));
+            return this;
+        }
         public Builder string(String text) {
             tokens.add(Token.string(lineNo, text));
             return this;

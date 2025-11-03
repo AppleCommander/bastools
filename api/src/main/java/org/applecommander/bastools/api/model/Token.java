@@ -70,6 +70,9 @@ public record Token(int line, Type type, ApplesoftKeyword keyword, Double number
     public static Token comment(int line, String text) {
         return new Token(line, Type.COMMENT, null, null, text);
     }
+    public static Token data(int line, String data) {
+        return new Token(line, Type.DATA, null, null, data);
+    }
     public static Token string(int line, String text) {
         return new Token(line, Type.STRING, null, null, text);
     }
@@ -85,6 +88,6 @@ public record Token(int line, Type type, ApplesoftKeyword keyword, Double number
     }
 
     public enum Type {
-        EOL, NUMBER, IDENT, COMMENT, STRING, KEYWORD, SYNTAX, DIRECTIVE
+        EOL, NUMBER, IDENT, COMMENT, DATA, STRING, KEYWORD, SYNTAX, DIRECTIVE
     }
 }
