@@ -173,7 +173,7 @@ public class Main implements Callable<Integer> {
 	/** General CLI processing. */
 	public void process(Configuration config) throws IOException {
 		Queue<Token> tokens = switch (tokenizer) {
-            case "modern" -> TokenReader.tokenize(sourceFile);
+            case "modern" -> ModernTokenReader.tokenize(sourceFile);
             case "classic" -> ClassicTokenReader.tokenize(sourceFile);
             default -> throw new RuntimeException("Unknown tokenizer: " + tokenizer);
         };
@@ -198,7 +198,7 @@ public class Main implements Callable<Integer> {
 		ByteVisitor byteVisitor = Visitors.byteVisitor(config);
 		byte[] wrapperData = new byte[0];
 		if (wrapProgram) {
-			Queue<Token> wrapperTokens = TokenReader.tokenize(new ByteArrayInputStream(
+			Queue<Token> wrapperTokens = ModernTokenReader.tokenize(new ByteArrayInputStream(
 					"10 POKE 103,24:POKE 104,8:RUN".getBytes()));
 			Parser wrapperParser = new Parser(wrapperTokens);
 			Program wrapperProgram = wrapperParser.parse();

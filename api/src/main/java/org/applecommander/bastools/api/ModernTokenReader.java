@@ -42,7 +42,7 @@ import org.applecommander.bastools.api.model.Token;
  * 
  * @author rob
  */
-public class TokenReader {
+public class ModernTokenReader {
 	private boolean hasMore = true;
 	// Internal flag just in case we consume the EOL (see REM for instance)s
 	private boolean needSyntheticEol = false;
@@ -68,7 +68,7 @@ public class TokenReader {
 		}
 	}
 	private static Queue<Token> tokenize(Reader reader) throws IOException {
-		TokenReader tokenReader = new TokenReader(reader);
+		ModernTokenReader tokenReader = new ModernTokenReader(reader);
 		LinkedList<Token> tokens = new LinkedList<>();
 		while (tokenReader.hasMore()) {
 			// Magic number: maximum number of pieces from the StreamTokenizer that may be combined.
@@ -78,7 +78,7 @@ public class TokenReader {
 		return tokens;
 	}
 
-	private TokenReader(Reader reader) {
+	private ModernTokenReader(Reader reader) {
 		this.reader = reader;
 		this.tokenizer = ApplesoftKeyword.tokenizer(reader);
 	}
