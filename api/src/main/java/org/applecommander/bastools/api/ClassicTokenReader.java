@@ -131,6 +131,20 @@ public class ClassicTokenReader {
                 else if (ch == '.') {
                     emitNumber(ch);
                 }
+                // Cases of missed tokens(?)
+                else if (ch == '=') {
+                    emitKeyword(ApplesoftKeyword.eq);
+                }
+                // A "$" _might_ be a directive, figure that out
+                else if (ch == '$') {
+                    int n = handleDirective(i, line);
+                    if (n == -1) {
+                        // No directive, emit as general syntax character
+                        emitSyntax(ch);
+                        n = 1;
+                    }
+                    i += n;
+                }
                 // Else assume we've got general syntax character
                 else {
                     emitSyntax(ch);
@@ -176,6 +190,27 @@ public class ClassicTokenReader {
             return -1;
         }
 
+        /** Look ahead for the directive. Note that spaces are important. */
+        public int handleDirective(final int base, final String line) {
+            for (String directive : Directives.names()) {
+                int lookahead_idx = base;
+                int directive_idx = 0;
+                while (lookahead_idx < line.length() && directive_idx < directive.length()) {
+                    char ch = line.charAt(lookahead_idx);
+                    if (Character.toUpperCase(ch) != Character.toUpperCase(directive.charAt(directive_idx))) {
+                        break;
+                    }
+                    if (directive_idx == directive.length() - 1) {
+                        emitDirective(line.substring(base, lookahead_idx+1));
+                        return lookahead_idx - base + 1;
+                    }
+                    lookahead_idx++;
+                    directive_idx++;
+                }
+            }
+            return -1;
+        }
+
         private void emitSyntax(char ch) {
             tokens.add(Token.syntax(lineNo, ch));
         }
@@ -198,6 +233,9 @@ public class ClassicTokenReader {
         }
         private void emitKeyword(ApplesoftKeyword kw) {
             tokens.add(Token.keyword(lineNo, kw));
+        }
+        private void emitDirective(String directive) {
+            tokens.add(Token.directive(lineNo, directive));
         }
         private void emitNumber(char ch) {
             String num = extendString(ch, Token.Type.NUMBER);

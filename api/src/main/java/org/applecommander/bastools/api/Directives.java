@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.io.Serial;
 import java.lang.reflect.Constructor;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.applecommander.bastools.api.directives.EmbeddedBinaryDirective;
@@ -54,4 +55,8 @@ public class Directives {
 		}
 		throw new IllegalArgumentException(String.format("Unable to find directive '%s'", text));
 	}
+
+    public static Set<String> names() {
+        return DIRECTIVES.keySet();
+    }
 }
