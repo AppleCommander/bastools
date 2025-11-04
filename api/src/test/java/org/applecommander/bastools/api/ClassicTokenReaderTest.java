@@ -243,6 +243,22 @@ public class ClassicTokenReaderTest {
                     .end());
     }
 
+    @Test
+    public void testApostropheComment() throws IOException {
+        testCode("""
+                ' Comment the doesn't make it into tokens
+                10 PRINT "'SUP?":REM REMARK MAKES IT INTO TOKEN STREAM
+                """,
+            Tokens.builder()
+                .nextLine()     // that comment just creates a newline (per ModernTokenReader)
+                .number("10")
+                    .keyword(ApplesoftKeyword.PRINT)
+                    .string("'SUP?")
+                    .syntax(':')
+                    .comment(" REMARK MAKES IT INTO TOKEN STREAM")
+                .end());
+    }
+
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);
         Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));

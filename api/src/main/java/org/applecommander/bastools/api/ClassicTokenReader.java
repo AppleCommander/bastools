@@ -101,6 +101,11 @@ public class ClassicTokenReader {
                     continue;
                 }
 
+                if (ch == '\'') {
+                    // This is a non-tokenized (custom) comment to the end of the line
+                    break;
+                }
+
                 // Keyword handling
                 if (Character.isLetter(ch)) {
                     int n = handleKeyword(i, line);
