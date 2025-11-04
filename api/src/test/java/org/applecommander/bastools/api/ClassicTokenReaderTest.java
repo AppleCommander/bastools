@@ -259,6 +259,27 @@ public class ClassicTokenReaderTest {
                 .end());
     }
 
+    @Test
+    public void testLineContinuation() throws IOException {
+        testCode("""
+                10 TEXT \\
+                 : HOME \\
+                 : PRINT "HELLO, WORLD" \\
+                 : END
+                """,
+            Tokens.builder()
+                .number("10")
+                    .keyword(ApplesoftKeyword.TEXT)
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.HOME)
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.PRINT)
+                    .string("HELLO, WORLD")
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.END)
+                .end());
+    }
+
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);
         Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));

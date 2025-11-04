@@ -33,8 +33,16 @@ public class ClassicTokenReader {
             String line = lineNumberReader.readLine();
             int lineNo = lineNumberReader.getLineNumber();
             if (line == null) break;
-            new LinePopulator(lineNo, tokens).populate(line);
-            tokens.add(Token.eol(lineNo));
+
+            LinePopulator lp = new LinePopulator(lineNo, tokens);
+            if (line.endsWith("\\")) {
+                // Line continuation -- we just skip the eol bit
+                lp.populate(line.substring(0, line.length() - 2));
+            }
+            else {
+                lp.populate(line);
+                tokens.add(Token.eol(lineNo));
+            }
         }
         return tokens;
     }
