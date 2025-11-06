@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import io.github.applecommander.applesingle.AppleSingle;
 import org.applecommander.bastools.api.*;
@@ -37,6 +38,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ArgGroup;
 
 /** A command-line interface to the AppleSoft BAS tokenizer libraries. */
 @Command(description = "Transforms an AppleSoft program from text back to its tokenized state.",
@@ -86,6 +88,9 @@ public class Main implements Callable<Integer> {
 
 	@Option(names = "--wrapper", description = "Wrap the Applesoft program (DOS 3.3).")
 	private boolean wrapProgram;
+
+    @ArgGroup(heading = "%nTokenizer selection%n")
+    private TokenizerSelection tokenizer = new TokenizerSelection();
 	
 	@Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
 			"Enable specific optimizations.",
@@ -110,9 +115,6 @@ public class Main implements Callable<Integer> {
 			}
 		});
 
-    @Option(names = "--tokenizer", description = "Select tokenizer (modern, classic)")
-    private String tokenizer = "modern";
-	
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
 	private File sourceFile;
 	
@@ -144,7 +146,8 @@ public class Main implements Callable<Integer> {
 			Configuration.Builder builder = Configuration.builder()
 					.maxLineLength(this.maxLineLength)
 					.sourceFile(this.sourceFile)
-					.startAddress(this.address);
+					.startAddress(this.address)
+                    .preserveNumbers(tokenizer.preserveNumbers);
 			if (debugFlag) builder.debugStream(System.out);
 			process(builder.build());
 		}
@@ -172,11 +175,7 @@ public class Main implements Callable<Integer> {
 	
 	/** General CLI processing. */
 	public void process(Configuration config) throws IOException {
-		Queue<Token> tokens = switch (tokenizer) {
-            case "modern" -> ModernTokenReader.tokenize(sourceFile);
-            case "classic" -> ClassicTokenReader.tokenize(sourceFile);
-            default -> throw new RuntimeException("Unknown tokenizer: " + tokenizer);
-        };
+		Queue<Token> tokens = tokenizer.tokenizerFn.apply(sourceFile);
 		if (showTokens) {
 			tokens.forEach(t -> System.out.printf("%s%s", t, t.type() == Type.EOL ? "\n" : ", "));
 		}
@@ -189,7 +188,7 @@ public class Main implements Callable<Integer> {
 		}
 
 		if (prettyPrint || listPrint) {
-			program.accept(Visitors.printBuilder().prettyPrint(prettyPrint).build());
+			program.accept(Visitors.printBuilder(config).prettyPrint(prettyPrint).build());
 		}
 		if (showVariableReport) {
 			program.accept(Visitors.variableReportVisitor());
@@ -261,4 +260,42 @@ public class Main implements Callable<Integer> {
 			}
 		}
 	}
+
+    public static class TokenizerSelection {
+        Function<File,Queue<Token>> tokenizerFn = this::modernTokenizer;
+        boolean preserveNumbers = false;
+
+        @Option(names = "--modern", description = "Select modern tokenizer (default)")
+        public void selectModernTokenizer(boolean flag) {
+            this.tokenizerFn = this::modernTokenizer;
+            this.preserveNumbers = false;
+        }
+
+        @Option(names = "--classic", description = "Select classic tokenizer")
+        public void selectClassicTokenizer(boolean flag) {
+            this.tokenizerFn = this::classicTokenizer;
+            this.preserveNumbers = false;
+        }
+
+        @Option(names = "--preserve", description = "Select classic tokenizer with number preservation")
+        public void selectPreserveTokenizer(boolean flag) {
+            this.tokenizerFn = this::classicTokenizer;
+            this.preserveNumbers = true;
+        }
+
+        Queue<Token> modernTokenizer(File file) {
+            try {
+                return ModernTokenReader.tokenize(file);
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        }
+        Queue<Token> classicTokenizer(File file) {
+            try {
+                return ClassicTokenReader.tokenize(file);
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        }
+    }
 }

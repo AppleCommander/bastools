@@ -38,12 +38,17 @@ import org.applecommander.bastools.api.visitors.VariableReportVisitor;
  * @author rob
  */
 public class Visitors {
-	public static PrintBuilder printBuilder() {
-		return new PrintBuilder();
+	public static PrintBuilder printBuilder(Configuration config) {
+		return new PrintBuilder(config);
 	}
 	public static class PrintBuilder {
+        private final Configuration config;
 		private PrintStream printStream = System.out;
 		private Function<PrintBuilder,Visitor> creator = PrintVisitor::new;
+
+        private PrintBuilder(Configuration config) {
+            this.config = config;
+        }
 		
 		public PrintBuilder printStream(PrintStream printStream) {
 			Objects.requireNonNull(printStream);
@@ -69,7 +74,10 @@ public class Visitors {
 		public PrintStream getPrintStream() {
 			return printStream;
 		}
-	}
+        public Configuration getConfig() {
+            return config;
+        }
+    }
 	
 	public static ByteVisitor byteVisitor(Configuration config) {
 		return new ByteVisitor(config);

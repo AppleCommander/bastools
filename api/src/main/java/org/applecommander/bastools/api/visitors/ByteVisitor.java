@@ -150,11 +150,7 @@ public class ByteVisitor implements Visitor {
 				currentDirective = Directives.find(token.text(), config, os);
 				break;
 			case NUMBER:
-				if (Math.rint(token.number()) == token.number()) {
-					os.write(Integer.toString(token.number().intValue()).getBytes());
-				} else {
-					os.write(Double.toString(token.number()).getBytes());
-				}
+                os.write(config.numberToString(token).getBytes());
 				break;
             case STRING:
 				os.write('"');
