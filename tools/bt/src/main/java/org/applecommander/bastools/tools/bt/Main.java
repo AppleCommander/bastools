@@ -40,6 +40,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ArgGroup;
 
+import static picocli.CommandLine.Model.UsageMessageSpec.SECTION_KEY_FOOTER;
+
 /** A command-line interface to the AppleSoft BAS tokenizer libraries. */
 @Command(description = "Transforms an AppleSoft program from text back to its tokenized state.",
 		descriptionHeading = "%n",
@@ -123,7 +125,30 @@ public class Main implements Callable<Integer> {
 		// so we cannot have the 'System.exit' call in the try-catch block!
 		int exitCode = 0;
 		try {
-			exitCode = new CommandLine(new Main()).execute(args);
+            CommandLine cl = new CommandLine(new Main());
+            cl.getHelpSectionMap().put(SECTION_KEY_FOOTER, help -> {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                pw.println("\nTokenizer Defaults:");
+                CommandLine.Help.Column[] columns = {
+                    new CommandLine.Help.Column(12, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(20, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(28, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(22, 2, CommandLine.Help.Column.Overflow.WRAP)
+                };
+                CommandLine.Help.TextTable table = CommandLine.Help.TextTable.forColumns(help.colorScheme(), columns);
+                table.addRowValues("Option", "Tokenizer Class", "Applesoft-like Parsing?", "Number Preservation?");
+                table.addRowValues("----------", "------------------", "------------------------", "-------------------");
+                table.addRowValues("--modern", "ModernTokenReader", "No", "No");
+                table.addRowValues("--classic", "ClassicTokenReader", "Yes", "No");
+                table.addRowValues("--preserve", "ClassicTokenReader", "Yes", "Yes");
+                table.addRowValues("----------", "------------------", "------------------------", "-------------------");
+                pw.print(table);
+                pw.println("  * Applesoft-like parsing includes ignoring spaces, handling AT/ATN/A TO.");
+                pw.println("  * Number Preservation keeps entire number in output to assist with code validators.");
+                return sw.toString();
+            });
+			exitCode = cl.execute(args);
 		} catch (Throwable t) {
 			if (Main.debugFlag) {
 				t.printStackTrace(System.err);
