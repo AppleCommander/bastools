@@ -53,7 +53,6 @@ public class Configuration {
                 return Double.toString(token.number());
             }
         }
-
     }
 	
 	public static Builder builder() {
