@@ -91,7 +91,7 @@ public class Main implements Callable<Integer> {
 	@Option(names = "--wrapper", description = "Wrap the Applesoft program (DOS 3.3).")
 	private boolean wrapProgram;
 
-    @ArgGroup(heading = "%nTokenizer selection%n")
+    @ArgGroup(heading = "%nTokenizer Selection:%n")
     private TokenizerSelection tokenizer = new TokenizerSelection();
 	
 	@Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
