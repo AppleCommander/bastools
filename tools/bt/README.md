@@ -5,7 +5,8 @@ $ bt --help
 Usage: bt [-chOVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
           [--stdout] [--tokens] [--variables] [--wrapper] [-a=<address>]
           [--max-line-length=<maxLineLength>] [-o=<outputFile>]
-          [-f=<optimizations>[,<optimizations>...]]... <sourceFile>
+          [-f=<optimizations>[,<optimizations>...]]... [--modern | --classic |
+          --preserve] <sourceFile>
 
 Transforms an AppleSoft program from text back to its tokenized state.
       <sourceFile>          AppleSoft BASIC program to process.
@@ -43,7 +44,22 @@ Options:
       --variables           Generate a variable report
       --wrapper             Wrap the Applesoft program (DOS 3.3).
   -x, --hex                 Generate a binary hex dump for debugging.
-```
+
+Tokenizer Selection:
+      --classic             Select classic tokenizer
+      --modern              Select modern tokenizer (default)
+      --preserve            Select classic tokenizer with number preservation
+
+Tokenizer Defaults:
+  Option      Tokenizer Class     Applesoft-like Parsing?     Number Preservation?
+  ----------  ------------------  ------------------------    -------------------
+  --modern    ModernTokenReader   No                          No
+  --classic   ClassicTokenReader  Yes                         No
+  --preserve  ClassicTokenReader  Yes                         Yes
+  ----------  ------------------  ------------------------    -------------------
+  * Applesoft-like parsing includes ignoring spaces, handling AT/ATN/A TO.
+  * Number Preservation keeps entire number in output to assist with code validators.
+  ```
 
 ## Using copy and paste
 
@@ -51,7 +67,8 @@ If your Apple emulator supports copy and paste (not all do!), this is handy when
 
 ```shell
 $ bt --copy tools/bt/src/test/resources/circles.bas 
-0067:01 08 E1 09 
+0067:01 08 
+00AF:E2 09 
 0800:00 
 0801:0A 08 0A 00 AB 31 30 30 00 23 08 14 00 B2 64 72 
 0811:61 77 20 63 69 72 63 6C 65 20 72 6F 75 74 69 6E 
@@ -163,3 +180,45 @@ DOS 3.3 (but not ProDOS) seems to rewrite the application linked list when an Ap
 ```
 
 This is a valid program that resets the Applesoft pointer to just after the current program and runs that other program.
+
+## Preserving input
+
+`bt` now supports a "classic" tokenizer that has the ability to preserve numbers in the source code (instead of simplifying them). 
+The primary motivation is for those typing in magazine programs that have check programs... altering the code defeats the usefulness
+of the check algorithm.
+
+For instance:
+
+```shell
+# Note the extended digits...
+$ cat ticket-49a.bas 
+10 PRINT "MATHING"
+30 A = .4
+40 B = 0.6000
+50 C = -.250
+60 D = -0.70
+70 PRINT "A=";A
+80 PRINT "B=";B
+90 PRINT "C=";C
+95 PRINT "D=";D
+# ... Those digits remain in the listing...
+$ bt --preserve --list ticket-49a.bas
+10  PRINT "MATHING"
+30 A = .4
+40 B = 0.6000
+50 C =  - .250
+60 D =  - 0.70
+70  PRINT "A=";A
+80  PRINT "B=";B
+90  PRINT "C=";C
+95  PRINT "D=";D
+# ... A bit harder to see, but the digits remain in the program bytes as well
+$ bt --preserve --hex ticket-49a.bas
+0801: 10 08 0a 00 ba 22 4d 41 54 48 49 4e 47 22 00 19  ....."MATHING"..
+0811: 08 1e 00 41 d0 2e 34 00 26 08 28 00 42 d0 30 2e  ...A..4.&.(.B.0.
+0821: 36 30 30 30 00 32 08 32 00 43 d0 c9 2e 32 35 30  6000.2.2.C...250
+0831: 00 3e 08 3c 00 44 d0 c9 30 2e 37 30 00 4a 08 46  .>.<.D..0.70.J.F
+0841: 00 ba 22 41 3d 22 3b 41 00 56 08 50 00 ba 22 42  .."A=";A.V.P.."B
+0851: 3d 22 3b 42 00 62 08 5a 00 ba 22 43 3d 22 3b 43  =";B.b.Z.."C=";C
+0861: 00 6e 08 5f 00 ba 22 44 3d 22 3b 44 00 00 00 ..  .n._.."D=";D... 
+```
