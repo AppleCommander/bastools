@@ -133,19 +133,26 @@ public class Main implements Callable<Integer> {
                 CommandLine.Help.Column[] columns = {
                     new CommandLine.Help.Column(12, 2, CommandLine.Help.Column.Overflow.WRAP),
                     new CommandLine.Help.Column(20, 2, CommandLine.Help.Column.Overflow.WRAP),
-                    new CommandLine.Help.Column(28, 2, CommandLine.Help.Column.Overflow.WRAP),
-                    new CommandLine.Help.Column(22, 2, CommandLine.Help.Column.Overflow.WRAP)
+                    new CommandLine.Help.Column(11, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(11, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(11, 2, CommandLine.Help.Column.Overflow.WRAP)
                 };
                 CommandLine.Help.TextTable table = CommandLine.Help.TextTable.forColumns(help.colorScheme(), columns);
-                table.addRowValues("Option", "Tokenizer Class", "Applesoft-like Parsing?", "Number Preservation?");
-                table.addRowValues("----------", "------------------", "------------------------", "-------------------");
-                table.addRowValues("--modern", "ModernTokenReader", "No", "No");
-                table.addRowValues("--classic", "ClassicTokenReader", "Yes", "No");
-                table.addRowValues("--preserve", "ClassicTokenReader", "Yes", "Yes");
-                table.addRowValues("----------", "------------------", "------------------------", "-------------------");
+                table.addRowValues("Option", "Tokenizer Class", "Parsing?", "Numbers?", "DATA?");
+                table.addRowValues("----------", "------------------", "---------", "---------", "---------");
+                table.addRowValues("--modern", "ModernTokenReader", "'Modern'", "Rewritten", "Rewritten");
+                table.addRowValues("--classic", "ClassicTokenReader", "Applesoft", "Rewritten", "Preserved");
+                table.addRowValues("--preserve", "ClassicTokenReader", "Applesoft", "Preserved", "Preserved");
+                table.addRowValues("----------", "------------------", "---------", "---------", "---------");
                 pw.print(table);
-                pw.println("  * Applesoft-like parsing includes ignoring spaces, handling AT/ATN/A TO.");
-                pw.println("  * Number Preservation keeps entire number in output to assist with code validators.");
+                pw.println("  * Parsing: 'Modern' -  spaces between keywords and tokens are important,");
+                pw.println("                         any variable name can be used;");
+                pw.println("             Applesoft - ignores spaces, special logic to disambiguate AT/ATN/A TO,");
+                pw.println("                         variables cannot have keywords in them (ex: TON is invalid).");
+                pw.println("  * Numbers: Rewritten - means that a 0.600 is output as 0.6;");
+                pw.println("             Preserved - means that a 0.600 is output as 0.600.");
+                pw.println("  * Data:    Rewritten - the tokenizer identifies the data type and handles it appropriately;");
+                pw.println("             Preserved - the statement text (including all whitespace) is preserved.");
                 return sw.toString();
             });
 			exitCode = cl.execute(args);

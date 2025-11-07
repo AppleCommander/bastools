@@ -1,7 +1,6 @@
 ## Usage
 
 ```shell
-$ bt --help
 Usage: bt [-chOVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
           [--stdout] [--tokens] [--variables] [--wrapper] [-a=<address>]
           [--max-line-length=<maxLineLength>] [-o=<outputFile>]
@@ -51,15 +50,21 @@ Tokenizer Selection:
       --preserve            Select classic tokenizer with number preservation
 
 Tokenizer Defaults:
-  Option      Tokenizer Class     Applesoft-like Parsing?     Number Preservation?
-  ----------  ------------------  ------------------------    -------------------
-  --modern    ModernTokenReader   No                          No
-  --classic   ClassicTokenReader  Yes                         No
-  --preserve  ClassicTokenReader  Yes                         Yes
-  ----------  ------------------  ------------------------    -------------------
-  * Applesoft-like parsing includes ignoring spaces, handling AT/ATN/A TO.
-  * Number Preservation keeps entire number in output to assist with code validators.
-  ```
+  Option      Tokenizer Class     Parsing?   Numbers?   DATA?
+  ----------  ------------------  ---------  ---------  ---------
+  --modern    ModernTokenReader   'Modern'   Rewritten  Rewritten
+  --classic   ClassicTokenReader  Applesoft  Rewritten  Preserved
+  --preserve  ClassicTokenReader  Applesoft  Preserved  Preserved
+  ----------  ------------------  ---------  ---------  ---------
+  * Parsing: 'Modern' -  spaces between keywords and tokens are important,
+                         any variable name can be used;
+             Applesoft - ignores spaces, special logic to disambiguate AT/ATN/A TO,
+                         variables cannot have keywords in them (ex: TON is invalid).
+  * Numbers: Rewritten - means that a 0.600 is output as 0.6;
+             Preserved - means that a 0.600 is output as 0.600.
+  * Data:    Rewritten - the tokenizer identifies the data type and handles it appropriately;
+             Preserved - the statement text (including all whitespace) is preserved.
+```
 
 ## Using copy and paste
 
