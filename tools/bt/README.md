@@ -4,8 +4,8 @@
 Usage: bt [-chOVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
           [--stdout] [--tokens] [--variables] [--wrapper] [-a=<address>]
           [--max-line-length=<maxLineLength>] [-o=<outputFile>]
-          [-f=<optimizations>[,<optimizations>...]]... [--modern | --classic |
-          --preserve] <sourceFile>
+          [-f=<optimizations>[,<optimizations>...]]... [--preserve | --modern |
+          --classic] <sourceFile>
 
 Transforms an AppleSoft program from text back to its tokenized state.
       <sourceFile>          AppleSoft BASIC program to process.
@@ -29,6 +29,7 @@ Options:
                               values first.
                             * merge-lines - Merge lines.
                             * renumber - Renumber program.
+                            * shorten-numbers - Shorten numbers.
   -h, --help                Show this help message and exit.
       --list                List structure as bastools understands it.
       --max-line-length=<maxLineLength>

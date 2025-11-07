@@ -112,3 +112,18 @@ tests:
           80  PRINT "B=";B
           90  PRINT "C=";C
           95  PRINT "D=";D
+  - name: check number optimization
+    steps:
+      - command: bt -f=shorten-numbers --list $numberPreservation
+        criteria:
+          whitespace: trim
+        stdout: |
+          10  PRINT "MATHING"
+          30 A = .4
+          40 B = .6
+          50 C =  - .25
+          60 D =  - .7
+          70  PRINT "A=";A
+          80  PRINT "B=";B
+          90  PRINT "C=";C
+          95  PRINT "D=";D

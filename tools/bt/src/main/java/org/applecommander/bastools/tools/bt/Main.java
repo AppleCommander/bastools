@@ -101,7 +101,8 @@ public class Main implements Callable<Integer> {
 			"* @|green shorten-variable-names|@ - Ensure all variables are 1 or 2 characters long.",
 			"* @|green extract-constant-values|@ - Assign all constant values first.",
 			"* @|green merge-lines|@ - Merge lines.",
-			"* @|green renumber|@ - Renumber program."
+			"* @|green renumber|@ - Renumber program.",
+		    "* @|green shorten-numbers|@ - Shorten numbers."
 	})
 	private List<Optimization> optimizations = new ArrayList<>();
 
@@ -192,6 +193,10 @@ public class Main implements Callable<Integer> {
 		if (allOptimizations) {
 			optimizations.clear();
 			optimizations.addAll(Arrays.asList(Optimization.values()));
+		}
+		// Special handling for the "shorten numbers" optimization to be applied
+		if (optimizations.contains(Optimization.SHORTEN_NUMBERS)) {
+			tokenizer.preserveNumbers = true;
 		}
 		boolean hasTextOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport 
 				|| debugFlag || showLineAddresses;

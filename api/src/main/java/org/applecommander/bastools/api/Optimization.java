@@ -19,12 +19,7 @@ package org.applecommander.bastools.api;
 
 import java.util.function.Function;
 
-import org.applecommander.bastools.api.optimizations.ExtractConstantValues;
-import org.applecommander.bastools.api.optimizations.ShortenVariableNames;
-import org.applecommander.bastools.api.optimizations.MergeLines;
-import org.applecommander.bastools.api.optimizations.RemoveEmptyStatements;
-import org.applecommander.bastools.api.optimizations.RemoveRemStatements;
-import org.applecommander.bastools.api.optimizations.Renumber;
+import org.applecommander.bastools.api.optimizations.*;
 
 /**
  * All optimization capabilities are definined here in the "best" manner of execution.
@@ -36,7 +31,8 @@ public enum Optimization {
 	SHORTEN_VARIABLE_NAMES(ShortenVariableNames::new),
 	EXTRACT_CONSTANT_VALUES(ExtractConstantValues::new),
 	MERGE_LINES(MergeLines::new),
-	RENUMBER(Renumber::new);
+	RENUMBER(Renumber::new),
+	SHORTEN_NUMBERS(ShortenNumbers::new);
 	
 	private final Function<Configuration,Visitor> factory;
 	
