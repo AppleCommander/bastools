@@ -48,6 +48,8 @@ public class ClassicTokenReader {
     }
 
     static class LinePopulator {
+        /** These are the alternate tokens that do not start with an alphabetic character. */
+        private static final Set<Character> ALT_TOKENS = Set.of('&','+','-','*','/','^','<','=','>');
         private final int lineNo;
         private final LinkedList<Token> tokens;
         private boolean dataFlag = false;
@@ -115,7 +117,8 @@ public class ClassicTokenReader {
                 }
 
                 // Keyword handling
-                if (Character.isLetter(ch)) {
+                // Additional: &+-*/^<=>
+                if (Character.isLetter(ch) || ALT_TOKENS.contains(ch)) {
                     int n = handleKeyword(i, line);
                     if (n == -1) {
                         // No keyword found, must be identifier
@@ -143,10 +146,6 @@ public class ClassicTokenReader {
                 // A "." at this point is expected to be a number
                 else if (ch == '.') {
                     emitNumber(ch);
-                }
-                // Cases of missed tokens(?)
-                else if (ch == '=') {
-                    emitKeyword(ApplesoftKeyword.eq);
                 }
                 // A "$" _might_ be a directive, figure that out
                 else if (ch == '$') {
