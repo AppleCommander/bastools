@@ -57,7 +57,8 @@ public class HexDumper {
 	public void apple2Header(int address, int length) {
 		int end = address + length + 1;
 		printLine.accept(0x67, new byte[] {
-                (byte)(address&0xff), (byte)(address>>8)        // $67-68: Start of Applesoft program
+                (byte)(address&0xff), (byte)(address>>8),       // $67-68: Start of Applesoft program
+				(byte)(end&0xff), (byte)(end>>8),               // $69-6A: Start of Applesoft variables
         });
         printLine.accept(0xaf, new byte[] {
                 (byte)(end&0xff), (byte)(end>>8),               // $AF-B0: End of Applesoft program

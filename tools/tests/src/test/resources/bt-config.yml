@@ -55,7 +55,7 @@ tests:
         criteria:
           whitespace: trim
         stdout: |
-          0067:01 08
+          0067:01 08 2A 08
           00AF:2A 08
           0800:00
           0801:07 08 0A 00 89 00 0D 08 14 00 97 00 21 08 1E 00
