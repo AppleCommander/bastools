@@ -33,6 +33,7 @@ import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
+import org.applecommander.bastools.api.visitors.NibbleCheckit;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
@@ -93,6 +94,9 @@ public class Main implements Callable<Integer> {
 
     @ArgGroup(heading = "%nTokenizer Selection:%n")
     private TokenizerSelection tokenizer = new TokenizerSelection();
+
+    @Option(names = "--checkit", description = "Apply Nibble Checkit (ca 1988) to code")
+    private boolean showCheckitValues;
 	
 	@Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
 			"Enable specific optimizations.",
@@ -199,7 +203,7 @@ public class Main implements Callable<Integer> {
 			tokenizer.preserveNumbers = true;
 		}
 		boolean hasTextOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport 
-				|| debugFlag || showLineAddresses;
+				|| debugFlag || showLineAddresses || showCheckitValues;
 		if (stdoutFlag && hasTextOutput) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
@@ -230,6 +234,9 @@ public class Main implements Callable<Integer> {
 		if (showVariableReport) {
 			program.accept(Visitors.variableReportVisitor());
 		}
+        if (showCheckitValues) {
+            program.accept(new NibbleCheckit(config));
+        }
 
 		ByteVisitor byteVisitor = Visitors.byteVisitor(config);
 		byte[] wrapperData = new byte[0];

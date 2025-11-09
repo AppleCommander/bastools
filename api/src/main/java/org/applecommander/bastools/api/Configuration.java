@@ -31,7 +31,7 @@ public class Configuration {
 	public final int startAddress;
 	public final int maxLineLength;
 	public final PrintStream debugStream;
-	public final Map<String,String >variableReplacements = new HashMap<>();
+	public final Map<String,String> variableReplacements = new HashMap<>();
     public final boolean preserveNumbers;
 	
 	private Configuration(Builder b) {

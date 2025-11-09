@@ -26,6 +26,12 @@ files:
       90 PRINT "C=";C
       95 PRINT "D=";D
     suffix: .bas
+  checkitSample:
+    type: text
+    content: |
+      10 REM RING THE BELL
+      20 FOR J = 1 TO 5:PRINT CHR$ (7):NEXT J
+      30 END
 
 tests:
   - name: Forms of help
@@ -127,3 +133,14 @@ tests:
           80  PRINT "B=";B
           90  PRINT "C=";C
           95  PRINT "D=";D
+  - name: checkit test
+    steps:
+      - command: bt --checkit $checkitSample
+        criteria:
+          match: contains
+          whitespace: ignore
+        stdout: |
+          37|10 REM RING THE BELL
+          54|20 FOR J = 1 TO 5: PRINT CHR$ (7): NEXT J
+          91|30 END
+          TOTAL: 1CB9
