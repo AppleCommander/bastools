@@ -33,7 +33,7 @@ import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
-import org.applecommander.bastools.api.visitors.NibbleCheckit;
+import org.applecommander.bastools.api.proofreaders.NibbleCheckit;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;

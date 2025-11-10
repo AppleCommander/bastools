@@ -1,4 +1,4 @@
-package org.applecommander.bastools.api.visitors;
+package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
 import org.applecommander.bastools.api.Visitor;
