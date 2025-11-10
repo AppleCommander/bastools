@@ -13,26 +13,20 @@ import java.io.StringWriter;
 
 public class NibbleCheckit implements Visitor {
     private final Configuration config;
-    private final PrintStream printStream;
     private int totalChecksum;
     private int lineChecksum;
 
     public NibbleCheckit(Configuration config) {
-        this(config, System.out);
-    }
-    // For testing
-    public NibbleCheckit(Configuration config, PrintStream pw) {
         this.config = config;
-        this.printStream = pw;
     }
 
     @Override
     public Program visit(Program program) {
-        printStream.println("Nibble Checkit, Copyright 1988, Microsparc Inc.");
+        System.out.println("Nibble Checkit, Copyright 1988, Microsparc Inc.");
         try {
             return Visitor.super.visit(program);
         } finally {
-            printStream.printf("TOTAL: %02X%02X\n", totalChecksum & 0xff, totalChecksum >> 8);
+            System.out.printf("TOTAL: %02X%02X\n", totalChecksum & 0xff, totalChecksum >> 8);
         }
     }
 
@@ -53,7 +47,7 @@ public class NibbleCheckit implements Visitor {
             first = false;
         }
         int cs = ( (lineChecksum & 0xff) - (lineChecksum >> 8) ) & 0xff;
-        printStream.printf("%02X|%s\n", cs, toString(line));
+        System.out.printf("%02X|%s\n", cs, toString(line));
 
         // Update program values
         totalChecksum = checkit(totalChecksum, line.lineNumber & 0xff);
