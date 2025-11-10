@@ -1,29 +1,24 @@
 package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Visitor;
 import org.applecommander.bastools.api.model.Line;
 import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Statement;
 import org.applecommander.bastools.api.model.Token;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-public class NibbleCheckit implements Visitor {
-    private final Configuration config;
+public class NibbleCheckit extends LineOrientedProofReader {
     private int totalChecksum;
     private int lineChecksum;
 
     public NibbleCheckit(Configuration config) {
-        this.config = config;
+        super(config);
     }
 
     @Override
     public Program visit(Program program) {
         System.out.println("Nibble Checkit, Copyright 1988, Microsparc Inc.");
         try {
-            return Visitor.super.visit(program);
+            return super.visit(program);
         } finally {
             System.out.printf("TOTAL: %02X%02X\n", totalChecksum & 0xff, totalChecksum >> 8);
         }
@@ -42,7 +37,7 @@ public class NibbleCheckit implements Visitor {
                 // We need to synthesize the colons
                 lineChecksum = checkit(lineChecksum, ':'|0x80);
             }
-            Visitor.super.visit(statement);
+            super.visit(statement);
             first = false;
         }
         int cs = ( (lineChecksum & 0xff) - (lineChecksum >> 8) ) & 0xff;
@@ -75,46 +70,6 @@ public class NibbleCheckit implements Visitor {
         return token;
     }
 
-    public String toString(Line line) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        pw.printf("%d ", line.lineNumber);
-        boolean first = true;
-        for (Statement statement : line.statements) {
-            if (first) {
-                first = false;
-            } else {
-                pw.print(":");
-            }
-            for (Token token : statement.tokens) {
-                switch (token.type()) {
-                    case EOL:
-                        pw.print("<EOL>");
-                        break;
-                    case COMMENT:
-                        pw.printf("REM %s", token.text());
-                        break;
-                    case DATA, IDENT, SYNTAX:
-                        pw.print(token.text());
-                        break;
-                    case STRING:
-                        pw.printf("\"%s\"", token.text());
-                        break;
-                    case KEYWORD:
-                        pw.printf(" %s ", token.keyword().text);
-                        break;
-                    case DIRECTIVE:
-                        pw.printf("%s ", token.text());
-                        break;
-                    case NUMBER:
-                        pw.print(config.numberToString(token));
-                        break;
-                }
-            }
-        }
-        return sw.toString();
-    }
-
     /**
      * Perform Nibble Checkit algorithm. Note that a large part of the assembly is shifting the
      * new value byte into the checksum; if the checksum itself causes a carry in the high byte,
@@ -143,7 +98,7 @@ public class NibbleCheckit implements Visitor {
      * XOR. The result is the middle two bytes where the checksum resides. (Note that the
      * <code>0x1021</code> was shifted by a byte as well.)
      */
-    public int checkit(int checksum, int value) {
+    public static int checkit(int checksum, int value) {
         assert value >= 0 && value <= 0xff;
         int work = (checksum << 8) | value;
         for (int i=0; i<8; i++) {

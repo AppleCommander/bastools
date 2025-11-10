@@ -1,11 +1,12 @@
 ## Usage
 
 ```shell
-Usage: bt [-chOVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
+$ bt --help
+Usage: bt [-chVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
           [--stdout] [--tokens] [--variables] [--wrapper] [-a=<address>]
-          [--max-line-length=<maxLineLength>] [-o=<outputFile>]
-          [-f=<optimizations>[,<optimizations>...]]... [--preserve | --modern |
-          --classic] <sourceFile>
+          [--max-line-length=<maxLineLength>] [-o=<outputFile>] [--modern |
+          --classic | --preserve] [-f=<selected>[,<selected>...] [-f=<selected>
+          [,<selected>...]]... | -O] [--checkit | --proofreader] <sourceFile>
 
 Transforms an AppleSoft program from text back to its tokenized state.
       <sourceFile>          AppleSoft BASIC program to process.
@@ -18,25 +19,12 @@ Options:
   -c, --copy                Generate a copy/paste form of output for testing in
                               an emulator.
       --debug               Print debug output.
-  -f=<optimizations>[,<optimizations>...]
-                            Enable specific optimizations.
-                            * remove-empty-statements - Strip out all '::'-like
-                              statements.
-                            * remove-rem-statements - Remove all REM statements.
-                            * shorten-variable-names - Ensure all variables are
-                              1 or 2 characters long.
-                            * extract-constant-values - Assign all constant
-                              values first.
-                            * merge-lines - Merge lines.
-                            * renumber - Renumber program.
-                            * shorten-numbers - Shorten numbers.
   -h, --help                Show this help message and exit.
       --list                List structure as bastools understands it.
       --max-line-length=<maxLineLength>
                             Maximum line length for generated lines.
                               Default: 255
   -o, --output=<outputFile> Write binary output to file.
-  -O, --optimize            Apply all optimizations.
       --pretty              Pretty print structure as bastools understands it.
       --stdout              Send binary output to stdout.
       --tokens              Dump token list to stdout for debugging.
@@ -49,6 +37,26 @@ Tokenizer Selection:
       --classic             Select classic tokenizer
       --modern              Select modern tokenizer (default)
       --preserve            Select classic tokenizer with number preservation
+
+Optimization:
+  -f=<selected>[,<selected>...]
+                            Enable specific optimizations.
+                            * remove-empty-statements - Strip out all '::'-like
+                              statements.
+                            * remove-rem-statements - Remove all REM statements.
+                            * shorten-variable-names - Ensure all variables are
+                              1 or 2 characters long.
+                            * extract-constant-values - Assign all constant
+                              values first.
+                            * merge-lines - Merge lines.
+                            * renumber - Renumber program.
+                            * shorten-numbers - Shorten numbers.
+  -O, --optimize            Apply all optimizations.
+
+Proof Readers:
+      --checkit             Apply Nibble Checkit (ca 1988) to code
+      --proofreader         Apply Compute! Apple Automatic Proofreader (ca
+                              1985) to code
 
 Tokenizer Defaults:
   Option      Tokenizer Class     Parsing?   Numbers?   DATA?
@@ -227,4 +235,50 @@ $ bt --preserve --hex ticket-49a.bas
 0841: 00 ba 22 41 3d 22 3b 41 00 56 08 50 00 ba 22 42  .."A=";A.V.P.."B
 0851: 3d 22 3b 42 00 62 08 5a 00 ba 22 43 3d 22 3b 43  =";B.b.Z.."C=";C
 0861: 00 6e 08 5f 00 ba 22 44 3d 22 3b 44 00 00 00 ..  .n._.."D=";D... 
+```
+
+## Proofreaders
+
+`bt` has the capability of computing checksums of BASIC programs. The hypothesis is that if `bt` supports the proofreader,
+you can get quick feedback on typos before loading onto an Apple II for verification.
+
+Some examples:
+
+```shell
+$ bt --checkit checkit-example.bas 
+Nibble Checkit, Copyright 1988, Microsparc Inc.
+37|10 REM RING THE BELL
+54|20  FOR J = 1 TO 5: PRINT  CHR$ (7): NEXT J
+91|30  END 
+TOTAL: 1CB9
+
+$ bt --proofreader proofreader-example.bas 
+Compute! Apple Automatic Proofreader, Copyright 1985
+4A|10  HOME 
+52|20 D$ =  CHR$ (4)
+25|40  PRINT "DO YOU WANT TO:"
+A6|50  PRINT " (1) MAKE A SPEEDSCRIPT FILE INTO A TEXT FILE"
+AE|60  PRINT " (2) MAKE A TEXT FILE INTO A SPEEDSCRIPT FILE"
+67|70  GET A$:A =  VAL (A$)
+47|80  IF A <  > 1 AND A <  > 2 THEN 70
+65|90  ON A GOTO 100,200
+53|100  PRINT "ENTER SPEEDSCRIPT FILE NAME": INPUT ":";A$
+89|110  PRINT "ENTER TEXT FILE NAME TO CREATE": INPUT ":";B$
+7E|120  PRINT D$;"BLOAD ";A$;",A$2000"
+A4|125 L =  PEEK (48859) +  PEEK (48860) * 256 + 8192
+5A|150  FOR I = 8192 TO L - 1
+39|160  IF  PEEK (I) = 60 THEN  POKE I,141
+09|180  NEXT 
+C9|190  PRINT D$;"CREATE ";B$;",TTXT"
+F5|195  PRINT D$;"BSAVE ";B$;",A$2000,E";L - 1;",TTXT"
+B3|196  END 
+6D|200  PRINT "ENTER TEXT FILE NAME": INPUT ":";B$
+06|210  INPUT "ENTER SPEEDSCRIPT FILE NAME TO CREATE   :";A$
+25|220  PRINT  CHR$ (4);"BLOAD ";B$;",A$2000,TTXT"
+93|230 L =  PEEK (48859) +  PEEK (48860) * 256 + 8192
+59|240  FOR I = 8192 TO L - 1
+1A|245  IF  PEEK (I) = 141 THEN  POKE I,60
+06|260  NEXT 
+4A|295  PRINT D$;"BSAVE ";A$;",A8192,E";L - 1
+B4|296  END 
 ```

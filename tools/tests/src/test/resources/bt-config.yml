@@ -32,6 +32,20 @@ files:
       10 REM RING THE BELL
       20 FOR J = 1 TO 5:PRINT CHR$ (7):NEXT J
       30 END
+    suffix: .bas
+  # From Compute! July 1985 issue - this code is just above the introductory article for the Apple Automatic Proofreader
+  proofreaderSample:
+    type: text
+    content: |
+      10 HOME
+      20 D$ = CHR$(4)
+      40 PRINT "DO YOU WANT TO:"
+      50 PRINT " (1) MAKE A SPEEDSCRIPT FILE INTO A TEXT FILE"
+      60 PRINT " (2) MAKE A TEXT FILE INTO A SPEEDSCRIPT FILE"
+      70 GET A$:A = VAL(A$)
+      80 IF A<>1 AND A<>2 THEN 70
+      90 ON A GOTO 100,200
+    suffix: .bas
 
 tests:
   - name: Forms of help
@@ -133,7 +147,7 @@ tests:
           80  PRINT "B=";B
           90  PRINT "C=";C
           95  PRINT "D=";D
-  - name: checkit test
+  - name: Nibble Checkit test
     steps:
       - command: bt --checkit $checkitSample
         criteria:
@@ -144,3 +158,18 @@ tests:
           54|20 FOR J = 1 TO 5: PRINT CHR$ (7): NEXT J
           91|30 END
           TOTAL: 1CB9
+  - name: Compute! Automatic Proofreader test
+    steps:
+      - command: bt --proofreader $proofreaderSample
+        criteria:
+          match: contains
+          whitespace: ignore
+        stdout: |
+          4A|10 HOME
+          52|20 D$ = CHR$ (4)
+          25|40 PRINT "DO YOU WANT TO:"
+          A6|50 PRINT " (1) MAKE A SPEEDSCRIPT FILE INTO A TEXT FILE"
+          AE|60 PRINT " (2) MAKE A TEXT FILE INTO A SPEEDSCRIPT FILE"
+          67|70 GET A$:A = VAL (A$)
+          47|80 IF A < > 1 AND A < > 2 THEN 70
+          65|90 ON A GOTO 100,200

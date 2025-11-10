@@ -32,6 +32,7 @@ import org.applecommander.bastools.api.*;
 import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
+import org.applecommander.bastools.api.proofreaders.ComputeAutomaticProofreader;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
 import org.applecommander.bastools.api.proofreaders.NibbleCheckit;
 import picocli.CommandLine;
@@ -95,11 +96,11 @@ public class Main implements Callable<Integer> {
     @ArgGroup(heading = "%nTokenizer Selection:%n")
     private final TokenizerSelection tokenizer = new TokenizerSelection();
 
-    @Option(names = "--checkit", description = "Apply Nibble Checkit (ca 1988) to code")
-    private boolean showCheckitValues;
-
     @ArgGroup(heading = "%nOptimization:%n")
     private final OptimizationSelection optimizations = new OptimizationSelection();
+
+    @ArgGroup(heading = "%nProof Readers:%n")
+    private final ProofReaderSelection proofReader = new ProofReaderSelection();
 	
 	@Option(names = "--debug", description = "Print debug output.")
 	private static boolean debugFlag;
@@ -187,7 +188,7 @@ public class Main implements Callable<Integer> {
 			tokenizer.preserveNumbers = true;
 		}
 		boolean hasTextOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport 
-				|| debugFlag || showLineAddresses || showCheckitValues;
+				|| debugFlag || showLineAddresses || proofReader.proofReaderFn != null;
 		if (stdoutFlag && hasTextOutput) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
@@ -218,8 +219,8 @@ public class Main implements Callable<Integer> {
 		if (showVariableReport) {
 			program.accept(Visitors.variableReportVisitor());
 		}
-        if (showCheckitValues) {
-            program.accept(new NibbleCheckit(config));
+        if (proofReader.proofReaderFn != null) {
+            program.accept(proofReader.proofReaderFn.apply(config));
         }
 
 		ByteVisitor byteVisitor = Visitors.byteVisitor(config);
@@ -343,6 +344,20 @@ public class Main implements Callable<Integer> {
         @Option(names = { "-O", "--optimize" }, description = "Apply all optimizations.")
         public void selectAllOptimizations(boolean flag) {
             selected.addAll(List.of(Optimization.values()));
+        }
+    }
+
+    public static class ProofReaderSelection {
+        Function<Configuration,Visitor> proofReaderFn;
+
+        @Option(names = "--checkit", description = "Apply Nibble Checkit (ca 1988) to code")
+        public void selectNibbleCheckit(boolean flag) {
+            this.proofReaderFn = NibbleCheckit::new;
+        }
+
+        @Option(names = "--proofreader", description = "Apply Compute! Apple Automatic Proofreader (ca 1985) to code")
+        public void selectComputeProofreader(boolean flag) {
+            this.proofReaderFn = ComputeAutomaticProofreader::new;
         }
     }
 }
