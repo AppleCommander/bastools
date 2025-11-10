@@ -93,25 +93,13 @@ public class Main implements Callable<Integer> {
 	private boolean wrapProgram;
 
     @ArgGroup(heading = "%nTokenizer Selection:%n")
-    private TokenizerSelection tokenizer = new TokenizerSelection();
+    private final TokenizerSelection tokenizer = new TokenizerSelection();
 
     @Option(names = "--checkit", description = "Apply Nibble Checkit (ca 1988) to code")
     private boolean showCheckitValues;
-	
-	@Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
-			"Enable specific optimizations.",
-			"* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
-			"* @|green remove-rem-statements|@ - Remove all REM statements.",
-			"* @|green shorten-variable-names|@ - Ensure all variables are 1 or 2 characters long.",
-			"* @|green extract-constant-values|@ - Assign all constant values first.",
-			"* @|green merge-lines|@ - Merge lines.",
-			"* @|green renumber|@ - Renumber program.",
-		    "* @|green shorten-numbers|@ - Shorten numbers."
-	})
-	private List<Optimization> optimizations = new ArrayList<>();
 
-	@Option(names = { "-O", "--optimize" }, description = "Apply all optimizations.")
-	private boolean allOptimizations;
+    @ArgGroup(heading = "%nOptimization:%n")
+    private final OptimizationSelection optimizations = new OptimizationSelection();
 	
 	@Option(names = "--debug", description = "Print debug output.")
 	private static boolean debugFlag;
@@ -194,12 +182,8 @@ public class Main implements Callable<Integer> {
 	
 	/** A basic test to ensure parameters are somewhat sane. */
 	public boolean checkParameters() {
-		if (allOptimizations) {
-			optimizations.clear();
-			optimizations.addAll(Arrays.asList(Optimization.values()));
-		}
 		// Special handling for the "shorten numbers" optimization to be applied
-		if (optimizations.contains(Optimization.SHORTEN_NUMBERS)) {
+		if (optimizations.selected.contains(Optimization.SHORTEN_NUMBERS)) {
 			tokenizer.preserveNumbers = true;
 		}
 		boolean hasTextOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport 
@@ -223,7 +207,7 @@ public class Main implements Callable<Integer> {
 		Parser parser = new Parser(tokens);
 		Program program = parser.parse();
 		
-		for (Optimization optimization : optimizations) {
+		for (Optimization optimization : optimizations.selected) {
 			debug.printf("Optimization: %s\n", optimization.name());
 			program = program.accept(optimization.create(config));
 		}
@@ -340,6 +324,25 @@ public class Main implements Callable<Integer> {
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }
+        }
+    }
+
+    public static class OptimizationSelection {
+        @Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
+                "Enable specific optimizations.",
+                "* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
+                "* @|green remove-rem-statements|@ - Remove all REM statements.",
+                "* @|green shorten-variable-names|@ - Ensure all variables are 1 or 2 characters long.",
+                "* @|green extract-constant-values|@ - Assign all constant values first.",
+                "* @|green merge-lines|@ - Merge lines.",
+                "* @|green renumber|@ - Renumber program.",
+                "* @|green shorten-numbers|@ - Shorten numbers."
+        })
+        private List<Optimization> selected = new ArrayList<>();
+
+        @Option(names = { "-O", "--optimize" }, description = "Apply all optimizations.")
+        public void selectAllOptimizations(boolean flag) {
+            selected.addAll(List.of(Optimization.values()));
         }
     }
 }
