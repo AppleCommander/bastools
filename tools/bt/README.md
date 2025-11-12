@@ -6,7 +6,8 @@ Usage: bt [-chVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
           [--stdout] [--tokens] [--variables] [--wrapper] [-a=<address>]
           [--max-line-length=<maxLineLength>] [-o=<outputFile>] [--modern |
           --classic | --preserve] [-f=<selected>[,<selected>...] [-f=<selected>
-          [,<selected>...]]... | -O] [--checkit | --proofreader] <sourceFile>
+          [,<selected>...]]... | -O] [--apple-checker | --proofreader |
+          --checkit] <sourceFile>
 
 Transforms an AppleSoft program from text back to its tokenized state.
       <sourceFile>          AppleSoft BASIC program to process.
@@ -54,6 +55,7 @@ Optimization:
   -O, --optimize            Apply all optimizations.
 
 Proof Readers:
+      --apple-checker       Apply Nibble Apple Checker 3.0 (ca 1982) to code
       --checkit             Apply Nibble Checkit (ca 1988) to code
       --proofreader         Apply Compute! Apple Automatic Proofreader (ca
                               1985) to code

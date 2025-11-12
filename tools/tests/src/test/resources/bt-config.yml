@@ -46,6 +46,12 @@ files:
       80 IF A<>1 AND A<>2 THEN 70
       90 ON A GOTO 100,200
     suffix: .bas
+  # Just a silly example as a start
+  appleCheckerSample:
+    type: text
+    content: |
+      10 TEXT:HOME
+    suffix: .bas
 
 tests:
   - name: Forms of help
@@ -173,3 +179,12 @@ tests:
           67|70 GET A$:A = VAL (A$)
           47|80 IF A < > 1 AND A < > 2 THEN 70
           65|90 ON A GOTO 100,200
+  - name: Nibble Apple Checker 3.0 test
+    steps:
+      - command: bt --apple-checker $appleCheckerSample
+        criteria:
+          match: contains
+          whitespace: ignore
+        stdout: |
+          Length: 0002
+          Checksum: 4B

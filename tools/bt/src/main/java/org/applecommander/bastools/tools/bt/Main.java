@@ -33,6 +33,7 @@ import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
 import org.applecommander.bastools.api.proofreaders.ComputeAutomaticProofreader;
+import org.applecommander.bastools.api.proofreaders.NibbleAppleChecker;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
 import org.applecommander.bastools.api.proofreaders.NibbleCheckit;
 import picocli.CommandLine;
@@ -358,6 +359,11 @@ public class Main implements Callable<Integer> {
         @Option(names = "--proofreader", description = "Apply Compute! Apple Automatic Proofreader (ca 1985) to code")
         public void selectComputeProofreader(boolean flag) {
             this.proofReaderFn = ComputeAutomaticProofreader::new;
+        }
+
+        @Option(names = "--apple-checker", description = "Apply Nibble Apple Checker 3.0 (ca 1982) to code")
+        public void selectNibbleAppleChecker(boolean flag) {
+            this.proofReaderFn = NibbleAppleChecker::new;
         }
     }
 }
