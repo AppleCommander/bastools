@@ -20,7 +20,6 @@ package org.applecommander.bastools.tools.bt;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -33,6 +32,7 @@ import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
 import org.applecommander.bastools.api.proofreaders.ComputeAutomaticProofreader;
+import org.applecommander.bastools.api.proofreaders.MicrosparcKeyPerfect4;
 import org.applecommander.bastools.api.proofreaders.NibbleAppleChecker;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
 import org.applecommander.bastools.api.proofreaders.NibbleCheckit;
@@ -364,6 +364,11 @@ public class Main implements Callable<Integer> {
         @Option(names = "--apple-checker", description = "Apply Nibble Apple Checker 3.0 (ca 1982) to code")
         public void selectNibbleAppleChecker(boolean flag) {
             this.proofReaderFn = NibbleAppleChecker::new;
+        }
+
+        @Option(names = { "--key-perfect-4", "--kp4" }, description = "Apple MicroSPARC Key Perfect V4 to code")
+        public void selectKeyPerfectV4(boolean flag) {
+            this.proofReaderFn = MicrosparcKeyPerfect4::new;
         }
     }
 }

@@ -52,6 +52,31 @@ files:
     content: |
       10 TEXT:HOME
     suffix: .bas
+  # Partial code pulled from escape-from-monster-caverns.bas in the bt tests
+  keyPerfectSample:
+    type: text
+    content: |
+      1  GOTO 10
+      2  HOME : RETURN
+      10  REM  ESCAPE FROM MONSTER CAVERNS
+      100  PRINT "YOU CAN PLAY THIS GAME IN 3 VERSIONS:"
+      110  PRINT
+      120  PRINT  TAB( 5);"1-HARD"
+      130  PRINT  TAB( 5);"2-MEDIUM"
+      140  PRINT  TAB( 5);"3-EASY"
+      150  PRINT
+      160  PRINT "WHICH ONE DO YOU WANT";
+      170  INPUT DI
+      180  IF DI <1  THEN 160
+      190  IF DI >3  THEN 160
+      200  GOSUB 2
+      210  PRINT "YOU ARE A FAMOUS EXPLORER WHO HAS"
+      220  PRINT "SPENT YEARS PREPARING FOR A GREAT"
+      230  PRINT "EXPEDITION TO THE ISLAND OF PIHC,"
+      240  PRINT "AN UNCHARTED DOT OF LAND THOUSANDS"
+      250  PRINT "OF MILES PRON CIVILIZATION.  YOUR"
+      260  PRINT "RESEARCH HAS LED TO A DUSTY OLD"
+    suffix: .bas
 
 tests:
   - name: Forms of help
@@ -188,3 +213,14 @@ tests:
         stdout: |
           Length: 0002
           Checksum: 4B
+  - name: MicroSPARC Key Perfect 4.0 test
+    steps:
+      - command: bt --key-perfect-4 $keyPerfectSample
+        criteria:
+          whitespace: ignore
+        stdout: |
+          Line# - Line#   CODE-4.0
+          -------------   --------
+              1 -   160       4C2A
+            170 -   260       6D52
+          PROGRAM TOTAL       01A0
