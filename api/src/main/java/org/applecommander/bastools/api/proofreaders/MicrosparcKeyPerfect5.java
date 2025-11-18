@@ -156,6 +156,9 @@ public class MicrosparcKeyPerfect5 implements Visitor {
                     // do not add to checksum
                 }
                 else if (ch > 0x20 || ch == 0x04) {
+                    if (ch >= 0x60 && ch < 0x80) {
+                        ch -= 0x20;     // Force characters to uppercase
+                    }
                     lineChecksum.addByte(ch);
                     pgmChecksum.addByte(ch);
                 }

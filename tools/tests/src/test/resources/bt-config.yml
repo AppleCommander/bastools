@@ -5,13 +5,21 @@ commands:
     executable:  tools/bt/build/native/nativeCompile/bt-*
 
 files:
-  helloWorld:
+  helloWorldUC:
     type: text
     content: |
       10 TEXT
       20 HOME
       30 PRINT "HELLO, WORLD"
       40 END
+    suffix: .bas
+  helloWorldLC:
+    type: text
+    content: |
+      10 text
+      20 home
+      30 print "Hello, World"
+      40 end
     suffix: .bas
   numberPreservation:    # See https://github.com/AppleCommander/bastools/issues/49
     type: text
@@ -92,7 +100,7 @@ tests:
         rc: 2
   - name: list output
     steps:
-      - command: bt --list $helloWorld
+      - command: bt --list $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
@@ -102,7 +110,7 @@ tests:
           40  END
   - name: copy/paste output
     steps:
-      - command: bt --copy $helloWorld
+      - command: bt --copy $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
@@ -114,14 +122,14 @@ tests:
           0821:27 08 28 00 80 00 00 00
   - name: optimize output
     steps:
-      - command: bt --optimize --list $helloWorld
+      - command: bt --optimize --list $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
           0  TEXT : HOME : PRINT "HELLO, WORLD": END
   - name: wrap output
     steps:
-      - command: bt --wrapper --hex $helloWorld
+      - command: bt --wrapper --hex $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
@@ -178,6 +186,7 @@ tests:
           80  PRINT "B=";B
           90  PRINT "C=";C
           95  PRINT "D=";D
+
   - name: Nibble Checkit test
     steps:
       - command: bt --checkit $checkitSample
@@ -189,6 +198,7 @@ tests:
           54|20 FOR J = 1 TO 5: PRINT CHR$ (7): NEXT J
           91|30 END
           TOTAL: 1CB9
+
   - name: Compute! Automatic Proofreader test
     steps:
       - command: bt --proofreader $proofreaderSample
@@ -204,6 +214,7 @@ tests:
           67|70 GET A$:A = VAL (A$)
           47|80 IF A < > 1 AND A < > 2 THEN 70
           65|90 ON A GOTO 100,200
+
   - name: Nibble Apple Checker 3.0 test
     steps:
       - command: bt --apple-checker $appleCheckerSample
@@ -213,6 +224,7 @@ tests:
         stdout: |
           Length: 0002
           Checksum: 4B
+
   - name: MicroSPARC Key Perfect 4.0 test
     steps:
       - command: bt --key-perfect-4 $keyPerfectSample
@@ -224,6 +236,26 @@ tests:
               1 -   160       4C2A
             170 -   260       6D52
           PROGRAM TOTAL       01A0
+  - name: MicroSPARC Key Perfect 4.0 lowercase/uppercase test
+    variables:
+      source: [ "$helloWorldUC", "$helloWorldLC"]
+      result:   # Note: result varies by case
+        - |     # UPPERCASE
+          Line# - Line#   CODE-4.0
+          -------------   --------
+          10 -    40       0CE8
+          PROGRAM TOTAL         23
+        - |     # lowercase
+          Line# - Line#   CODE-4.0
+          -------------   --------
+          10 -    40       0A58
+          PROGRAM TOTAL         23
+    steps:
+      - command: bt --kp4 $source
+        criteria:
+          whitespace: ignore
+        stdout: $result
+
   - name: MicroSPARC Key Perfect 5.0 test
     steps:
       - command: bt --key-perfect-5 $keyPerfectSample
@@ -235,3 +267,15 @@ tests:
               1 -   160   E11CFC2E
             170 -   260   CF1C6F7F
           PROGRAM TOTAL   D6462CDD
+  - name: MicroSPARC Key Perfect 5.0 lowercase/uppercase test
+    variables:
+      source: [ "$helloWorldUC", "$helloWorldLC" ]
+    steps:
+      - command: bt --kp5 $source
+        criteria:
+          whitespace: ignore
+        stdout: |   # Note: result is the same regardless of case
+          Line# - Line#   CODE-5.0
+          -------------   --------
+             10 -    40   64B6C397
+          PROGRAM TOTAL   64B6C397
