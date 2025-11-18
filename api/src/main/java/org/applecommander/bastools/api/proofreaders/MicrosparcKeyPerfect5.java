@@ -131,7 +131,6 @@ public class MicrosparcKeyPerfect5 implements Visitor {
         Checksum lineChecksum = new Checksum();
         Checksum pgmChecksum = new Checksum();
         final List<Integer> lines = new ArrayList<>();
-        boolean inComment = false;
         while (code.hasRemaining()) {
             int ptr = code.getShort();
             if (ptr == 0) break;
@@ -144,6 +143,7 @@ public class MicrosparcKeyPerfect5 implements Visitor {
             pgmChecksum.addByte(b2);
             lines.add(b2 << 8 | b1);
             // Process tokenized line...
+            boolean inComment = false;
             int ch = 0;
             do {
                 ch = Byte.toUnsignedInt(code.get());
