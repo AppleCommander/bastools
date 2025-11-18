@@ -31,11 +31,8 @@ import org.applecommander.bastools.api.*;
 import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
-import org.applecommander.bastools.api.proofreaders.ComputeAutomaticProofreader;
-import org.applecommander.bastools.api.proofreaders.MicrosparcKeyPerfect4;
-import org.applecommander.bastools.api.proofreaders.NibbleAppleChecker;
+import org.applecommander.bastools.api.proofreaders.*;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
-import org.applecommander.bastools.api.proofreaders.NibbleCheckit;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
@@ -370,5 +367,10 @@ public class Main implements Callable<Integer> {
         public void selectKeyPerfectV4(boolean flag) {
             this.proofReaderFn = MicrosparcKeyPerfect4::new;
         }
+
+		@Option(names = { "--key-perfect-5", "--kp5" }, description = "Apple MicroSPARC Key Perfect V5 to code")
+		public void selectKeyPerfectV5(boolean flag) {
+			this.proofReaderFn = MicrosparcKeyPerfect5::new;
+		}
     }
 }

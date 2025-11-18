@@ -224,3 +224,14 @@ tests:
               1 -   160       4C2A
             170 -   260       6D52
           PROGRAM TOTAL       01A0
+  - name: MicroSPARC Key Perfect 5.0 test
+    steps:
+      - command: bt --key-perfect-5 $keyPerfectSample
+        criteria:
+          whitespace: ignore
+        stdout: |
+          Line# - Line#   CODE-5.0
+          -------------   --------
+              1 -   160   E11CFC2E
+            170 -   260   CF1C6F7F
+          PROGRAM TOTAL
