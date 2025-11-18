@@ -15,15 +15,15 @@ import java.util.List;
  * <p/>
  * Partial disassembly; note that some V5 checksum logic is embedded here but not use.
  * Key takeaways:
- * <li>
- * <ul>Program "checksum" is essentially a byte count of number of bytes used in checksum,
- *     but also including next line pointer</ul>
- * <ul>Checksums ignore whitespace except for Ctrl+D (spaces are ignored)</ul>
- * <ul>No special REM logic for V4 algorithm</ul>
- * <ul>Line checksum has low-byte as an EOR, ROL, ADC sequence and the next two bytes end up being a counter
- *     of the number of carry bits that resulted</ul>
- * <ul>Output skips printing 00 bytes except for the low-value (+2 index)</ul>
- * </li>
+ * <ul>
+ * <li>Program "checksum" is essentially a byte count of number of bytes used in checksum,
+ *     but also including next line pointer</li>
+ * <li>Checksums ignore whitespace except for Ctrl+D (spaces are ignored)</li>
+ * <li>No special REM logic for V4 algorithm</li>
+ * <li>Line checksum has low-byte as an EOR, ROL, ADC sequence and the next two bytes end up being a counter
+ *     of the number of carry bits that resulted</li>
+ * <li>Output skips printing 00 bytes except for the low-value (+2 index)</li>
+ * </ul>
  * <pre>
  * DO_CHKSUM_V4    lda   LINE_BYTES_READ
  *                 beq   ]CALC_V4_CHKSUM
@@ -53,7 +53,7 @@ import java.util.List;
  *                 cmp   #$02            ;2=REM has been recorded
  *                 beq   ]NOT_REM
  *                 lda   CHAR_READ
- *                 jsr   RUN_CHECKSUM    ;Non-REM contents. (V5 only)
+ *                 jsr   RUN_V5_CHECKSUM ;Non-REM contents. (V5 only)
  *                 lda   TOKEN_FLAG
  *                 cmp   #$01
  *                 bne   ]NOT_REM
@@ -152,7 +152,7 @@ public class MicrosparcKeyPerfect4 implements Visitor {
         System.out.printf("%-13.13s     ", text);
         String fmt = "    %02X";
         if (checksum > 0xffff) {
-            fmt = "$06X";
+            fmt = "%06X";
         }
         else if (checksum > 0xff) {
             fmt = "  %04X";
