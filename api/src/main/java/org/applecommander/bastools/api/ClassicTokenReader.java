@@ -134,9 +134,12 @@ public class ClassicTokenReader {
                     continue;
                 }
 
+                // Handy flag
+                boolean lastTokenWasIdent = !tokens.isEmpty() && tokens.getLast().type() == Token.Type.IDENT;
+
                 // Special handling of digits - we might be handing a variable like "A9", so we detect that...
                 if (Character.isDigit(ch)) {
-                    if (!tokens.isEmpty() && tokens.getLast().type() == Token.Type.IDENT) {
+                    if (lastTokenWasIdent) {
                         emitIdent(ch);
                     }
                     else {
@@ -151,11 +154,17 @@ public class ClassicTokenReader {
                 else if (ch == '$') {
                     int n = handleDirective(i, line);
                     if (n == -1) {
-                        // No directive, emit as general syntax character
-                        emitSyntax(ch);
+                        // No directive, emit as ident or general syntax character
+                        if (lastTokenWasIdent) {
+                            emitIdent(ch);
+                        }
+                        else {
+                            emitSyntax(ch);
+                        }
                         n = 1;
                     }
                     i += n;
+                    continue;
                 }
                 // Else assume we've got general syntax character
                 else {

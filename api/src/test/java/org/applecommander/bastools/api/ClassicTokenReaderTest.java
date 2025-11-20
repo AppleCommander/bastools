@@ -280,6 +280,17 @@ public class ClassicTokenReaderTest {
                 .end());
     }
 
+    @Test
+    public void testStringArrayIssue49() throws IOException {
+        testCode("NAME$(2)",
+            Tokens.builder()
+                .ident("NAME$")
+                .syntax('(')
+                .number("2")
+                .syntax(')')
+                .end());
+    }
+
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);
         Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));
