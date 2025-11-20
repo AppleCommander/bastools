@@ -84,6 +84,12 @@ public class ClassicTokenReader {
                     // We don't store the quote (because original token reader does not so the tooling synthesizes it for us)
                     quoteFlag = !quoteFlag;
                     i++;
+                    // Special case: When a string starts, "prime" it. This helps with zero-length strings
+                    // ... and the (unlikely) possibility of two strings next to each other in a PRINT statement.
+                    // ... aka 'PRINT "HELLO""WORLD"' which is a valid Applesoft construct.
+                    if (quoteFlag) {
+                        tokens.add(Token.string(lineNo, ""));
+                    }
                     continue;
                 }
 
@@ -134,12 +140,9 @@ public class ClassicTokenReader {
                     continue;
                 }
 
-                // Handy flag
-                boolean lastTokenWasIdent = !tokens.isEmpty() && tokens.getLast().type() == Token.Type.IDENT;
-
                 // Special handling of digits - we might be handing a variable like "A9", so we detect that...
                 if (Character.isDigit(ch)) {
-                    if (lastTokenWasIdent) {
+                    if (isLastToken(Token.Type.IDENT)) {
                         emitIdent(ch);
                     }
                     else {
@@ -155,7 +158,7 @@ public class ClassicTokenReader {
                     int n = handleDirective(i, line);
                     if (n == -1) {
                         // No directive, emit as ident or general syntax character
-                        if (lastTokenWasIdent) {
+                        if (isLastToken(Token.Type.IDENT)) {
                             emitIdent(ch);
                         }
                         else {
@@ -272,11 +275,14 @@ public class ClassicTokenReader {
         }
         private String extendString(final char ch, final Token.Type ttype) {
             String str = Character.toString(ch);
-            if (!tokens.isEmpty() && tokens.getLast().type() == ttype) {
+            if (isLastToken(ttype)) {
                 str = tokens.getLast().text() + ch;
                 tokens.removeLast();
             }
             return str;
+        }
+        private boolean isLastToken(final Token.Type ttype) {
+            return !tokens.isEmpty() && tokens.getLast().type() == ttype;
         }
     }
 }
