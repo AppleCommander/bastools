@@ -111,7 +111,7 @@ public class ModernTokenReader {
 						while (true) {
 							// Bypass the Tokenizer and just read to EOL for the comment
 							int ch = reader.read();
-							if (ch == '\n') {
+							if (ch == '\n' || ch == '\r') {
 								// Recover to the newline so that the next token is a EOL
 								// This is needed for parsing!
 								this.needSyntheticEol = true;
