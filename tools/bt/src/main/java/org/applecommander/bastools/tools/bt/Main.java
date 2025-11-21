@@ -363,6 +363,11 @@ public class Main implements Callable<Integer> {
             this.proofReaderFn = NibbleAppleChecker::new;
         }
 
+        @Option(names = { "--key-perfect-2", "--kp2" }, description = "Apply MicroSPARC Key Perfect V2 (ca 1981) to code")
+        public void selectKeyPerfectV2(boolean flag) {
+            this.proofReaderFn = MicrosparcKeyPerfect2::new;
+        }
+
         @Option(names = { "--key-perfect-4", "--kp4" }, description = "Apply MicroSPARC Key Perfect V4 (ca 1981) to code")
         public void selectKeyPerfectV4(boolean flag) {
             this.proofReaderFn = MicrosparcKeyPerfect4::new;
