@@ -194,9 +194,9 @@ tests:
           match: contains
           whitespace: ignore
         stdout: |
-          37|10 REM RING THE BELL
-          54|20 FOR J = 1 TO 5: PRINT CHR$ (7): NEXT J
-          91|30 END
+          37 | 10 REM RING THE BELL
+          54 | 20 FOR J = 1 TO 5: PRINT CHR$ (7): NEXT J
+          91 | 30 END
           TOTAL: 1CB9
 
   - name: Compute! Automatic Proofreader test
@@ -206,14 +206,14 @@ tests:
           match: contains
           whitespace: ignore
         stdout: |
-          4A|10 HOME
-          52|20 D$ = CHR$ (4)
-          25|40 PRINT "DO YOU WANT TO:"
-          A6|50 PRINT " (1) MAKE A SPEEDSCRIPT FILE INTO A TEXT FILE"
-          AE|60 PRINT " (2) MAKE A TEXT FILE INTO A SPEEDSCRIPT FILE"
-          67|70 GET A$:A = VAL (A$)
-          47|80 IF A < > 1 AND A < > 2 THEN 70
-          65|90 ON A GOTO 100,200
+          4A | 10 HOME
+          52 | 20 D$ = CHR$ (4)
+          25 | 40 PRINT "DO YOU WANT TO:"
+          A6 | 50 PRINT " (1) MAKE A SPEEDSCRIPT FILE INTO A TEXT FILE"
+          AE | 60 PRINT " (2) MAKE A TEXT FILE INTO A SPEEDSCRIPT FILE"
+          67 | 70 GET A$:A = VAL (A$)
+          47 | 80 IF A < > 1 AND A < > 2 THEN 70
+          65 | 90 ON A GOTO 100,200
 
   - name: Nibble Apple Checker 3.0 test
     steps:
