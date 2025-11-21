@@ -7,6 +7,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 
 import static org.junit.Assert.*;
@@ -39,23 +42,23 @@ public class ClassicTokenReaderTest {
                     .nextLine()
                 .number("30")
                     .ident("A")
-                    .syntax('=')
+                    .keyword(ApplesoftKeyword.eq)
                     .number(".4")
                     .nextLine()
                 .number("40")
                     .ident("B")
-                    .syntax('=')
+                    .keyword(ApplesoftKeyword.eq)
                     .number("0.6000")
                     .nextLine()
                 .number("50")
                     .ident("C")
-                    .syntax('=')
+                    .keyword(ApplesoftKeyword.eq)
                     .keyword(ApplesoftKeyword.sub)
                     .number(".250")
                     .nextLine()
                 .number("60")
                     .ident("D")
-                    .syntax('=')
+                    .keyword(ApplesoftKeyword.eq)
                     .keyword(ApplesoftKeyword.sub)
                     .number("0.70")
                 .end());
@@ -67,7 +70,7 @@ public class ClassicTokenReaderTest {
                 Tokens.builder()
                     .number("100")
                         .ident("CI")
-                        .syntax('=')
+                        .keyword(ApplesoftKeyword.eq)
                         .number("11")
                         .keyword(ApplesoftKeyword.mul)
                         .ident("I1")
@@ -120,7 +123,7 @@ public class ClassicTokenReaderTest {
                 Tokens.builder()
                     .number("10")
                         .ident("A")
-                        .syntax('=')
+                        .keyword(ApplesoftKeyword.eq)
                         .keyword(ApplesoftKeyword.ATN)
                         .syntax('(')
                         .number("0")
@@ -135,7 +138,7 @@ public class ClassicTokenReaderTest {
                         .syntax(':')
                         .keyword(ApplesoftKeyword.FOR)
                         .ident("I")
-                        .syntax('=')
+                        .keyword(ApplesoftKeyword.eq)
                         .ident("A")
                         .keyword(ApplesoftKeyword.TO)
                         .ident("N")
@@ -151,7 +154,7 @@ public class ClassicTokenReaderTest {
                     .number("0")
                         .keyword(ApplesoftKeyword.FOR)
                         .ident("X")
-                        .syntax('=')
+                        .keyword(ApplesoftKeyword.eq)
                         .number("1")
                         .keyword(ApplesoftKeyword.TO)
                         .number("100")
@@ -171,7 +174,7 @@ public class ClassicTokenReaderTest {
                 .number("70")
                     .keyword(ApplesoftKeyword.DATA)
                     // EVERYTHING AFTER DATA IS PRESERVED AS-IS (until ':' or end of line)
-                    .string(" 0,- 5,3,0,- 100,60,- 40,1,0,1")
+                    .data(" 0,- 5,3,0,- 100,60,- 40,1,0,1")
                 .end());
     }
 
@@ -200,11 +203,11 @@ public class ClassicTokenReaderTest {
             Tokens.builder()
                 .number("10")
                     .ident("OUT")
-                    .syntax('=')
+                    .keyword(ApplesoftKeyword.eq)
                     .number("40")
                     .syntax(':')
                     .ident("IN")
-                    .syntax('=')
+                    .keyword(ApplesoftKeyword.eq)
                     .number("10")
                 .end());
     }
@@ -220,14 +223,14 @@ public class ClassicTokenReaderTest {
                 Tokens.builder()
                     .number("20")
                         .ident("INQ")
-                        .syntax('=')
+                        .keyword(ApplesoftKeyword.eq)
                         .number("767")
                         .nextLine()
                     .number("30")
                         .ident("IN")
-                        .syntax('=')
+                        .keyword(ApplesoftKeyword.eq)
                         .ident("IN")
-                        .syntax('+')
+                        .keyword(ApplesoftKeyword.add)
                         .number("1")
                         .nextLine()
                     .number("40")
@@ -296,7 +299,7 @@ public class ClassicTokenReaderTest {
         testCode("A$=\"\"",
             Tokens.builder()
                 .ident("A$")
-                .syntax('=')
+                .keyword(ApplesoftKeyword.eq)
                 .string("")
                 .end());
     }
@@ -327,25 +330,58 @@ public class ClassicTokenReaderTest {
         testCode("DATA \"Name: \"",
             Tokens.builder()
                 .keyword(ApplesoftKeyword.DATA)
-                .string(" \"Name: \"")
+                .data(" \"Name: \"")
+                .end());
+    }
+
+    @Test
+    public void testKeywordInDATA() throws IOException {
+        testCode("10 DATA TEXT",
+            Tokens.builder()
+                .number("10")
+                    .keyword(ApplesoftKeyword.DATA)
+                    .data(" TEXT")
                 .end());
     }
 
     public void testCode(String code, Token... expectedTokens) throws IOException {
-        String expectedCode = tokensToString(expectedTokens);
-        Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));
-        String actualCode = tokensToString(actualTokens.toArray(new Token[0]));
-        assertEquals(expectedCode, actualCode);
+        final Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));
+        final Token[] actualArray = actualTokens.toArray(new Token[0]);
+        int max = Math.max(expectedTokens.length, actualTokens.size());
+        List<String> errors = new ArrayList<>();
+        for (int i=0; i<max; i++) {
+            Token expected = null;
+            if (i < expectedTokens.length) {
+                expected = expectedTokens[i];
+            } else {
+                errors.add("Expected token list is shorter than actual");
+                break;
+            }
+            Token actual = null;
+            if (i < actualArray.length) {
+                actual = actualArray[i];
+            } else {
+                errors.add("Actual token list is shorter than expected");
+                break;
+            }
+            if (!compareToken(expected, actual)) {
+                String msg = String.format("Token %d mismatch: '%s' != '%s'", i, expected, actual);
+                errors.add(msg);
+            }
+        }
+        if (!errors.isEmpty()) {
+            fail(String.join("\n", errors));
+        }
     }
 
-    public String tokensToString(Token... tokens) {
-        StringBuilder sb = new StringBuilder();
-        boolean spaceNeeded = false;
-        for (Token token : tokens) {
-            if (spaceNeeded) sb.append(' ');
-            sb.append(token.asString());
-            spaceNeeded = token.type() != Token.Type.EOL;
-        }
-        return sb.toString();
+    /**
+     * Selectively compare token details. Specifically, skip the line number
+     * since that doesn't always aling and isn't pertinent to these tests.
+     */
+    public boolean compareToken(Token expected, Token actual) {
+        return expected.type() == actual.type()
+            && Objects.equals(expected.text(), actual.text())
+            && expected.keyword() == actual.keyword()
+            && Objects.equals(expected.number(), actual.number());
     }
 }
