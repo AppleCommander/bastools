@@ -1,0 +1,28 @@
+These are the pieces of the Key Perfect 2.0 checksum routine.
+
+LINE CHECKSUM:
+16E7-   20 00 17    JSR   $1700     ; program checksum
+16EA-   AD 2A 17    LDA   $172A     ; last byte read from program (other code skips
+                                    ; first line pointer, but includes line number and
+                                    ; all program bytes)
+16ED-   F0 10       BEQ   $16FF     ; skips all $00 values
+16EF-   A2 02       LDX   #$02      ; add three byte integer
+16F1-   18          CLC
+16F2-   7D 36 17    ADC   $1736,X
+16F5-   9D 36 17    STA   $1736,X
+16F8-   90 05       BCC   $16FF     ; no carry, so we're done
+16FA-   A9 01       LDA   #$01
+16FC-   CA          DEX
+16FD-   10 F2       BPL   $16F1
+16FF-   60          RTS
+
+PROGRAM CHECKSUM:
+1700-   A2 02       LDX   #$02      ; note every byte (including first line pointer)
+1702-   18          CLC
+1703-   A9 01       LDA   #$01      ; simple increment
+1705-   7D 32 17    ADC   $1732,X
+1708-   9D 32 17    STA   $1732,X
+170B-   90 03       BCC   $1710
+170D-   CA          DEX
+170E-   10 F2       BPL   $1702
+1710-   60          RTS
