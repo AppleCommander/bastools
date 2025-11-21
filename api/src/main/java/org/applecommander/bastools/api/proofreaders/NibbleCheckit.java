@@ -41,7 +41,7 @@ public class NibbleCheckit extends LineOrientedProofReader {
             first = false;
         }
         int cs = ( (lineChecksum & 0xff) - (lineChecksum >> 8) ) & 0xff;
-        System.out.printf("%02X|%s\n", cs, toString(line));
+        System.out.printf("%02X | %s\n", cs, toString(line));
 
         // Update program values
         totalChecksum = checkit(totalChecksum, line.lineNumber & 0xff);

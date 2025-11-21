@@ -27,7 +27,7 @@ public class ComputeAutomaticProofreader extends LineOrientedProofReader {
             }
         }
 
-        System.out.printf("%02X|%s\n", checksum, text);
+        System.out.printf("%02X | %s\n", checksum, text);
         return line;
     }
 
