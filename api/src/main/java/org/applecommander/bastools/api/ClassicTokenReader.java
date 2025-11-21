@@ -72,9 +72,8 @@ public class ClassicTokenReader {
                     continue;
                 }
 
-                if (ch == ':' && !remFlag) {
+                if (ch == ':' && !remFlag && !quoteFlag) {
                     dataFlag = false;
-                    quoteFlag = false;
                     emitSyntax(ch);
                     i++;
                     continue;

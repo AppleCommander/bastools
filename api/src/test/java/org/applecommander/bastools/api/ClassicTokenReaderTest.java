@@ -311,6 +311,17 @@ public class ClassicTokenReaderTest {
                 .end());
     }
 
+    @Test
+    public void testStringFiasco49() throws IOException {
+        testCode("PRINT \": \";G$",
+            Tokens.builder()
+                .keyword(ApplesoftKeyword.PRINT)
+                .string(": ")
+                .syntax(';')
+                .ident("G$")
+                .end());
+    }
+
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);
         Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));
