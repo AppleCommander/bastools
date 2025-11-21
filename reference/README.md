@@ -14,7 +14,7 @@ Some summary notes and observations on the Apple II code proofing tools.
 
 ## References
 
-* See the [reference](.) directory.
+* See the [reference](.) directory for source code and original articles.
 * [Computer Magzine Proofreaders](https://github.com/22samurai/computer-magazine-proofreaders).
 * [a2_proofreader](https://github.com/hartze11/a2_proofreader)
-* As always [archive.org](https://archive.org).
+* As always searching through [archive.org](https://archive.org) is highly valuable.
