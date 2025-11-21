@@ -322,6 +322,15 @@ public class ClassicTokenReaderTest {
                 .end());
     }
 
+    @Test
+    public void testColonInDATA() throws IOException {
+        testCode("DATA \"Name: \"",
+            Tokens.builder()
+                .keyword(ApplesoftKeyword.DATA)
+                .string(" \"Name: \"")
+                .end());
+    }
+
     public void testCode(String code, Token... expectedTokens) throws IOException {
         String expectedCode = tokensToString(expectedTokens);
         Queue<Token> actualTokens = ClassicTokenReader.tokenize(new StringReader(code));

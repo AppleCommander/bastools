@@ -92,14 +92,19 @@ public class ClassicTokenReader {
                     continue;
                 }
 
-                if (quoteFlag) {
-                    emitString(ch);
+                // Need to handle DATA before quotes because quotes can occur in a DATA statement.
+                if (dataFlag) {
+                    emitData(ch);
                     i++;
+                    // We need to track strings in DATA because then we can ignore the colon.
+                    if (ch == '"') {
+                        quoteFlag = !quoteFlag;
+                    }
                     continue;
                 }
 
-                if (dataFlag) {
-                    emitData(ch);
+                if (quoteFlag) {
+                    emitString(ch);
                     i++;
                     continue;
                 }
