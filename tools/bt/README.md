@@ -6,8 +6,8 @@ Usage: bt [-chVx] [--addresses] [--applesingle] [--debug] [--list] [--pretty]
           [--stdout] [--tokens] [--variables] [--wrapper] [-a=<address>]
           [--max-line-length=<maxLineLength>] [-o=<outputFile>] [--modern |
           --classic | --preserve] [-f=<selected>[,<selected>...] [-f=<selected>
-          [,<selected>...]]... | -O] [--apple-checker | --proofreader |
-          --checkit] <sourceFile>
+          [,<selected>...]]... | -O] [--checkit | --kp2 | --kp4 | --kp5 |
+          --proofreader | --apple-checker] <sourceFile>
 
 Transforms an AppleSoft program from text back to its tokenized state.
       <sourceFile>          AppleSoft BASIC program to process.
@@ -57,6 +57,12 @@ Optimization:
 Proof Readers:
       --apple-checker       Apply Nibble Apple Checker 3.0 (ca 1982) to code
       --checkit             Apply Nibble Checkit (ca 1988) to code
+      --kp2, --key-perfect-2
+                            Apply MicroSPARC Key Perfect V2 (ca 1981) to code
+      --kp4, --key-perfect-4
+                            Apply MicroSPARC Key Perfect V4 (ca 1981) to code
+      --kp5, --key-perfect-5
+                            Apply MicroSPARC Key Perfect V5 (ca 1985) to code
       --proofreader         Apply Compute! Apple Automatic Proofreader (ca
                               1985) to code
 
