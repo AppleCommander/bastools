@@ -64,7 +64,10 @@ public class NibbleCheckit extends LineOrientedProofReader {
             }
             case STRING -> String.format("\"%s\"", token.text());
         };
+        boolean inQuote = false;
         for (char ch : value.toCharArray()) {
+            if (ch == '"') inQuote = !inQuote;
+            if (!inQuote && ch == ' ') continue;
             lineChecksum = checkit(lineChecksum, ch|0x80);
         }
         return token;

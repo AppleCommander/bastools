@@ -34,6 +34,7 @@ files:
       90 PRINT "C=";C
       95 PRINT "D=";D
     suffix: .bas
+  # Checkit
   checkitSample:
     type: text
     content: |
@@ -41,6 +42,12 @@ files:
       20 FOR J = 1 TO 5:PRINT CHR$ (7):NEXT J
       30 END
     suffix: .bas
+  checkitSampleWhitespace1:
+    type: text
+    content: 10 DATA    ,   ,   ,   "ONLY WHITESPACE IN QUOTES"
+  checkitSampleWhitespace2:
+    type: text
+    content: 10 DATA ,,,"ONLY WHITESPACE IN QUOTES"
   # From Compute! July 1985 issue - this code is just above the introductory article for the Apple Automatic Proofreader
   proofreaderSample:
     type: text
@@ -198,6 +205,25 @@ tests:
           54 | 20 FOR J = 1 TO 5: PRINT CHR$ (7): NEXT J
           91 | 30 END
           TOTAL: 1CB9
+  - name: Nibble Checkit test of whitespace
+    variables:
+      # Arrays don't multiplex, so doing that by hand
+      tokenizer: [
+        "--modern", "--classic", "--preserve",  # sample 1
+        "--modern", "--classic", "--preserve"   # sample 2
+      ]
+      source: [
+        "$checkitSampleWhitespace1", "$checkitSampleWhitespace1", "$checkitSampleWhitespace1",
+        "$checkitSampleWhitespace2", "$checkitSampleWhitespace2", "$checkitSampleWhitespace2"
+      ]
+    steps:
+      - command: bt $tokenizer --checkit $source
+        criteria:
+          match: contains
+          whitespace: ignore
+        # we ignore everything else because the tokenizers create different output
+        stdout: |
+          26 | 10 DATA
 
   - name: Compute! Automatic Proofreader test
     steps:
