@@ -92,6 +92,32 @@ files:
       250  PRINT "OF MILES PRON CIVILIZATION.  YOUR"
       260  PRINT "RESEARCH HAS LED TO A DUSTY OLD"
     suffix: .bas
+  # Code sample that has print statements without a terminating quote
+  printWithoutClosingQuote:
+    type: text
+    content: |
+      ' 300-390
+      300  PRINT  CHR$ (P2 + 224 * (P2 < 32) + 128 * (P2 > 31 AND P2 < 64));
+      310  NEXT : PRINT : NEXT
+      320  PRINT DA$: PRINT D$"PR#0
+      330  HOME : RETURN
+      340 REM  ** DIVIDER DIRECTORY **
+      350  HOME : PRINT "DIVIDERS:": PRINT
+      360  FOR S = 1 TO ND STEP 4: FOR A = 0 TO 3
+      370  HTAB 10 * A + 1: PRINT ND$(S + A);
+      380  NEXT : PRINT : NEXT : PRINT : PRINT
+      390 FL = 1: VTAB 17: CALL  - 868: IF  NOT  LEN (DV$) THEN 410
+      ' 700-790
+      700 FL = 0
+      710  PRINT : HTAB 12: PRINT "EDIT AN INDEX CARD
+      720  VTAB 11: PRINT "(1) ADD A NEW CARD
+      730  PRINT : PRINT "(2) EDIT AN EXISTING CARD
+      740  PRINT : PRINT "(3) RETURN TO MAIN MENU
+      750  VTAB 18: PRINT "SELECT (1-3) OR <ESC> ( )";: HTAB 24
+      760  GET S$: PRINT S$;:S =  VAL (S$): IF S$ = ES$ THEN S = 3
+      770  IF S < 1 OR S > 3 OR (S = 2 AND  NOT C) OR (S = 1 AND  NOT (ND * 35 - C)) THEN  PRINT  CHR$ (7): GOTO 750
+      780  ON S GOTO 790,1220,4180
+      790  GOSUB 590
 
 tests:
   - name: Forms of help
@@ -305,3 +331,30 @@ tests:
           -------------   --------
              10 -    40   64B6C397
           PROGRAM TOTAL   64B6C397
+  - name: Key Perfect 4 with unterminated strings
+    variables:
+      tokenizer: [ "--modern", "--classic", "--preserve" ]
+      result:
+        - | # modern
+          Line# - Line#   CODE-4.0
+          -------------   --------
+            300 -   390       5EA2
+            700 -   790       7D74
+          PROGRAM TOTAL       01D8
+        - | # classic
+          Line# - Line#   CODE-4.0
+          -------------   --------
+            300 -   390       59F9
+            700 -   790       7B5B
+          PROGRAM TOTAL       01D3
+        - | # preserve
+          Line# - Line#   CODE-4.0
+          -------------   --------
+            300 -   390       59F9
+            700 -   790       7B5B
+          PROGRAM TOTAL       01D3
+    steps:
+      - command: bt --kp4 $tokenizer $printWithoutClosingQuote
+        criteria:
+          whitespace: ignore
+        stdout: $result

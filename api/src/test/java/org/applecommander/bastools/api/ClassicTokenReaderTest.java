@@ -38,7 +38,7 @@ public class ClassicTokenReaderTest {
             Tokens.builder()
                 .number("10")
                     .keyword(ApplesoftKeyword.PRINT)
-                    .string("MATHING")
+                    .data("\"MATHING\"")
                     .nextLine()
                 .number("30")
                     .ident("A")
@@ -256,7 +256,7 @@ public class ClassicTokenReaderTest {
                 .nextLine()     // that comment just creates a newline (per ModernTokenReader)
                 .number("10")
                     .keyword(ApplesoftKeyword.PRINT)
-                    .string("'SUP?")
+                    .data("\"'SUP?\"")
                     .syntax(':')
                     .comment(" REMARK MAKES IT INTO TOKEN STREAM")
                 .end());
@@ -277,7 +277,7 @@ public class ClassicTokenReaderTest {
                     .keyword(ApplesoftKeyword.HOME)
                     .syntax(':')
                     .keyword(ApplesoftKeyword.PRINT)
-                    .string("HELLO, WORLD")
+                    .data("\"HELLO, WORLD\"")
                     .syntax(':')
                     .keyword(ApplesoftKeyword.END)
                 .end());
@@ -300,7 +300,7 @@ public class ClassicTokenReaderTest {
             Tokens.builder()
                 .ident("A$")
                 .keyword(ApplesoftKeyword.eq)
-                .string("")
+                .data("\"\"")
                 .end());
     }
 
@@ -309,8 +309,8 @@ public class ClassicTokenReaderTest {
         testCode("PRINT \"HELLO\"\"WORLD\"",
             Tokens.builder()
                 .keyword(ApplesoftKeyword.PRINT)
-                .string("HELLO")
-                .string("WORLD")
+                .data("\"HELLO\"")
+                .data("\"WORLD\"")
                 .end());
     }
 
@@ -319,7 +319,7 @@ public class ClassicTokenReaderTest {
         testCode("PRINT \": \";G$",
             Tokens.builder()
                 .keyword(ApplesoftKeyword.PRINT)
-                .string(": ")
+                .data("\": \"")
                 .syntax(';')
                 .ident("G$")
                 .end());
@@ -341,6 +341,19 @@ public class ClassicTokenReaderTest {
                 .number("10")
                     .keyword(ApplesoftKeyword.DATA)
                     .data(" TEXT")
+                .end());
+    }
+
+    @Test
+    public void testStringMissingLastQuote49() throws IOException {
+        testCode("10 PRINT \"HELLO\" : PRINT \"WORLD",
+            Tokens.builder()
+                .number("10")
+                    .keyword(ApplesoftKeyword.PRINT)
+                    .data("\"HELLO\"")
+                    .syntax(':')
+                    .keyword(ApplesoftKeyword.PRINT)
+                    .data("\"WORLD")
                 .end());
     }
 

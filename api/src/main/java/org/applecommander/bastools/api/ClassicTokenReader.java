@@ -87,8 +87,10 @@ public class ClassicTokenReader {
                     // ... and the (unlikely) possibility of two strings next to each other in a PRINT statement.
                     // ... aka 'PRINT "HELLO""WORLD"' which is a valid Applesoft construct.
                     if (quoteFlag) {
-                        tokens.add(Token.string(lineNo, ""));
+                        tokens.add(Token.data(lineNo, ""));
                     }
+                    // To mimic a string in a data token, we need to preserve the quotes
+                    emitData('"');
                     continue;
                 }
 
@@ -104,7 +106,7 @@ public class ClassicTokenReader {
                 }
 
                 if (quoteFlag) {
-                    emitString(ch);
+                    emitData(ch);
                     i++;
                     continue;
                 }
