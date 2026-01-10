@@ -10,6 +10,8 @@ function st() {
 
 printf "\n\n*** RUNNING ST THROUGH A NUMBER OF COMMANDS TO CAPTURE DETAILS FOR NATIVE IMAGE ***\n\n"
 
+st
+st --help
 st --version
 st generate --help
 st extract --help

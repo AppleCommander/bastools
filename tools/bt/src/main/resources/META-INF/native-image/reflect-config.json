@@ -3,34 +3,6 @@
   "name":"groovy.lang.Closure"
 },
 {
-  "name":"org.applecommander.bastools.api.directives.EmbeddedBinaryDirective",
-  "methods":[{"name":"<init>","parameterTypes":["org.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
-},
-{
-  "name":"org.applecommander.bastools.api.directives.EmbeddedShapeTable",
-  "methods":[{"name":"<init>","parameterTypes":["org.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.bt.IntegerTypeConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.bt.Main",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.bt.OptimizationTypeConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.bt.VersionProvider",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"java.io.Console",
   "methods":[{"name":"isTerminal","parameterTypes":[] }]
 },
@@ -131,6 +103,52 @@
 {
   "name":"java.time.ZonedDateTime",
   "methods":[{"name":"parse","parameterTypes":["java.lang.CharSequence"] }]
+},
+{
+  "name":"org.applecommander.bastools.api.directives.EmbeddedBinaryDirective",
+  "methods":[{"name":"<init>","parameterTypes":["org.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
+},
+{
+  "name":"org.applecommander.bastools.api.directives.EmbeddedShapeTable",
+  "methods":[{"name":"<init>","parameterTypes":["org.applecommander.bastools.api.Configuration","java.io.OutputStream"] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.bt.IntegerTypeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.bt.Main",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.bt.Main$OptimizationSelection",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"selectAllOptimizations","parameterTypes":["boolean"] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.bt.Main$ProofReaderSelection",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"selectComputeProofreader","parameterTypes":["boolean"] }, {"name":"selectKeyPerfectV2","parameterTypes":["boolean"] }, {"name":"selectKeyPerfectV4","parameterTypes":["boolean"] }, {"name":"selectKeyPerfectV5","parameterTypes":["boolean"] }, {"name":"selectNibbleAppleChecker","parameterTypes":["boolean"] }, {"name":"selectNibbleCheckit","parameterTypes":["boolean"] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.bt.Main$TokenizerSelection",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"selectClassicTokenizer","parameterTypes":["boolean"] }, {"name":"selectModernTokenizer","parameterTypes":["boolean"] }, {"name":"selectPreserveTokenizer","parameterTypes":["boolean"] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.bt.OptimizationTypeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.bt.VersionProvider",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"picocli.CommandLine$AutoHelpMixin",
