@@ -17,15 +17,6 @@
  */
 package org.applecommander.bastools.tools.bt;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
-
 import io.github.applecommander.applesingle.AppleSingle;
 import org.applecommander.bastools.api.*;
 import org.applecommander.bastools.api.model.Program;
@@ -34,11 +25,21 @@ import org.applecommander.bastools.api.model.Token.Type;
 import org.applecommander.bastools.api.proofreaders.*;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
 import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import picocli.CommandLine.ArgGroup;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static picocli.CommandLine.Model.UsageMessageSpec.SECTION_KEY_FOOTER;
 
@@ -218,7 +219,7 @@ public class Main implements Callable<Integer> {
 			program.accept(Visitors.variableReportVisitor());
 		}
         if (proofReader.proofReaderFn != null) {
-            program.accept(proofReader.proofReaderFn.apply(config));
+            proofReader.proofReaderFn.accept(config, program);
         }
 
 		ByteVisitor byteVisitor = Visitors.byteVisitor(config);
@@ -346,36 +347,54 @@ public class Main implements Callable<Integer> {
     }
 
     public static class ProofReaderSelection {
-        Function<Configuration,Visitor> proofReaderFn;
+        BiConsumer<Configuration,Program> proofReaderFn;
 
         @Option(names = "--checkit", description = "Apply Nibble Checkit (ca 1988) to code")
         public void selectNibbleCheckit(boolean flag) {
-            this.proofReaderFn = NibbleCheckit::new;
+            this.proofReaderFn = (c,p) -> {
+				NibbleCheckit proofreader = new NibbleCheckit(c);
+				proofreader.addProgram(p);
+			};
         }
 
         @Option(names = "--proofreader", description = "Apply Compute! Apple Automatic Proofreader (ca 1985) to code")
         public void selectComputeProofreader(boolean flag) {
-            this.proofReaderFn = ComputeAutomaticProofreader::new;
+            this.proofReaderFn = (c,p) -> {
+				ComputeAutomaticProofreader proofreader = new ComputeAutomaticProofreader(c);
+				proofreader.addProgram(p);
+			};
         }
 
         @Option(names = "--apple-checker", description = "Apply Nibble Apple Checker 3.0 (ca 1982) to code")
         public void selectNibbleAppleChecker(boolean flag) {
-            this.proofReaderFn = NibbleAppleChecker::new;
+            this.proofReaderFn = (c,p) -> {
+				NibbleAppleChecker proofreader = new NibbleAppleChecker(c);
+				proofreader.addProgram(p);
+			};
         }
 
         @Option(names = { "--key-perfect-2", "--kp2" }, description = "Apply MicroSPARC Key Perfect V2 (ca 1981) to code")
         public void selectKeyPerfectV2(boolean flag) {
-            this.proofReaderFn = MicrosparcKeyPerfect2::new;
+            this.proofReaderFn = (c,p) -> {
+				MicrosparcKeyPerfect2 proofreader = new MicrosparcKeyPerfect2(c);
+				proofreader.addProgram(p);
+			};
         }
 
         @Option(names = { "--key-perfect-4", "--kp4" }, description = "Apply MicroSPARC Key Perfect V4 (ca 1981) to code")
         public void selectKeyPerfectV4(boolean flag) {
-            this.proofReaderFn = MicrosparcKeyPerfect4::new;
+            this.proofReaderFn = (c,p) -> {
+				MicrosparcKeyPerfect4 proofreader = new MicrosparcKeyPerfect4(c);
+				proofreader.addProgram(p);
+			};
         }
 
 		@Option(names = { "--key-perfect-5", "--kp5" }, description = "Apply MicroSPARC Key Perfect V5 (ca 1985) to code")
 		public void selectKeyPerfectV5(boolean flag) {
-			this.proofReaderFn = MicrosparcKeyPerfect5::new;
+			this.proofReaderFn = (c,p) -> {
+				MicrosparcKeyPerfect5 proofreader = new MicrosparcKeyPerfect5(c);
+				proofreader.addProgram(p);
+			};
 		}
     }
 }

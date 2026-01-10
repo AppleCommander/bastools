@@ -1,9 +1,6 @@
 package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Visitor;
-import org.applecommander.bastools.api.model.Program;
-import org.applecommander.bastools.api.visitors.ByteVisitor;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -85,19 +82,21 @@ import java.util.List;
  * </pre>
  * ('@' replaced with ']' since Javadoc uses '@' for other purposes.)
  */
-public class MicrosparcKeyPerfect4 implements Visitor {
+public class MicrosparcKeyPerfect4 implements ApplesoftTokenizedProofReader {
     private final Configuration config;
-    private final ByteVisitor byteVisitor;
 
     public MicrosparcKeyPerfect4(Configuration config) {
         this.config = config;
-        this.byteVisitor = new ByteVisitor(config);
     }
 
     @Override
-    public Program visit(Program program) {
-        byteVisitor.visit(program);
-        ByteBuffer code = ByteBuffer.wrap(byteVisitor.getBytes());
+    public Configuration getConfiguration() {
+        return config;
+    }
+
+    @Override
+    public void addBytes(byte... tokenizedProgram) {
+        ByteBuffer code = ByteBuffer.wrap(tokenizedProgram);
         code.order(ByteOrder.LITTLE_ENDIAN);
 
         System.out.println("Line# - Line#   CODE-4.0");
@@ -112,9 +111,9 @@ public class MicrosparcKeyPerfect4 implements Visitor {
             if (ptr == 0) break;
             // Line number always gets added to checksum and total
             int b1 = Byte.toUnsignedInt(code.get());
-            checksum.addByte(b1);
+            checksum.add(b1);
             int b2 = Byte.toUnsignedInt(code.get());
-            checksum.addByte(b2);
+            checksum.add(b2);
             programChecksum+= 2;
             lines.add(b2 << 8 | b1);
             // Process tokenized line...
@@ -123,7 +122,7 @@ public class MicrosparcKeyPerfect4 implements Visitor {
                 ch = Byte.toUnsignedInt(code.get());
                 if (ch > 0x20 || ch == 0x04) {
                     programChecksum++;
-                    checksum.addByte(ch);
+                    checksum.add(ch);
                 }
             } while (ch > 0);
 
@@ -137,15 +136,13 @@ public class MicrosparcKeyPerfect4 implements Visitor {
             printLines(lines, checksum);
         }
         printLine("PROGRAM TOTAL", programChecksum);
-
-        return program;
     }
 
     public void printLines(List<Integer> lines, Checksum checksum) {
         int firstLine = lines.getFirst();
         int lastLine = lines.getLast();
         String text = String.format("%5d - %5d", firstLine, lastLine);
-        printLine(text, checksum.getChecksum());
+        printLine(text, checksum.value());
     }
 
     public static void printLine(String text, int checksum) {
@@ -161,20 +158,23 @@ public class MicrosparcKeyPerfect4 implements Visitor {
         System.out.println();
     }
 
-    public static class Checksum {
+    public static class Checksum implements ProofReaderChecksum {
         private int lineChecksum = 0;       // low byte with has EOR, ROL, ADC
         private int lineCounter = 0;        // high 2 bytes that just ADC on carry
 
-        public int getChecksum() {
+        @Override
+        public int value() {
             return lineCounter << 8 | lineChecksum;
         }
 
+        @Override
         public void reset() {
             lineChecksum = 0;
             lineCounter = 0;
         }
 
-        public void addByte(int code) {
+        @Override
+        public void add(int code) {
             int acc = lineChecksum ^ code;
             acc <<= 1;
             if (acc > 0xff) {

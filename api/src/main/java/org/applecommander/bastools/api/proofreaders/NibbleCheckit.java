@@ -1,76 +1,72 @@
 package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.model.Line;
-import org.applecommander.bastools.api.model.Program;
-import org.applecommander.bastools.api.model.Statement;
-import org.applecommander.bastools.api.model.Token;
 
-public class NibbleCheckit extends LineOrientedProofReader {
-    private int totalChecksum;
-    private int lineChecksum;
+public class NibbleCheckit implements ApplesoftInputBufferProofReader {
+    private final Configuration config;
+    private final Checksum totalChecksum = new Checksum();
+    private final Checksum lineChecksum = new Checksum();
 
     public NibbleCheckit(Configuration config) {
-        super(config);
+        this.config = config;
     }
 
     @Override
-    public Program visit(Program program) {
+    public Configuration getConfiguration() {
+        return config;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void addProgramText(String code) {
         System.out.println("Nibble Checkit, Copyright 1988, Microsparc Inc.");
-        try {
-            return super.visit(program);
-        } finally {
-            System.out.printf("TOTAL: %02X%02X\n", totalChecksum & 0xff, totalChecksum >> 8);
-        }
+        ApplesoftInputBufferProofReader.super.addProgramText(code);
+        System.out.printf("TOTAL: %02X%02X\n", totalChecksum.checksum & 0xff, totalChecksum.checksum >> 8);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public Line visit(Line line) {
+    public void addLine(String line) {
         // Calculate and output line value
-        lineChecksum = 0;
-        for (char ch : Integer.toString(line.lineNumber).toCharArray()) {
-            lineChecksum = checkit(lineChecksum, ch|0x80);
-        }
-        boolean first = true;
-        for (Statement statement : line.statements) {
-            if (!first) {
-                // We need to synthesize the colons
-                lineChecksum = checkit(lineChecksum, ':'|0x80);
-            }
-            super.visit(statement);
-            first = false;
-        }
-        int cs = ( (lineChecksum & 0xff) - (lineChecksum >> 8) ) & 0xff;
-        System.out.printf("%02X | %s\n", cs, toString(line));
+        lineChecksum.reset();
 
-        // Update program values
-        totalChecksum = checkit(totalChecksum, line.lineNumber & 0xff);
-        totalChecksum = checkit(totalChecksum, line.lineNumber >> 8);
-        return line;
-    }
+        // The ? => PRINT replacement always occurs, including in strings!
+        line = line.replace("?", "PRINT");
 
-    @Override
-    public Token visit(Token token) {
-        String value = switch (token.type()) {
-            case EOL, DIRECTIVE -> "";
-            case DATA, SYNTAX, IDENT -> token.text();
-            case COMMENT -> "REM";
-            case KEYWORD -> token.keyword().text;
-            case NUMBER -> {
-                if (token.text() != null) {
-                    yield token.text();
-                }
-                yield config.numberToString(token);
-            }
-            case STRING -> String.format("\"%s\"", token.text());
-        };
         boolean inQuote = false;
-        for (char ch : value.toCharArray()) {
+        StringBuilder remLettersSeen = new StringBuilder();
+        for (char ch : line.toCharArray()) {
             if (ch == '"') inQuote = !inQuote;
             if (!inQuote && ch == ' ') continue;
-            lineChecksum = checkit(lineChecksum, ch|0x80);
+            lineChecksum.add(ch|0x80);
+
+            // we only allow R E M from a comment; skip rest of the comment
+            remLettersSeen.append(ch);
+            if ("REM".contentEquals(remLettersSeen)) {
+                break;
+            }
+            else if ("R".contentEquals(remLettersSeen) || "RE".contentEquals(remLettersSeen)) {
+                // Keep them, this may be a comment
+            }
+            else {
+                remLettersSeen = new StringBuilder();
+            }
         }
-        return token;
+
+        int cs = ( (lineChecksum.checksum & 0xff) - (lineChecksum.checksum >> 8) ) & 0xff;
+        System.out.printf("%02X | %s\n", cs, line);
+
+        // Update program values
+        int lineNumber = Integer.parseInt(line.split(" ")[0].trim());
+        totalChecksum.add(lineNumber & 0xff);
+        totalChecksum.add(lineNumber >> 8);
+    }
+
+    public int getLineChecksumValue() {
+        return lineChecksum.value();
+    }
+    public int getTotalChecksumValue() {
+        return totalChecksum.value();
     }
 
     /**
@@ -101,17 +97,29 @@ public class NibbleCheckit extends LineOrientedProofReader {
      * XOR. The result is the middle two bytes where the checksum resides. (Note that the
      * <code>0x1021</code> was shifted by a byte as well.)
      */
-    public static int checkit(int checksum, int value) {
-        assert value >= 0 && value <= 0xff;
-        int work = (checksum << 8) | value;
-        for (int i=0; i<8; i++) {
-            work <<= 1;
-            // Note: If we run into negative issues somehow, this could also be "((work & 0xff000000) != 0)".
-            if (work > 0xffffff) {
-                work &= 0xffffff;
-                work ^= 0x102100;
-            }
+    public static class Checksum implements ProofReaderChecksum {
+        private int checksum = 0;
+        @Override
+        public void reset() {
+            this.checksum = 0;
         }
-        return work >> 8;
+        @Override
+        public void add(int value) {
+            assert value >= 0 && value <= 0xff;
+            int work = (checksum << 8) | value;
+            for (int i=0; i<8; i++) {
+                work <<= 1;
+                // Note: If we run into negative issues somehow, this could also be "((work & 0xff000000) != 0)".
+                if (work > 0xffffff) {
+                    work &= 0xffffff;
+                    work ^= 0x102100;
+                }
+            }
+            checksum = work >> 8;
+        }
+        @Override
+        public int value() {
+            return checksum;
+        }
     }
 }

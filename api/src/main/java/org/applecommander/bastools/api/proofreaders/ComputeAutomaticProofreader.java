@@ -1,34 +1,43 @@
 package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.model.Line;
 import org.applecommander.bastools.api.model.Program;
 
-public class ComputeAutomaticProofreader extends LineOrientedProofReader {
+public class ComputeAutomaticProofreader implements ApplesoftInputBufferProofReader {
+    private final Configuration config;
+    private final Checksum checksum = new Checksum();
+
     public ComputeAutomaticProofreader(Configuration config) {
-        super(config);
+        this.config = config;
     }
 
     @Override
-    public Program visit(Program program) {
+    public Configuration getConfiguration() {
+        return config;
+    }
+
+    @Override
+    public void addProgram(Program program) {
         System.out.println("Compute! Apple Automatic Proofreader, Copyright 1985");
-        return super.visit(program);
+        ApplesoftInputBufferProofReader.super.addProgram(program);
     }
 
     @Override
-    public Line visit(Line line) {
-        String text = toString(line);
-
-        int checksum = 0;
-        for (int i=text.length()-1; i>=0; i--) {
-            char ch = text.charAt(i);
+    public void addLine(String line) {
+        checksum.reset();
+        for (int i=line.length()-1; i>=0; i--) {
+            char ch = line.charAt(i);
             if (ch != ' ') {
-                checksum = proofreader(checksum, ch|0x80);
+                checksum.add(ch|0x80);
             }
         }
 
-        System.out.printf("%02X | %s\n", checksum, text);
-        return line;
+        System.out.printf("%02X | %s\n", checksum.value(), line);
+    }
+
+    // For testing purposes; only valid for the line
+    protected int getChecksumValue() {
+        return checksum.value();
     }
 
     /**
@@ -43,20 +52,34 @@ public class ComputeAutomaticProofreader extends LineOrientedProofReader {
      * </pre>
      * Generalized algorithm: <code>cksum = (cksum << 1) + (char|$80) + carry</code>
      */
-    public static int proofreader(int checksum, int value) {
-        assert value >= 0 && value <= 0xff;
-        checksum <<= 1;
-        // Handle carry from ASL
-        if (checksum > 0xff) {
-            checksum++;
-            checksum &= 0xff;
+    public static class Checksum implements ProofReaderChecksum {
+        private int checksum = 0;
+
+        @Override
+        public void reset() {
+            this.checksum = 0;
         }
-        // Handle carry from first ADC
-        checksum += value;
-        if (checksum > 0xff) {
-            checksum++;
-            checksum &= 0xff;
+
+        @Override
+        public void add(int value) {
+            assert value >= 0 && value <= 0xff;
+            checksum <<= 1;
+            // Handle carry from ASL
+            if (checksum > 0xff) {
+                checksum++;
+                checksum &= 0xff;
+            }
+            // Handle carry from first ADC
+            checksum += value;
+            if (checksum > 0xff) {
+                checksum++;
+                checksum &= 0xff;
+            }
         }
-        return checksum;
+
+        @Override
+        public int value() {
+            return checksum;
+        }
     }
 }

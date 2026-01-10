@@ -1,6 +1,9 @@
 package org.applecommander.bastools.api.proofreaders;
 
+import org.applecommander.bastools.api.Configuration;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,27 +20,37 @@ public class NibbleCheckitTest {
     }
 
     @Test
+    public void testQuestionMark49() {
+        assertEquals(0xf6, performLineCalc("110  PRINT \"HELLO WORLD?\""));
+        assertEquals(0xe7, performLineCalc("10 PRINT \"?\""));
+    }
+
+    @Test
     public void testProgramChecksum() {
         // Note: The value displayed is 1CB9, but the code prints low byte first...
         assertEquals(0xb91c, performProgramCalc(10, 20, 30));
     }
 
     protected int performLineCalc(String text) {
-        int checksum = 0;
-        for (char ch : text.toCharArray()) {
-            if (ch != ' ') {
-                checksum = NibbleCheckit.checkit(checksum, ch | 0x80);
-            }
-        }
-        return ( (checksum & 0xff) - (checksum >> 8) ) & 0xff;
+        Configuration config = Configuration.builder()
+                .preserveNumbers(true)
+                .sourceFile(new File("test.bas"))
+                .build();
+        NibbleCheckit proofreader = new NibbleCheckit(config);
+        proofreader.addLine(text);
+        return ( (proofreader.getLineChecksumValue() & 0xff) - (proofreader.getLineChecksumValue() >> 8) ) & 0xff;
     }
 
     protected int performProgramCalc(int... lineNumbers) {
-        int checksum = 0;
+        Configuration config = Configuration.builder()
+                .preserveNumbers(true)
+                .sourceFile(new File("test.bas"))
+                .build();
+        NibbleCheckit proofreader = new NibbleCheckit(config);
         for (int lineNumber : lineNumbers) {
-            checksum = NibbleCheckit.checkit(checksum, lineNumber & 0xff);
-            checksum = NibbleCheckit.checkit(checksum, lineNumber >> 8);
+            // We ignore the line, but line also computes the program checksum
+            proofreader.addLine(Integer.toString(lineNumber));
         }
-        return checksum;
+        return proofreader.getTotalChecksumValue();
     }
 }

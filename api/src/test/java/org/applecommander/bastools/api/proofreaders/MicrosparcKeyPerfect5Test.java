@@ -16,9 +16,9 @@ public class MicrosparcKeyPerfect5Test {
         };
         Checksum checksum = new Checksum();
         for (int b : code) {
-            checksum.addByte(b);
+            checksum.add(b);
         }
-        assertEquals(0xC397EF76, checksum.getChecksum());
+        assertEquals(0xC397EF76, checksum.value());
     }
 
     @Test
@@ -28,8 +28,8 @@ public class MicrosparcKeyPerfect5Test {
         };
         Checksum checksum = new Checksum();
         for (int b : code) {
-            checksum.addByte(b);
+            checksum.add(b);
         }
-        assertEquals(0x9b714628, checksum.getChecksum());
+        assertEquals(0x9b714628, checksum.value());
     }
 }

@@ -1,6 +1,9 @@
 package org.applecommander.bastools.api.proofreaders;
 
+import org.applecommander.bastools.api.Configuration;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,13 +20,12 @@ public class ComputeAutomaticProofreaderTest {
     }
 
     protected int performLineCalc(String text) {
-        int checksum = 0;
-        for (int i=text.length()-1; i>=0; i--) {
-            char ch = text.charAt(i);
-            if (ch != ' ') {
-                checksum = ComputeAutomaticProofreader.proofreader(checksum, ch|0x80);
-            }
-        }
-        return checksum;
+        Configuration config = Configuration.builder()
+                .preserveNumbers(true)
+                .sourceFile(new File("test.bas"))
+                .build();
+        ComputeAutomaticProofreader proofreader = new ComputeAutomaticProofreader(config);
+        proofreader.addLine(text);
+        return proofreader.getChecksumValue();
     }
 }

@@ -1,9 +1,6 @@
 package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Visitor;
-import org.applecommander.bastools.api.model.Program;
-import org.applecommander.bastools.api.visitors.ByteVisitor;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -44,19 +41,21 @@ import java.util.List;
  * 1710-   60          RTS
  * </pre>
  */
-public class MicrosparcKeyPerfect2 implements Visitor {
+public class MicrosparcKeyPerfect2 implements ApplesoftTokenizedProofReader {
     private final Configuration config;
-    private final ByteVisitor byteVisitor;
 
     public MicrosparcKeyPerfect2(Configuration config) {
         this.config = config;
-        this.byteVisitor = new ByteVisitor(config);
     }
 
     @Override
-    public Program visit(Program program) {
-        byteVisitor.visit(program);
-        ByteBuffer code = ByteBuffer.wrap(byteVisitor.getBytes());
+    public Configuration getConfiguration() {
+        return config;
+    }
+
+    @Override
+    public void addBytes(byte... tokenizedProgram) {
+        ByteBuffer code = ByteBuffer.wrap(tokenizedProgram);
         code.order(ByteOrder.LITTLE_ENDIAN);
 
         System.out.println("Line# - Line#   CODE-2.0");
@@ -96,8 +95,6 @@ public class MicrosparcKeyPerfect2 implements Visitor {
             printLines(lines, lineChecksum);
         }
         printLine("PROGRAM TOTAL", programChecksum);
-
-        return program;
     }
 
     public void printLines(List<Integer> lines, int lineChecksum) {

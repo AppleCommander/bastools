@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 public class ClassicTokenReaderTest {
     @Test
@@ -354,6 +354,23 @@ public class ClassicTokenReaderTest {
                     .syntax(':')
                     .keyword(ApplesoftKeyword.PRINT)
                     .data("\"WORLD")
+                .end());
+    }
+
+    @Test
+    public void testQuestionMarkAsPrint49() throws IOException {
+        testCode("""
+                100  PRINT "HELLO WORLD"
+                110  PRINT "HELLO WORLD?"
+                """,
+            Tokens.builder()
+                .number("100")
+                    .keyword(ApplesoftKeyword.PRINT)
+                    .data("\"HELLO WORLD\"")
+                    .nextLine()
+                .number("110")
+                    .keyword(ApplesoftKeyword.PRINT)
+                    .data("\"HELLO WORLD?\"")
                 .end());
     }
 

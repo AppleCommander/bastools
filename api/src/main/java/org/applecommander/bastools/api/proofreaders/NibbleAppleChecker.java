@@ -1,68 +1,62 @@
 package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Visitor;
 import org.applecommander.bastools.api.model.Program;
-import org.applecommander.bastools.api.visitors.ByteVisitor;
 
-public class NibbleAppleChecker implements Visitor {
+public class NibbleAppleChecker implements ApplesoftTokenizedProofReader {
     private final Configuration config;
-    private final ByteVisitor byteVisitor;
+    private int length;
+    private final Checksum checksum = new Checksum();
 
     public NibbleAppleChecker(Configuration config) {
         this.config = config;
-        this.byteVisitor = new ByteVisitor(config);
     }
 
     @Override
-    public Program visit(Program program) {
-        byteVisitor.visit(program);
-        byte[] code = byteVisitor.getBytes();
-        Checksum checksum = new Checksum();
-        checksum.compute(code, config.startAddress);
+    public Configuration getConfiguration() {
+        return config;
+    }
+
+    @Override
+    public void addProgram(Program program) {
+        ApplesoftTokenizedProofReader.super.addProgram(program);
 
         System.out.printf("On: %s\n", config.sourceFile.getName());
         System.out.println("Type: A");
         System.out.println();
-        System.out.printf("Length: %04X\n", checksum.getLength());
-        System.out.printf("Checksum: %02X\n", checksum.getChecksum());
-        return program;
+        System.out.printf("Length: %04X\n", length);
+        System.out.printf("Checksum: %02X\n", checksum.value());
     }
 
-    public static class Checksum {
-        private int length;
-        private int checksum;
-
-        public int getLength() {
-            return length;
+    @Override
+    public void addBytes(byte... tokenizedProgram) {
+        // Length is less 2 for Applesoft
+        length = tokenizedProgram.length+1 - 2;
+        // Zero out the next line links
+        int nextAddr = config.startAddress;
+        while (nextAddr >= 0 && nextAddr < tokenizedProgram.length) {
+            nextAddr = (tokenizedProgram[nextAddr+1]<<8 | tokenizedProgram[nextAddr]) - config.startAddress;
+            tokenizedProgram[nextAddr] = 0;
+            tokenizedProgram[nextAddr+1] = 0;
         }
-        public int getChecksum() {
-            return checksum;
-        }
-
-        public void compute(byte[] code, int startAddress) {
-            // Length is less 2 for Applesoft
-            length = code.length+1 - 2;
-            // Zero out the next line links
-            int nextAddr = startAddress;
-            while (nextAddr >= 0 && nextAddr < code.length) {
-                nextAddr = (code[nextAddr+1]<<8 | code[nextAddr]) - startAddress;
-                code[nextAddr] = 0;
-                code[nextAddr+1] = 0;
-            }
-            // Compute checksum
-            this.checksum = 0;
-            for (int i=0; i<code.length; i++) {
-                int acc = Byte.toUnsignedInt(code[i]);
-                if (acc >= 0x21 || acc == 0x04) {
-                    this.checksum = checksum(this.checksum, acc);
-                }
-                else {
-                    // We skip _and_ reduce the length by 1
-                    this.length--;
-                }
+        // Compute checksum
+        checksum.reset();
+        for (byte b : tokenizedProgram) {
+            int acc = Byte.toUnsignedInt(b);
+            if (acc >= 0x21 || acc == 0x04) {
+                checksum.add(acc);
+            } else {
+                // We skip _and_ reduce the length by 1
+                this.length--;
             }
         }
+    }
+
+    public int getLength() {
+        return length;
+    }
+    public int getChecksumValue() {
+        return checksum.value();
     }
 
     /**
@@ -76,23 +70,38 @@ public class NibbleAppleChecker implements Visitor {
      *        STA CKCD
      * </pre>
      */
-    public static int checksum(int checksum, int acc) {
-        // EOR CKCD
-        acc ^= checksum;
-        // ROL A
-        acc <<= 1;
-        // ADC CKCD
-        if (acc >= 0xff) {
-            checksum++;
-            acc &= 0xff;
+    public static class Checksum implements ProofReaderChecksum {
+        private int checksum;
+
+        @Override
+        public void reset() {
+            this.checksum = 0;
         }
-        acc += checksum;
-        // ADC #0
-        if (acc > 0xff) {
-            acc++;
-            acc &= 0xff;
+
+        @Override
+        public void add(int acc) {
+            // EOR CKCD
+            acc ^= checksum;
+            // ROL A
+            acc <<= 1;
+            // ADC CKCD
+            if (acc >= 0xff) {
+                checksum++;
+                acc &= 0xff;
+            }
+            acc += checksum;
+            // ADC #0
+            if (acc > 0xff) {
+                acc++;
+                acc &= 0xff;
+            }
+            // STA CKCD
+            checksum = acc;
         }
-        // STA CKCD
-        return acc;
+
+        @Override
+        public int value() {
+            return this.checksum;
+        }
     }
 }

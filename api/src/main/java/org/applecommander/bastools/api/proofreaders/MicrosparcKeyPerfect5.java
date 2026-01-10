@@ -1,11 +1,7 @@
 package org.applecommander.bastools.api.proofreaders;
 
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Visitor;
-import org.applecommander.bastools.api.model.Program;
-import org.applecommander.bastools.api.visitors.ByteVisitor;
 
-import javax.swing.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -110,19 +106,21 @@ import java.util.List;
  * </pre>
  * ('@' replaced with ']' since Javadoc uses '@' for other purposes.)
  */
-public class MicrosparcKeyPerfect5 implements Visitor {
+public class MicrosparcKeyPerfect5 implements ApplesoftTokenizedProofReader {
     private final Configuration config;
-    private final ByteVisitor byteVisitor;
 
     public MicrosparcKeyPerfect5(Configuration config) {
         this.config = config;
-        this.byteVisitor = new ByteVisitor(config);
     }
 
     @Override
-    public Program visit(Program program) {
-        byteVisitor.visit(program);
-        ByteBuffer code = ByteBuffer.wrap(byteVisitor.getBytes());
+    public Configuration getConfiguration() {
+        return config;
+    }
+
+    @Override
+    public void addBytes(byte... tokenizedProgram) {
+        ByteBuffer code = ByteBuffer.wrap(tokenizedProgram);
         code.order(ByteOrder.LITTLE_ENDIAN);
 
         System.out.println("Line# - Line#   CODE-5.0");
@@ -136,11 +134,11 @@ public class MicrosparcKeyPerfect5 implements Visitor {
             if (ptr == 0) break;
             // Line number always gets added to checksum and total
             int b1 = Byte.toUnsignedInt(code.get());
-            lineChecksum.addByte(b1);
-            pgmChecksum.addByte(b1);
+            lineChecksum.add(b1);
+            pgmChecksum.add(b1);
             int b2 = Byte.toUnsignedInt(code.get());
-            lineChecksum.addByte(b2);
-            pgmChecksum.addByte(b2);
+            lineChecksum.add(b2);
+            pgmChecksum.add(b2);
             lines.add(b2 << 8 | b1);
             // Process tokenized line...
             boolean inComment = false;
@@ -149,8 +147,8 @@ public class MicrosparcKeyPerfect5 implements Visitor {
                 ch = Byte.toUnsignedInt(code.get());
                 if (ch == 0xb2) {
                     inComment = true;
-                    lineChecksum.addByte(ch);
-                    pgmChecksum.addByte(ch);
+                    lineChecksum.add(ch);
+                    pgmChecksum.add(ch);
                 }
                 else if (inComment) {
                     // do not add to checksum
@@ -159,8 +157,8 @@ public class MicrosparcKeyPerfect5 implements Visitor {
                     if (ch >= 0x60 && ch < 0x80) {
                         ch -= 0x20;     // Force characters to uppercase
                     }
-                    lineChecksum.addByte(ch);
-                    pgmChecksum.addByte(ch);
+                    lineChecksum.add(ch);
+                    pgmChecksum.add(ch);
                 }
             } while (ch > 0);
 
@@ -174,8 +172,6 @@ public class MicrosparcKeyPerfect5 implements Visitor {
             printLines(lines, lineChecksum);
         }
         printLine("PROGRAM TOTAL", pgmChecksum);
-
-        return program;
     }
 
     public void printLines(List<Integer> lines, Checksum checksum) {
@@ -186,24 +182,27 @@ public class MicrosparcKeyPerfect5 implements Visitor {
     }
 
     public static void printLine(String text, Checksum checksum) {
-        System.out.printf("%-13.13s   %08X\n", text, checksum.getChecksum());
+        System.out.printf("%-13.13s   %08X\n", text, checksum.value());
     }
 
-    public static class Checksum {
+    public static class Checksum implements ProofReaderChecksum {
         /**
          * Checksum is 4 bytes, long is 8 so we don't get surprised by negativity.
          */
         private long checksum = 0xffffffffL;
 
-        public int getChecksum() {
+        @Override
+        public int value() {
             return (int)checksum;
         }
 
+        @Override
         public void reset() {
             checksum = 0xffffffffL;
         }
 
-        public void addByte(int code) {
+        @Override
+        public void add(int code) {
             assert code >= 0 && code <= 0xff;
             // Combines the CHKSUM_V5_1 effort
             int idx = (int)(checksum >> 24 & 0xff) ^ code;
