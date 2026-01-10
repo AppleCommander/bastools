@@ -17,8 +17,6 @@
  */
 package org.applecommander.bastools.api.visitors;
 
-import java.io.PrintStream;
-
 import org.applecommander.bastools.api.Configuration;
 import org.applecommander.bastools.api.Visitor;
 import org.applecommander.bastools.api.Visitors.PrintBuilder;
@@ -26,6 +24,12 @@ import org.applecommander.bastools.api.model.Line;
 import org.applecommander.bastools.api.model.Statement;
 import org.applecommander.bastools.api.model.Token;
 
+import java.io.PrintStream;
+
+// Based on reviewing the https://6502disassembly.com/a2-rom/Applesoft.html#SymLIST disassembly:
+// - LINE#<spc>
+// - <spc><keyword><spc>
+// - <char>
 public class PrintVisitor implements Visitor {
     private final Configuration config;
 	private final PrintStream printStream;
@@ -57,7 +61,7 @@ public class PrintVisitor implements Visitor {
 			printStream.print("<EOL>");
 			break;
 		case COMMENT:
-			printStream.printf("REM %s", token.text());
+			printStream.printf(" REM %s", token.text());
 			break;
         case DATA, IDENT, SYNTAX:
             printStream.print(token.text());
