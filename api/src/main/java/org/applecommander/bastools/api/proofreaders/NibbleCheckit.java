@@ -26,12 +26,12 @@ public class NibbleCheckit implements ApplesoftInputBufferProofReader {
 
     /** {@inheritDoc} */
     @Override
-    public void addLine(String line) {
+    public void addLine(final String originalLine) {
         // Calculate and output line value
         lineChecksum.reset();
 
         // The ? => PRINT replacement always occurs, including in strings!
-        line = line.replace("?", "PRINT");
+        String line = originalLine.replace("?", "PRINT");
 
         boolean inQuote = false;
         StringBuilder remLettersSeen = new StringBuilder();
@@ -54,7 +54,7 @@ public class NibbleCheckit implements ApplesoftInputBufferProofReader {
         }
 
         int cs = ( (lineChecksum.checksum & 0xff) - (lineChecksum.checksum >> 8) ) & 0xff;
-        System.out.printf("%02X | %s\n", cs, line);
+        System.out.printf("%02X | %s\n", cs, originalLine);
 
         // Update program values
         int lineNumber = Integer.parseInt(line.split(" ")[0].trim());
