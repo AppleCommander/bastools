@@ -17,6 +17,8 @@
  */
 package org.applecommander.bastools.api;
 
+import org.applecommander.bastools.api.model.Token;
+
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -29,14 +31,29 @@ public class Configuration {
 	public final int startAddress;
 	public final int maxLineLength;
 	public final PrintStream debugStream;
-	public final Map<String,String >variableReplacements = new HashMap<>();
+	public final Map<String,String> variableReplacements = new HashMap<>();
+    public final boolean preserveNumbers;
 	
 	private Configuration(Builder b) {
 		this.sourceFile = b.sourceFile;
 		this.startAddress = b.startAddress;
 		this.maxLineLength = b.maxLineLength;
 		this.debugStream = b.debugStream;
+        this.preserveNumbers = b.preserveNumbers;
 	}
+
+    public String numberToString(Token token) {
+        if (preserveNumbers && token.text() != null) {
+            return token.text();
+        }
+        else {
+            if (Math.rint(token.number()) == token.number()) {
+                return Integer.toString(token.number().intValue());
+            } else {
+                return Double.toString(token.number());
+            }
+        }
+    }
 	
 	public static Builder builder() {
 		return new Builder();
@@ -53,6 +70,7 @@ public class Configuration {
 					// Do nothing
 				}
 			});
+        private boolean preserveNumbers;
 
 		public Builder sourceFile(File sourceFile) {
 			this.sourceFile = sourceFile;
@@ -70,6 +88,10 @@ public class Configuration {
 			this.debugStream = debugStream;
 			return this;
 		}
+        public Builder preserveNumbers(boolean preserveNumbers) {
+            this.preserveNumbers = preserveNumbers;
+            return this;
+        }
 		
 		public Configuration build() {
 			Objects.requireNonNull(sourceFile, "Please configure a sourceFile");

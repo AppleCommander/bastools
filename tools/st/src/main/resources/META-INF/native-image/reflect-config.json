@@ -3,34 +3,6 @@
   "name":"groovy.lang.Closure"
 },
 {
-  "name":"org.applecommander.bastools.tools.st.ExtractCommand",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.st.GenerateCommand",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.st.IntegerRangeTypeConverter",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.st.Main",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
-},
-{
-  "name":"org.applecommander.bastools.tools.st.VersionProvider",
-  "allDeclaredFields":true,
-  "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
   "name":"java.io.Console",
   "methods":[{"name":"isTerminal","parameterTypes":[] }]
 },
@@ -131,6 +103,34 @@
 {
   "name":"java.time.ZonedDateTime",
   "methods":[{"name":"parse","parameterTypes":["java.lang.CharSequence"] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.st.ExtractCommand",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.st.GenerateCommand",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.st.IntegerRangeTypeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.st.Main",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"main","parameterTypes":["java.lang.String[]"] }]
+},
+{
+  "name":"org.applecommander.bastools.tools.st.VersionProvider",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"picocli.CommandLine$AutoHelpMixin",

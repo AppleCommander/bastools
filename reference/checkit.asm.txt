@@ -1,0 +1,210 @@
+; SOURCE AND NOTES FOR NIBBLE CHECKIT
+
+; XO = line length?
+
+8500- D8                   CLD
+8501- 20 1B FD             JSR   KEYIN
+8504- C9 9A                CMP   #$9A		; Ctrl+Z
+8506- F0 1F                BEQ   L8527		; yes - do full total
+8508- C9 8D                CMP   #$8D		; CR
+850A- D0 1A                BNE   L8526		; no - return
+
+# CR - per line
+850C- 86 E0                STX   XO		; preserve line length
+850E- 20 B2 85             JSR   L85B2		; compute checksum
+8511- 20 FB DA             JSR   $DAFB		; CR output
+8514- 20 80 FE             JSR   SETINV
+8517- 38                   SEC
+8518- A5 08                LDA   $08
+851A- E5 09                SBC   $09
+851C- 20 DA FD             JSR   PRBYTE
+851F- 20 84 FE             JSR   SETNORM
+8522- A6 E0                LDX   XO
+8524- A9 8D                LDA   #$8D
+8526- 60        L8526      RTS
+
+# Ctrl+Z - TOTAL lines
+8527- 20 6A 86  L8527      JSR   L866A		; zero out $08/$09 $FB/$FC; A=0
+852A- 2C AA 85             BIT   L85AA		; is this applesoft or hexadecimal?
+852D- 10 2B                BPL   L855A		; hexadecimal
+852F- A9 01                LDA   #$01		; setup start of applesoft program $801
+8531- 85 06                STA   $06
+8533- A9 08                LDA   #$08
+8535- 85 07                STA   $07
+8537- A0 00     L8537      LDY   #$00
+8539- B1 06                LDA   ($06),Y	; save next line pointer
+853B- 85 FB                STA   $FB
+853D- C8                   INY
+853E- B1 06                LDA   ($06),Y
+8540- 85 FC                STA   $FC
+8542- F0 3F                BEQ   L8583		; high byte is 0, all done
+8544- C8                   INY
+8545- B1 06                LDA   ($06),Y	; line# low
+8547- 20 4F 86             JSR   L864F		; CHECKSUM
+854A- C8                   INY
+854B- B1 06                LDA   ($06),Y	; line# high
+854D- 20 4F 86             JSR   L864F		; CHECKSUM
+8550- A5 FB                LDA   $FB
+8552- 85 06                STA   $06
+8554- A5 FC                LDA   $FC
+8556- 85 07                STA   $07
+8558- D0 DD                BNE   L8537		; scan next line - always
+855A- AD A7 85  L855A      LDA   L85A7		; hexadecimal AND applesoft!
+855D- 85 07                STA   $07
+855F- AD A6 85             LDA   L85A6
+8562- 85 06                STA   $06
+8564- A0 00                LDY   #$00
+8566- B1 06     L8566      LDA   ($06),Y
+8568- 20 4F 86             JSR   L864F		; CHECKSUM
+856B- E6 06                INC   $06
+856D- D0 02                BNE   L8571
+856F- E6 07                INC   $07
+8571- E6 FB     L8571      INC   $FB
+8573- D0 02                BNE   L8577
+8575- E6 FC                INC   $FC
+8577- A5 FB     L8577      LDA   $FB
+8579- CD A8 85             CMP   L85A8
+857C- A5 FC                LDA   $FC
+857E- ED A9 85             SBC   L85A9
+8581- 90 E3                BCC   L8566
+8583- A2 00     L8583      LDX   #$00
+8585- BD AB 85  L8585      LDA   L85AB,X
+8588- 20 ED FD             JSR   COUT
+858B- E8                   INX
+858C- E0 07                CPX   #$07
+858E- 90 F5                BCC   L8585
+8590- 2C 10 C0             BIT   KBDSTRB
+8593- 20 80 FE             JSR   SETINV
+8596- A4 08                LDY   $08
+8598- A6 09                LDX   $09
+859A- 20 40 F9             JSR   $F940
+859D- 20 FB DA             JSR   $DAFB
+85A0- 20 84 FE             JSR   SETNORM
+85A3- A9 98                LDA   #$98
+85A5- 60                   RTS
+
+85A6- 00        L85A6	; ADDR LOW
+85A7- 00        L85A7	; ADDR HIGH
+85A8- 00        L85A8	; LEN LOW
+85A9- 00        L85A9	; LEN HIGH
+85AA- 80        L85AA
+85AB- 14 0F 14 01 0C 3A 20 	L85AB "TOTAL: "
+
+ZP FB: ???? ???S	; S=string
+
+85B2- 20 6A 86  L85B2      JSR   L866A		; zero out $08/$09 $FB/$FC; A=0
+85B5- 85 06                STA   $06            ; $06/07=$200 (input buffer)
+85B7- A9 02                LDA   #$02
+85B9- 85 07                STA   $07
+85BB- A0 00                LDY   #$00
+85BD- B1 06                LDA   ($06),Y
+85BF- C9 B0                CMP   #$B0		; "0"
+85C1- 90 49                BCC   L860C		; not a line number
+85C3- C9 BA                CMP   #$BA		; "9"+1
+85C5- B0 45                BCS   L860C		; not a line number
+
+LOOP THROUGH LINE:
+85C7- B1 06     L85C7      LDA   ($06),Y
+85C9- 2C AA 85             BIT   L85AA		; Applesoft?
+85CC- 10 35                BPL   L8603		; no - assembly
+85CE- C9 D2                CMP   #$D2		; "R" (REM?)
+85D0- D0 04                BNE   L85D6
+85D2- A6 FB                LDX   $FB
+85D4- F0 3D                BEQ   L8613		; no flags set (not in string)
+85D6- C9 A2     L85D6      CMP   #$A2		; '"' (string?)
+85D8- D0 08                BNE   L85E2
+85DA- 48                   PHA
+85DB- A9 01                LDA   #$01
+85DD- 45 FB                EOR   $FB
+85DF- 85 FB                STA   $FB
+85E1- 68                   PLA
+85E2- C9 A0     L85E2      CMP   #$A0		; " " (space?)
+85E4- D0 06                BNE   L85EC
+85E6- A6 FB                LDX   $FB
+85E8- D0 19                BNE   L8603		; flags set (string?)
+85EA- F0 1A                BEQ   L8606		; no flags
+
+85EC- C9 BF     L85EC      CMP   #$BF		; "?" (print?)
+85EE- D0 13                BNE   L8603
+85F0- 84 E2                STY   YO
+85F2- A0 00                LDY   #$00
+85F4- B9 75 86  L85F4      LDA   L8675,Y	; "PRINT"
+85F7- 20 4F 86             JSR   L864F		; CHECKSUM
+85FA- C8                   INY
+85FB- C0 05                CPY   #$05
+85FD- 90 F5                BCC   L85F4
+85FF- A4 E2                LDY   YO
+8601- B0 03                BCS   L8606
+
+8603- 20 4F 86  L8603      JSR   L864F		; CHECKSUM
+8606- C8        L8606      INY
+8607- C4 E0                CPY   XO
+8609- 90 BC                BCC   L85C7
+860B- 60                   RTS
+
+860C- A6 E0     L860C      LDX   XO
+860E- 68                   PLA
+860F- 68                   PLA
+8610- A9 8D                LDA   #$8D
+8612- 60                   RTS
+
+; REM????
+8613- 84 E2     L8613      STY   YO
+8615- 88        L8615      DEY
+8616- B1 06                LDA   ($06),Y
+8618- C9 A0                CMP   #$A0		; " "
+861A- F0 F9                BEQ   L8615
+861C- C9 BA                CMP   #$BA		; ":"
+861E- F0 08                BEQ   L8628
+8620- C9 B0                CMP   #$B0		; "0"
+8622- 90 24                BCC   L8648
+8624- C9 BA                CMP   #$BA		; "9"+1
+8626- B0 20                BCS   L8648
+8628- A4 E2     L8628      LDY   YO
+862A- C8                   INY
+862B- B1 06                LDA   ($06),Y
+862D- C9 C5                CMP   #$C5		; "E"
+862F- D0 17                BNE   L8648
+8631- C8                   INY
+8632- B1 06                LDA   ($06),Y
+8634- C9 CD                CMP   #$CD		; "M"
+8636- D0 10                BNE   L8648
+8638- A9 D2                LDA   #$D2		; "R"
+863A- 20 4F 86             JSR   L864F		; CHECKSUM
+863D- A9 C5                LDA   #$C5		; "E"
+863F- 20 4F 86             JSR   L864F		; CHECKSUM
+8642- A9 CD                LDA   #$CD		; "M"
+8644- 20 4F 86             JSR   L864F		; CHECKSUM
+8647- 60                   RTS
+
+8648- A4 E2     L8648      LDY   YO
+864A- B1 06                LDA   ($06),Y
+864C- 18                   CLC
+864D- 90 87                BCC   L85D6
+
+; CHECKSUM ROUTINE!
+864F- A2 08     L864F      LDX   #$08
+8651- 0A        L8651      ASL
+8652- 26 08                ROL   $08
+8654- 26 09                ROL   $09
+8656- 90 0E                BCC   L8666
+8658- 48                   PHA
+8659- A5 08                LDA   $08
+865B- 49 21                EOR   #$21
+865D- 85 08                STA   $08
+865F- A5 09                LDA   $09
+8661- 49 10                EOR   #$10
+8663- 85 09                STA   $09
+8665- 68                   PLA
+8666- CA        L8666      DEX
+8667- D0 E8                BNE   L8651
+8669- 60                   RTS
+
+866A- A9 00     L866A      LDA   #$00
+866C- 85 08                STA   $08
+866E- 85 09                STA   $09
+8670- 85 FB                STA   $FB
+8672- 85 FC                STA   $FC
+8674- 60                   RTS
+
+8675- D0 D2 C9 CE D4		L8675	"PRINT"

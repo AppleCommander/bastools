@@ -2,14 +2,14 @@
 
 Generally, the usage pattern is:
 1. Setup the `Configuration`.
-2. Read the tokens.
+2. Read the tokens. Token readers are: ModernTokenReader and ClassicTokenReader.
 3. Parse the tokens into a `Program`.
 4. Apply transformations, if applicable.
 
 ## Code snippets
 
 ```java
-Queue<Token> tokens = TokenReader.tokenize(config.sourceFile);
+Queue<Token> tokens = ModernTokenReader.tokenize(config.sourceFile);
 ```
 
 The list of tokens is a loose interpretation. It includes more of a compiler sense of tokens -- numbers, end of line markers (they're significant), AppleSoft tokens, strings, comments, identifiers, etc.

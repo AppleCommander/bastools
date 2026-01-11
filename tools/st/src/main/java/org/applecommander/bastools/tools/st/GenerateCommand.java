@@ -41,7 +41,7 @@ import io.github.applecommander.applesingle.AppleSingle;
 import io.github.applecommander.applesingle.Utilities;
 import org.applecommander.bastools.api.Configuration;
 import org.applecommander.bastools.api.Parser;
-import org.applecommander.bastools.api.TokenReader;
+import org.applecommander.bastools.api.ModernTokenReader;
 import org.applecommander.bastools.api.Visitors;
 import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
@@ -159,7 +159,7 @@ public class GenerateCommand implements Callable<Void> {
         // Generate Applesoft program data
         ByteArrayInputStream sourceStream = new ByteArrayInputStream(demoProgram.getBytes());
         Configuration config = Configuration.builder().sourceFile(new File("FAKEFILE")).build();
-        Queue<Token> tokens = TokenReader.tokenize(sourceStream);
+        Queue<Token> tokens = ModernTokenReader.tokenize(sourceStream);
         Parser parser = new Parser(tokens);
         Program program = parser.parse();
         byte[] programBytes = Visitors.byteVisitor(config).dump(program);

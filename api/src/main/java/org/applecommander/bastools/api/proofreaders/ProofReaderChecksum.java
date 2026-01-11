@@ -1,6 +1,6 @@
 /*
  * bastools
- * Copyright (C) 2025  Robert Greene
+ * Copyright (C) 2026  Robert Greene
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,20 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.applecommander.bastools.api.optimizations;
+package org.applecommander.bastools.api.proofreaders;
 
-import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.model.Statement;
-import org.applecommander.bastools.api.model.Token.Type;
-
-/** Drop all REM statements as they are encountered in the tree walk. */
-public class RemoveRemStatements extends BaseVisitor {
-	public RemoveRemStatements(Configuration config) {
-		// ignored
-	}
-	
-	@Override
-	public Statement visit(Statement statement) {
-		return statement.tokens.getFirst().type() == Type.COMMENT ? null : statement;
-	}
+public interface ProofReaderChecksum {
+    /** Reset the checksum back to initial state. */
+    void reset();
+    /** Add a value (typically a byte) into the checksum. */
+    void add(int value);
+    /** Get the current value of the checksum. */
+    int value();
 }

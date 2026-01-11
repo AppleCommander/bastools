@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.Queue;
 
 import org.applecommander.bastools.api.model.*;
-import org.applecommander.bastools.api.model.*;
 import org.applecommander.bastools.api.model.Token.Type;
 
 /** 
@@ -48,7 +47,7 @@ public class Parser {
 	public Optional<Line> readLine(Program program) {
 	    return expectNumber().map(lineNumber -> {
             Line line = new Line(lineNumber, program);
-            while (!tokens.isEmpty() && tokens.peek().type != Type.EOL) {
+            while (!tokens.isEmpty() && tokens.peek().type() != Type.EOL) {
                 Statement statement = readStatement();
                 if (statement != null) {
                     line.statements.add(statement);
@@ -56,7 +55,7 @@ public class Parser {
                     break;
                 }
             }
-            if (!tokens.isEmpty() && tokens.peek().type == Type.EOL) {
+            if (!tokens.isEmpty() && tokens.peek().type() == Type.EOL) {
                 tokens.remove();    // Skip that EOL
             }
             return line;
@@ -67,15 +66,15 @@ public class Parser {
 		Statement statement = new Statement();
         Token firstToken = null;
 		while (!tokens.isEmpty()) {
-			if (tokens.peek().type == Type.EOL) break;
+			if (tokens.peek().type() == Type.EOL) break;
 			Token t = tokens.remove();
-			if (t.type == Type.SYNTAX && ":".equals(t.text)) break;
+			if (t.type() == Type.SYNTAX && ":".equals(t.text())) break;
             if (firstToken == null) {
                 firstToken = t;
             }
-            else if (firstToken.keyword == ApplesoftKeyword.DATA && t.keyword != null) {
+            else if (firstToken.keyword() == ApplesoftKeyword.DATA && t.keyword() != null) {
                 // AppleSoft doesn't put actual keyword or tokens into data (beyond quotes or comma)
-                t = Token.ident(t.line, t.keyword.text);
+                t = Token.ident(t.line(), t.keyword().text);
             }
 			statement.tokens.add(t);
 		}
@@ -84,12 +83,12 @@ public class Parser {
 	
 	public Optional<Integer> expectNumber() {
 		Token c = tokens.remove();
-		if (c.type == Type.EOL) {
+		if (c.type() == Type.EOL) {
 		    return Optional.empty();
 		}
-		if (c.type != Type.NUMBER) {
-			throw new RuntimeException("Expected a number in line #" + c.line);
+		if (c.type() != Type.NUMBER) {
+			throw new RuntimeException("Expected a number in line #" + c.line());
 		}
-		return Optional.of(c.number.intValue());
+		return Optional.of(c.number().intValue());
 	}
 }

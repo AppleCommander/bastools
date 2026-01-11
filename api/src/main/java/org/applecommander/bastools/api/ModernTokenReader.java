@@ -42,7 +42,7 @@ import org.applecommander.bastools.api.model.Token;
  * 
  * @author rob
  */
-public class TokenReader {
+public class ModernTokenReader {
 	private boolean hasMore = true;
 	// Internal flag just in case we consume the EOL (see REM for instance)s
 	private boolean needSyntheticEol = false;
@@ -68,7 +68,7 @@ public class TokenReader {
 		}
 	}
 	private static Queue<Token> tokenize(Reader reader) throws IOException {
-		TokenReader tokenReader = new TokenReader(reader);
+		ModernTokenReader tokenReader = new ModernTokenReader(reader);
 		LinkedList<Token> tokens = new LinkedList<>();
 		while (tokenReader.hasMore()) {
 			// Magic number: maximum number of pieces from the StreamTokenizer that may be combined.
@@ -78,7 +78,7 @@ public class TokenReader {
 		return tokens;
 	}
 
-	private TokenReader(Reader reader) {
+	private ModernTokenReader(Reader reader) {
 		this.reader = reader;
 		this.tokenizer = ApplesoftKeyword.tokenizer(reader);
 	}
@@ -111,7 +111,7 @@ public class TokenReader {
 						while (true) {
 							// Bypass the Tokenizer and just read to EOL for the comment
 							int ch = reader.read();
-							if (ch == '\n') {
+							if (ch == '\n' || ch == '\r') {
 								// Recover to the newline so that the next token is a EOL
 								// This is needed for parsing!
 								this.needSyntheticEol = true;
@@ -129,7 +129,7 @@ public class TokenReader {
 							// Pull next token and see if it is the 2nd part ("PR#" == "PR", "#"; checking for the "#")
                             // If not, drop into identifier routine
 							good = next(depth-1)
-								.filter(t -> opt.get().parts.get(1).equals(t.text))
+								.filter(t -> opt.get().parts.get(1).equals(t.text()))
                                 .isPresent();
 						}
                         if (good) {

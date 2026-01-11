@@ -10,9 +10,20 @@ function bt() {
 
 printf "\n\n*** RUNNING BT THROUGH A NUMBER OF COMMANDS TO CAPTURE DETAILS FOR NATIVE IMAGE ***\n\n"
 
+bt
+bt --help
 bt --version
 bt --optimize tools/bt/src/test/resources/alien-drizzle.bas --output=alien-drizzle.out
 bt --applesingle tools/bt/src/test/resources/route6502.bas --output=route6502.as
 bt --wrapper tools/bt/src/test/resources/test.bas --hex
 bt tools/bt/src/test/resources/embed-example.bas --copy
 bt tools/bt/src/test/resources/mouse.bas --copy
+bt --preserve --list tools/bt/src/test/resources/test.bas
+bt --modern --list tools/bt/src/test/resources/test.bas
+bt --classic --list tools/bt/src/test/resources/test.bas
+bt --apple-checker tools/bt/src/test/resources/test.bas
+bt --checkit tools/bt/src/test/resources/test.bas
+bt --kp2 tools/bt/src/test/resources/test.bas
+bt --kp4 tools/bt/src/test/resources/test.bas
+bt --kp5 tools/bt/src/test/resources/test.bas
+bt --proofreader tools/bt/src/test/resources/test.bas

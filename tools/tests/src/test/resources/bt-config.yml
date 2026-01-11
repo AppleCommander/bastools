@@ -5,7 +5,7 @@ commands:
     executable:  tools/bt/build/native/nativeCompile/bt-*
 
 files:
-  helloWorld:
+  helloWorldUC:
     type: text
     content: |
       10 TEXT
@@ -13,6 +13,111 @@ files:
       30 PRINT "HELLO, WORLD"
       40 END
     suffix: .bas
+  helloWorldLC:
+    type: text
+    content: |
+      10 text
+      20 home
+      30 print "Hello, World"
+      40 end
+    suffix: .bas
+  numberPreservation:    # See https://github.com/AppleCommander/bastools/issues/49
+    type: text
+    content: |
+      10 PRINT "MATHING"
+      30 A = .4
+      40 B = 0.6000
+      50 C = -.250
+      60 D = -0.70
+      70 PRINT "A=";A
+      80 PRINT "B=";B
+      90 PRINT "C=";C
+      95 PRINT "D=";D
+    suffix: .bas
+  # Checkit
+  checkitSample:
+    type: text
+    content: |
+      10 REM RING THE BELL
+      20 FOR J = 1 TO 5:PRINT CHR$ (7):NEXT J
+      30 END
+    suffix: .bas
+  checkitSampleWhitespace1:
+    type: text
+    content: 10 DATA    ,   ,   ,   "ONLY WHITESPACE IN QUOTES"
+  checkitSampleWhitespace2:
+    type: text
+    content: 10 DATA ,,,"ONLY WHITESPACE IN QUOTES"
+  # From Compute! July 1985 issue - this code is just above the introductory article for the Apple Automatic Proofreader
+  proofreaderSample:
+    type: text
+    content: |
+      10 HOME
+      20 D$ = CHR$(4)
+      40 PRINT "DO YOU WANT TO:"
+      50 PRINT " (1) MAKE A SPEEDSCRIPT FILE INTO A TEXT FILE"
+      60 PRINT " (2) MAKE A TEXT FILE INTO A SPEEDSCRIPT FILE"
+      70 GET A$:A = VAL(A$)
+      80 IF A<>1 AND A<>2 THEN 70
+      90 ON A GOTO 100,200
+    suffix: .bas
+  # Just a silly example as a start
+  appleCheckerSample:
+    type: text
+    content: |
+      10 TEXT:HOME
+    suffix: .bas
+  # Partial code pulled from escape-from-monster-caverns.bas in the bt tests
+  keyPerfectSample:
+    type: text
+    content: |
+      1  GOTO 10
+      2  HOME : RETURN
+      10  REM  ESCAPE FROM MONSTER CAVERNS
+      100  PRINT "YOU CAN PLAY THIS GAME IN 3 VERSIONS:"
+      110  PRINT
+      120  PRINT  TAB( 5);"1-HARD"
+      130  PRINT  TAB( 5);"2-MEDIUM"
+      140  PRINT  TAB( 5);"3-EASY"
+      150  PRINT
+      160  PRINT "WHICH ONE DO YOU WANT";
+      170  INPUT DI
+      180  IF DI <1  THEN 160
+      190  IF DI >3  THEN 160
+      200  GOSUB 2
+      210  PRINT "YOU ARE A FAMOUS EXPLORER WHO HAS"
+      220  PRINT "SPENT YEARS PREPARING FOR A GREAT"
+      230  PRINT "EXPEDITION TO THE ISLAND OF PIHC,"
+      240  PRINT "AN UNCHARTED DOT OF LAND THOUSANDS"
+      250  PRINT "OF MILES PRON CIVILIZATION.  YOUR"
+      260  PRINT "RESEARCH HAS LED TO A DUSTY OLD"
+    suffix: .bas
+  # Code sample that has print statements without a terminating quote
+  printWithoutClosingQuote:
+    type: text
+    content: |
+      ' 300-390
+      300  PRINT  CHR$ (P2 + 224 * (P2 < 32) + 128 * (P2 > 31 AND P2 < 64));
+      310  NEXT : PRINT : NEXT
+      320  PRINT DA$: PRINT D$"PR#0
+      330  HOME : RETURN
+      340 REM  ** DIVIDER DIRECTORY **
+      350  HOME : PRINT "DIVIDERS:": PRINT
+      360  FOR S = 1 TO ND STEP 4: FOR A = 0 TO 3
+      370  HTAB 10 * A + 1: PRINT ND$(S + A);
+      380  NEXT : PRINT : NEXT : PRINT : PRINT
+      390 FL = 1: VTAB 17: CALL  - 868: IF  NOT  LEN (DV$) THEN 410
+      ' 700-790
+      700 FL = 0
+      710  PRINT : HTAB 12: PRINT "EDIT AN INDEX CARD
+      720  VTAB 11: PRINT "(1) ADD A NEW CARD
+      730  PRINT : PRINT "(2) EDIT AN EXISTING CARD
+      740  PRINT : PRINT "(3) RETURN TO MAIN MENU
+      750  VTAB 18: PRINT "SELECT (1-3) OR <ESC> ( )";: HTAB 24
+      760  GET S$: PRINT S$;:S =  VAL (S$): IF S$ = ES$ THEN S = 3
+      770  IF S < 1 OR S > 3 OR (S = 2 AND  NOT C) OR (S = 1 AND  NOT (ND * 35 - C)) THEN  PRINT  CHR$ (7): GOTO 750
+      780  ON S GOTO 790,1220,4180
+      790  GOSUB 590
 
 tests:
   - name: Forms of help
@@ -28,7 +133,7 @@ tests:
         rc: 2
   - name: list output
     steps:
-      - command: bt --list $helloWorld
+      - command: bt --list $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
@@ -38,25 +143,26 @@ tests:
           40  END
   - name: copy/paste output
     steps:
-      - command: bt --copy $helloWorld
+      - command: bt --copy $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
-          0067:01 08 29 08 
+          0067:01 08 2A 08
+          00AF:2A 08
           0800:00
           0801:07 08 0A 00 89 00 0D 08 14 00 97 00 21 08 1E 00
           0811:BA 22 48 45 4C 4C 4F 2C 20 57 4F 52 4C 44 22 00
           0821:27 08 28 00 80 00 00 00
   - name: optimize output
     steps:
-      - command: bt --optimize --list $helloWorld
+      - command: bt --optimize --list $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
           0  TEXT : HOME : PRINT "HELLO, WORLD": END
   - name: wrap output
     steps:
-      - command: bt --wrapper --hex $helloWorld
+      - command: bt --wrapper --hex $helloWorldUC
         criteria:
           whitespace: trim
         stdout: |
@@ -64,3 +170,191 @@ tests:
           0811: 2c 38 3a ac 00 00 00 1e 08 0a 00 89 00 24 08 14  ,8:..........$..
           0821: 00 97 00 38 08 1e 00 ba 22 48 45 4c 4c 4f 2c 20  ...8...."HELLO,
           0831: 57 4f 52 4c 44 22 00 3e 08 28 00 80 00 00 00 ..  WORLD".>.(..... 
+  - name: check number preservation
+    steps:
+      # This keeps numbers as-is
+      - command: bt --preserve --list $numberPreservation
+        criteria:
+          whitespace: trim
+        stdout: |
+          10  PRINT "MATHING"
+          30 A = .4
+          40 B = 0.6000
+          50 C =  - .250
+          60 D =  - 0.70
+          70  PRINT "A=";A
+          80  PRINT "B=";B
+          90  PRINT "C=";C
+          95  PRINT "D=";D
+  - name: check numbers not being preserved
+    variables:
+      switch: ["--modern", "--classic"]
+    steps:
+      # These rewrite numbers
+      - command: bt $switch --list $numberPreservation
+        criteria:
+          whitespace: trim
+        stdout: |
+          10  PRINT "MATHING"
+          30 A = 0.4
+          40 B = 0.6
+          50 C =  - 0.25
+          60 D =  - 0.7
+          70  PRINT "A=";A
+          80  PRINT "B=";B
+          90  PRINT "C=";C
+          95  PRINT "D=";D
+  - name: check number optimization
+    steps:
+      - command: bt -f=shorten-numbers --list $numberPreservation
+        criteria:
+          whitespace: trim
+        stdout: |
+          10  PRINT "MATHING"
+          30 A = .4
+          40 B = .6
+          50 C =  - .25
+          60 D =  - .7
+          70  PRINT "A=";A
+          80  PRINT "B=";B
+          90  PRINT "C=";C
+          95  PRINT "D=";D
+
+  - name: Nibble Checkit test
+    steps:
+      - command: bt --checkit $checkitSample
+        criteria:
+          match: contains
+          whitespace: ignore
+        stdout: |
+          37 | 10 REM RING THE BELL
+          54 | 20 FOR J = 1 TO 5: PRINT CHR$ (7): NEXT J
+          91 | 30 END
+          TOTAL: 1CB9
+  - name: Nibble Checkit test of whitespace
+    variables:
+      # Arrays don't multiplex, so doing that by hand
+      tokenizer: [
+        "--modern", "--classic", "--preserve",  # sample 1
+        "--modern", "--classic", "--preserve"   # sample 2
+      ]
+      source: [
+        "$checkitSampleWhitespace1", "$checkitSampleWhitespace1", "$checkitSampleWhitespace1",
+        "$checkitSampleWhitespace2", "$checkitSampleWhitespace2", "$checkitSampleWhitespace2"
+      ]
+    steps:
+      - command: bt $tokenizer --checkit $source
+        criteria:
+          match: contains
+          whitespace: ignore
+        # we ignore everything else because the tokenizers create different output
+        stdout: |
+          26 | 10 DATA
+
+  - name: Compute! Automatic Proofreader test
+    steps:
+      - command: bt --proofreader $proofreaderSample
+        criteria:
+          match: contains
+          whitespace: ignore
+        stdout: |
+          4A | 10 HOME
+          52 | 20 D$ = CHR$ (4)
+          25 | 40 PRINT "DO YOU WANT TO:"
+          A6 | 50 PRINT " (1) MAKE A SPEEDSCRIPT FILE INTO A TEXT FILE"
+          AE | 60 PRINT " (2) MAKE A TEXT FILE INTO A SPEEDSCRIPT FILE"
+          67 | 70 GET A$:A = VAL (A$)
+          47 | 80 IF A < > 1 AND A < > 2 THEN 70
+          65 | 90 ON A GOTO 100,200
+
+  - name: Nibble Apple Checker 3.0 test
+    steps:
+      - command: bt --apple-checker $appleCheckerSample
+        criteria:
+          match: contains
+          whitespace: ignore
+        stdout: |
+          Length: 0002
+          Checksum: 4B
+
+  - name: MicroSPARC Key Perfect 4.0 test
+    steps:
+      - command: bt --key-perfect-4 $keyPerfectSample
+        criteria:
+          whitespace: ignore
+        stdout: |
+          Line# - Line#   CODE-4.0
+          -------------   --------
+              1 -   160       4C2A
+            170 -   260       6D52
+          PROGRAM TOTAL       01A0
+  - name: MicroSPARC Key Perfect 4.0 lowercase/uppercase test
+    variables:
+      source: [ "$helloWorldUC", "$helloWorldLC"]
+      result:   # Note: result varies by case
+        - |     # UPPERCASE
+          Line# - Line#   CODE-4.0
+          -------------   --------
+          10 -    40       0CE8
+          PROGRAM TOTAL         23
+        - |     # lowercase
+          Line# - Line#   CODE-4.0
+          -------------   --------
+          10 -    40       0A58
+          PROGRAM TOTAL         23
+    steps:
+      - command: bt --kp4 $source
+        criteria:
+          whitespace: ignore
+        stdout: $result
+
+  - name: MicroSPARC Key Perfect 5.0 test
+    steps:
+      - command: bt --key-perfect-5 $keyPerfectSample
+        criteria:
+          whitespace: ignore
+        stdout: |
+          Line# - Line#   CODE-5.0
+          -------------   --------
+              1 -   160   E11CFC2E
+            170 -   260   CF1C6F7F
+          PROGRAM TOTAL   D6462CDD
+  - name: MicroSPARC Key Perfect 5.0 lowercase/uppercase test
+    variables:
+      source: [ "$helloWorldUC", "$helloWorldLC" ]
+    steps:
+      - command: bt --kp5 $source
+        criteria:
+          whitespace: ignore
+        stdout: |   # Note: result is the same regardless of case
+          Line# - Line#   CODE-5.0
+          -------------   --------
+             10 -    40   64B6C397
+          PROGRAM TOTAL   64B6C397
+  - name: Key Perfect 4 with unterminated strings
+    variables:
+      tokenizer: [ "--modern", "--classic", "--preserve" ]
+      result:
+        - | # modern
+          Line# - Line#   CODE-4.0
+          -------------   --------
+            300 -   390       5EA2
+            700 -   790       7D74
+          PROGRAM TOTAL       01D8
+        - | # classic
+          Line# - Line#   CODE-4.0
+          -------------   --------
+            300 -   390       59F9
+            700 -   790       7B5B
+          PROGRAM TOTAL       01D3
+        - | # preserve
+          Line# - Line#   CODE-4.0
+          -------------   --------
+            300 -   390       59F9
+            700 -   790       7B5B
+          PROGRAM TOTAL       01D3
+    steps:
+      - command: bt --kp4 $tokenizer $printWithoutClosingQuote
+        criteria:
+          whitespace: ignore
+        stdout: $result

@@ -1,0 +1,67 @@
+; SOURCE AND NOTES FOR COMPUTE! PROOFREADER
+
+10 C = 0: FOR I = 768 TO 768 + 68: READ A:C = C + A: POKE I,A: NEXT
+20  IF C <  > 7258 THEN  PRINT "ERROR IN PROOFREADER DATA STATEMENTS": END
+30  IF  PEEK(190 * 256) <  > 76 THEN  POKE 56,0: POKE 57,3: CALL 1002: GOTO 50
+40  PRINT  CHR$(4);"IN#A$300"
+50  POKE 34,0: HOME : POKE 34,1: VTAB 2: PRINT "PROOFREADER INTSALLED"
+60  NEW
+100  DATA 216,32,27,253,201,141
+110  DATA 208,60,138,72,169,0
+120  DATA 72,189,255,1,201,160
+130  DATA 240,8,104,10,125,255
+140  DATA 1,105,0,72,202,208
+150  DATA 238,104,170,41,15,9
+160  DATA 48,201,58,144,2,233
+170  DATA 57,141,1,4,138,74
+180  DATA 74,74,74,41,15,9
+190  DATA 48,201,58,144,2,233
+200  DATA 57,141,0,4,104,170
+210  DATA 169,141,96
+
+; Trigger on CR.
+; Compute for each character in buffer in reverse order.
+; All spaces are ignored.
+; cksum = (cksum << 1) + (char|$80) + carry
+
+0300- D8                   CLD
+0301- 20 1B FD             JSR   KEYIN
+0304- C9 8D                CMP   #$8D       ; CR
+0306- D0 3C                BNE   L0344      ; exit if not CR
+0308- 8A                   TXA
+0309- 48                   PHA
+030A- A9 00                LDA   #$00
+030C- 48                   PHA              ; cksum
+030D- BD FF 01  L030D      LDA   $01FF,X    ; read (backwards) through input buffer
+0310- C9 A0                CMP   #$A0       ; skip spaces
+0312- F0 08                BEQ   L031C
+0314- 68                   PLA              ; add to cksum
+0315- 0A                   ASL
+0316- 7D FF 01             ADC   $01FF,X
+0319- 69 00                ADC   #$00
+031B- 48                   PHA
+031C- CA        L031C      DEX
+031D- D0 EE                BNE   L030D
+031F- 68                   PLA
+0320- AA                   TAX
+0321- 29 0F                AND   #$0F       ; Place result in upper-left corner
+0323- 09 30                ORA   #$30       ; ... digit by digit
+0325- C9 3A                CMP   #$3A
+0327- 90 02                BCC   L032B
+0329- E9 39                SBC   #$39
+032B- 8D 01 04  L032B      STA   $0401
+032E- 8A        L032E      TXA
+032F- 4A                   LSR
+0330- 4A                   LSR
+0331- 4A                   LSR
+0332- 4A                   LSR
+0333- 29 0F                AND   #$0F
+0335- 09 30                ORA   #$30
+0337- C9 3A                CMP   #$3A
+0339- 90 02                BCC   L033D
+033B- E9 39                SBC   #$39
+033D- 8D 00 04  L033D      STA   $0400
+0340- 68                   PLA
+0341- AA                   TAX
+0342- A9 8D                LDA   #$8D
+0344- 60        L0344      RTS

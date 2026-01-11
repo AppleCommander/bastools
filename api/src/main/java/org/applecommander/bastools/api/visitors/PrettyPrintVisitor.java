@@ -19,6 +19,7 @@ package org.applecommander.bastools.api.visitors;
 
 import java.io.PrintStream;
 
+import org.applecommander.bastools.api.Configuration;
 import org.applecommander.bastools.api.Visitor;
 import org.applecommander.bastools.api.Visitors.PrintBuilder;
 import org.applecommander.bastools.api.model.Line;
@@ -26,9 +27,11 @@ import org.applecommander.bastools.api.model.Statement;
 import org.applecommander.bastools.api.model.Token;
 
 public class PrettyPrintVisitor implements Visitor {
+    private final Configuration config;
 	private final PrintStream printStream;
 	
 	public PrettyPrintVisitor(PrintBuilder builder) {
+        this.config = builder.getConfig();
 		this.printStream = builder.getPrintStream();
 	}
 	
@@ -49,32 +52,27 @@ public class PrettyPrintVisitor implements Visitor {
 	}
 	@Override
 	public Token visit(Token token) {
-		switch (token.type) {
+		switch (token.type()) {
 		case EOL:
 			printStream.print("<EOL>");
 			break;
 		case COMMENT:
-			printStream.printf(" REM %s", token.text);
+			printStream.printf(" REM %s", token.text());
 			break;
+        case DATA, IDENT, SYNTAX:
+            printStream.print(token.text());
+            break;
 		case STRING:
-			printStream.printf("\"%s\"", token.text);
+			printStream.printf("\"%s\"", token.text());
 			break;
 		case KEYWORD:
-			printStream.printf(" %s ", token.keyword.text);
+			printStream.printf(" %s ", token.keyword().text);
 			break;
-		case IDENT:
-		case SYNTAX:
-			printStream.print(token.text);
-			break;
-		case DIRECTIVE:
-			printStream.printf("%s ", token.text);
+        case DIRECTIVE:
+			printStream.printf("%s ", token.text());
 			break;
 		case NUMBER:
-			if (Math.rint(token.number) == token.number) {
-				printStream.print(token.number.intValue());
-			} else {
-				printStream.print(token.number);
-			}
+            printStream.print(config.numberToString(token));
 			break;
 		}
 		return token;

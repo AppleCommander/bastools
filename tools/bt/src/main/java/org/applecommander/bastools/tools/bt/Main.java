@@ -17,30 +17,31 @@
  */
 package org.applecommander.bastools.tools.bt;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.concurrent.Callable;
-
 import io.github.applecommander.applesingle.AppleSingle;
-import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Optimization;
-import org.applecommander.bastools.api.Parser;
-import org.applecommander.bastools.api.TokenReader;
-import org.applecommander.bastools.api.Visitors;
+import org.applecommander.bastools.api.*;
 import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
 import org.applecommander.bastools.api.model.Token.Type;
+import org.applecommander.bastools.api.proofreaders.*;
 import org.applecommander.bastools.api.visitors.ByteVisitor;
 import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
+import static picocli.CommandLine.Model.UsageMessageSpec.SECTION_KEY_FOOTER;
 
 /** A command-line interface to the AppleSoft BAS tokenizer libraries. */
 @Command(description = "Transforms an AppleSoft program from text back to its tokenized state.",
@@ -90,20 +91,15 @@ public class Main implements Callable<Integer> {
 
 	@Option(names = "--wrapper", description = "Wrap the Applesoft program (DOS 3.3).")
 	private boolean wrapProgram;
-	
-	@Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
-			"Enable specific optimizations.",
-			"* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
-			"* @|green remove-rem-statements|@ - Remove all REM statements.",
-			"* @|green shorten-variable-names|@ - Ensure all variables are 1 or 2 characters long.",
-			"* @|green extract-constant-values|@ - Assign all constant values first.",
-			"* @|green merge-lines|@ - Merge lines.",
-			"* @|green renumber|@ - Renumber program."
-	})
-	private List<Optimization> optimizations = new ArrayList<>();
 
-	@Option(names = { "-O", "--optimize" }, description = "Apply all optimizations.")
-	private boolean allOptimizations;
+    @ArgGroup(heading = "%nTokenizer Selection:%n")
+    private final TokenizerSelection tokenizer = new TokenizerSelection();
+
+    @ArgGroup(heading = "%nOptimization:%n")
+    private final OptimizationSelection optimizations = new OptimizationSelection();
+
+    @ArgGroup(heading = "%nProof Readers:%n")
+    private final ProofReaderSelection proofReader = new ProofReaderSelection();
 	
 	@Option(names = "--debug", description = "Print debug output.")
 	private static boolean debugFlag;
@@ -113,7 +109,7 @@ public class Main implements Callable<Integer> {
 				// Do nothing
 			}
 		});
-	
+
 	@Parameters(index = "0", description = "AppleSoft BASIC program to process.")
 	private File sourceFile;
 	
@@ -122,7 +118,37 @@ public class Main implements Callable<Integer> {
 		// so we cannot have the 'System.exit' call in the try-catch block!
 		int exitCode = 0;
 		try {
-			exitCode = new CommandLine(new Main()).execute(args);
+            CommandLine cl = new CommandLine(new Main());
+            cl.getHelpSectionMap().put(SECTION_KEY_FOOTER, help -> {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                pw.println("\nTokenizer Defaults:");
+                CommandLine.Help.Column[] columns = {
+                    new CommandLine.Help.Column(12, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(20, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(11, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(11, 2, CommandLine.Help.Column.Overflow.WRAP),
+                    new CommandLine.Help.Column(11, 2, CommandLine.Help.Column.Overflow.WRAP)
+                };
+                CommandLine.Help.TextTable table = CommandLine.Help.TextTable.forColumns(help.colorScheme(), columns);
+                table.addRowValues("Option", "Tokenizer Class", "Parsing?", "Numbers?", "DATA?");
+                table.addRowValues("----------", "------------------", "---------", "---------", "---------");
+                table.addRowValues("--modern", "ModernTokenReader", "'Modern'", "Rewritten", "Rewritten");
+                table.addRowValues("--classic", "ClassicTokenReader", "Applesoft", "Rewritten", "Preserved");
+                table.addRowValues("--preserve", "ClassicTokenReader", "Applesoft", "Preserved", "Preserved");
+                table.addRowValues("----------", "------------------", "---------", "---------", "---------");
+                pw.print(table);
+                pw.println("  * Parsing: 'Modern' -  spaces between keywords and tokens are important,");
+                pw.println("                         any variable name can be used;");
+                pw.println("             Applesoft - ignores spaces, special logic to disambiguate AT/ATN/A TO,");
+                pw.println("                         variables cannot have keywords in them (ex: TON is invalid).");
+                pw.println("  * Numbers: Rewritten - means that a 0.600 is output as 0.6;");
+                pw.println("             Preserved - means that a 0.600 is output as 0.600.");
+                pw.println("  * Data:    Rewritten - the tokenizer identifies the data type and handles it appropriately;");
+                pw.println("             Preserved - the statement text (including all whitespace) is preserved.");
+                return sw.toString();
+            });
+			exitCode = cl.execute(args);
 		} catch (Throwable t) {
 			if (Main.debugFlag) {
 				t.printStackTrace(System.err);
@@ -145,7 +171,8 @@ public class Main implements Callable<Integer> {
 			Configuration.Builder builder = Configuration.builder()
 					.maxLineLength(this.maxLineLength)
 					.sourceFile(this.sourceFile)
-					.startAddress(this.address);
+					.startAddress(this.address)
+                    .preserveNumbers(tokenizer.preserveNumbers);
 			if (debugFlag) builder.debugStream(System.out);
 			process(builder.build());
 		}
@@ -155,12 +182,12 @@ public class Main implements Callable<Integer> {
 	
 	/** A basic test to ensure parameters are somewhat sane. */
 	public boolean checkParameters() {
-		if (allOptimizations) {
-			optimizations.clear();
-			optimizations.addAll(Arrays.asList(Optimization.values()));
+		// Special handling for the "shorten numbers" optimization to be applied
+		if (optimizations.selected.contains(Optimization.SHORTEN_NUMBERS)) {
+			tokenizer.preserveNumbers = true;
 		}
 		boolean hasTextOutput = hexFormat || copyFormat || prettyPrint || listPrint || showTokens || showVariableReport 
-				|| debugFlag || showLineAddresses;
+				|| debugFlag || showLineAddresses || proofReader.proofReaderFn != null;
 		if (stdoutFlag && hasTextOutput) {
 			System.err.println("The pipe option blocks any other stdout options.");
 			return false;
@@ -173,29 +200,32 @@ public class Main implements Callable<Integer> {
 	
 	/** General CLI processing. */
 	public void process(Configuration config) throws IOException {
-		Queue<Token> tokens = TokenReader.tokenize(sourceFile);
+		Queue<Token> tokens = tokenizer.tokenizerFn.apply(sourceFile);
 		if (showTokens) {
-			tokens.forEach(t -> System.out.printf("%s%s", t, t.type == Type.EOL ? "\n" : ", "));
+			tokens.forEach(t -> System.out.printf("%s%s", t, t.type() == Type.EOL ? "\n" : ", "));
 		}
 		Parser parser = new Parser(tokens);
 		Program program = parser.parse();
 		
-		for (Optimization optimization : optimizations) {
+		for (Optimization optimization : optimizations.selected) {
 			debug.printf("Optimization: %s\n", optimization.name());
 			program = program.accept(optimization.create(config));
 		}
 
 		if (prettyPrint || listPrint) {
-			program.accept(Visitors.printBuilder().prettyPrint(prettyPrint).build());
+			program.accept(Visitors.printBuilder(config).prettyPrint(prettyPrint).build());
 		}
 		if (showVariableReport) {
 			program.accept(Visitors.variableReportVisitor());
 		}
+        if (proofReader.proofReaderFn != null) {
+            proofReader.proofReaderFn.accept(config, program);
+        }
 
 		ByteVisitor byteVisitor = Visitors.byteVisitor(config);
 		byte[] wrapperData = new byte[0];
 		if (wrapProgram) {
-			Queue<Token> wrapperTokens = TokenReader.tokenize(new ByteArrayInputStream(
+			Queue<Token> wrapperTokens = ModernTokenReader.tokenize(new ByteArrayInputStream(
 					"10 POKE 103,24:POKE 104,8:RUN".getBytes()));
 			Parser wrapperParser = new Parser(wrapperTokens);
 			Program wrapperProgram = wrapperParser.parse();
@@ -258,4 +288,113 @@ public class Main implements Callable<Integer> {
 			}
 		}
 	}
+
+    public static class TokenizerSelection {
+        Function<File,Queue<Token>> tokenizerFn = this::modernTokenizer;
+        boolean preserveNumbers = false;
+
+        @Option(names = "--modern", description = "Select modern tokenizer (default)")
+        public void selectModernTokenizer(boolean flag) {
+            this.tokenizerFn = this::modernTokenizer;
+            this.preserveNumbers = false;
+        }
+
+        @Option(names = "--classic", description = "Select classic tokenizer")
+        public void selectClassicTokenizer(boolean flag) {
+            this.tokenizerFn = this::classicTokenizer;
+            this.preserveNumbers = false;
+        }
+
+        @Option(names = "--preserve", description = "Select classic tokenizer with number preservation")
+        public void selectPreserveTokenizer(boolean flag) {
+            this.tokenizerFn = this::classicTokenizer;
+            this.preserveNumbers = true;
+        }
+
+        Queue<Token> modernTokenizer(File file) {
+            try {
+                return ModernTokenReader.tokenize(file);
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        }
+        Queue<Token> classicTokenizer(File file) {
+            try {
+                return ClassicTokenReader.tokenize(file);
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        }
+    }
+
+    public static class OptimizationSelection {
+        @Option(names = "-f", converter = OptimizationTypeConverter.class, split = ",", description = {
+                "Enable specific optimizations.",
+                "* @|green remove-empty-statements|@ - Strip out all '::'-like statements.",
+                "* @|green remove-rem-statements|@ - Remove all REM statements.",
+                "* @|green shorten-variable-names|@ - Ensure all variables are 1 or 2 characters long.",
+                "* @|green extract-constant-values|@ - Assign all constant values first.",
+                "* @|green merge-lines|@ - Merge lines.",
+                "* @|green renumber|@ - Renumber program.",
+                "* @|green shorten-numbers|@ - Shorten numbers."
+        })
+        private List<Optimization> selected = new ArrayList<>();
+
+        @Option(names = { "-O", "--optimize" }, description = "Apply all optimizations.")
+        public void selectAllOptimizations(boolean flag) {
+            selected.addAll(List.of(Optimization.values()));
+        }
+    }
+
+    public static class ProofReaderSelection {
+        BiConsumer<Configuration,Program> proofReaderFn;
+
+        @Option(names = "--checkit", description = "Apply Nibble Checkit (ca 1988) to code")
+        public void selectNibbleCheckit(boolean flag) {
+            this.proofReaderFn = (c,p) -> {
+				NibbleCheckit proofreader = new NibbleCheckit(c);
+				proofreader.addProgram(p);
+			};
+        }
+
+        @Option(names = "--proofreader", description = "Apply Compute! Apple Automatic Proofreader (ca 1985) to code")
+        public void selectComputeProofreader(boolean flag) {
+            this.proofReaderFn = (c,p) -> {
+				ComputeAutomaticProofreader proofreader = new ComputeAutomaticProofreader(c);
+				proofreader.addProgram(p);
+			};
+        }
+
+        @Option(names = "--apple-checker", description = "Apply Nibble Apple Checker 3.0 (ca 1982) to code")
+        public void selectNibbleAppleChecker(boolean flag) {
+            this.proofReaderFn = (c,p) -> {
+				NibbleAppleChecker proofreader = new NibbleAppleChecker(c);
+				proofreader.addProgram(p);
+			};
+        }
+
+        @Option(names = { "--key-perfect-2", "--kp2" }, description = "Apply MicroSPARC Key Perfect V2 (ca 1981) to code")
+        public void selectKeyPerfectV2(boolean flag) {
+            this.proofReaderFn = (c,p) -> {
+				MicrosparcKeyPerfect2 proofreader = new MicrosparcKeyPerfect2(c);
+				proofreader.addProgram(p);
+			};
+        }
+
+        @Option(names = { "--key-perfect-4", "--kp4" }, description = "Apply MicroSPARC Key Perfect V4 (ca 1981) to code")
+        public void selectKeyPerfectV4(boolean flag) {
+            this.proofReaderFn = (c,p) -> {
+				MicrosparcKeyPerfect4 proofreader = new MicrosparcKeyPerfect4(c);
+				proofreader.addProgram(p);
+			};
+        }
+
+		@Option(names = { "--key-perfect-5", "--kp5" }, description = "Apply MicroSPARC Key Perfect V5 (ca 1985) to code")
+		public void selectKeyPerfectV5(boolean flag) {
+			this.proofReaderFn = (c,p) -> {
+				MicrosparcKeyPerfect5 proofreader = new MicrosparcKeyPerfect5(c);
+				proofreader.addProgram(p);
+			};
+		}
+    }
 }
