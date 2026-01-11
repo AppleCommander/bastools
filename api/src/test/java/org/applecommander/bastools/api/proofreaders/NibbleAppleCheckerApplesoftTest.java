@@ -24,11 +24,11 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
-public class NibbleAppleCheckerTest {
+public class NibbleAppleCheckerApplesoftTest {
     @Test
     public void testChecksum() {
         // Based on 6502 assembly run - checks step-by-step values
-        NibbleAppleChecker.Checksum checksum = new NibbleAppleChecker.Checksum();
+        NibbleAppleCheckerChecksum checksum = new NibbleAppleCheckerChecksum();
         checksum.add(0x89);     // TEXT
         assertEquals(0x13, checksum.value());
         checksum.add(0x3a);     // :
@@ -43,7 +43,7 @@ public class NibbleAppleCheckerTest {
                 .startAddress(0xb01)
                 .sourceFile(new File("test.bas"))
                 .build();
-        NibbleAppleChecker checker = new NibbleAppleChecker(config);
+        NibbleAppleCheckerApplesoft checker = new NibbleAppleCheckerApplesoft(config);
         // 10 TEXT:HOME as a sample...
         byte[] code = { 0x09, 0x0b, 0x0a, (byte)0x89, 0x3a, (byte)0x97, 0x00, 0x00, 0x00, 0x00, 0x00 };
         checker.addBytes(code);

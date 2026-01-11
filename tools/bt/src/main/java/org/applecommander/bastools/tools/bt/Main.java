@@ -368,7 +368,7 @@ public class Main implements Callable<Integer> {
         @Option(names = "--apple-checker", description = "Apply Nibble Apple Checker 3.0 (ca 1982) to code")
         public void selectNibbleAppleChecker(boolean flag) {
             this.proofReaderFn = (c,p) -> {
-				NibbleAppleChecker proofreader = new NibbleAppleChecker(c);
+				NibbleAppleCheckerApplesoft proofreader = new NibbleAppleCheckerApplesoft(c);
 				proofreader.addProgram(p);
 			};
         }
