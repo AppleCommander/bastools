@@ -22,6 +22,14 @@ application {
     mainClass = "org.applecommander.bastools.tools.st.Main"
 }
 
+// Disable all Spring AOT processing
+processAot.configure {
+    enabled = false;
+}
+processTestAot.configure {
+    enabled = false;
+}
+
 bootJar {
   manifest {
     attributes(
