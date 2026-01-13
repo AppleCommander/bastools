@@ -1,6 +1,6 @@
 package org.applecommander.bastools.api.proofreaders;
 
-public class NibbleAppleCheckerBinary implements BinaryProofReader {
+public class NibbleAppleCheckerBinary implements BinaryDataProofReader {
     private final String filename;
     private int length;
     private final NibbleAppleCheckerChecksum checksum = new NibbleAppleCheckerChecksum();

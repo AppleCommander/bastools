@@ -352,7 +352,7 @@ public class Main implements Callable<Integer> {
         @Option(names = "--checkit", description = "Apply Nibble Checkit (ca 1988) to code")
         public void selectNibbleCheckit(boolean flag) {
             this.proofReaderFn = (c,p) -> {
-				NibbleCheckit proofreader = new NibbleCheckit(c);
+				NibbleCheckitApplesoft proofreader = new NibbleCheckitApplesoft(c);
 				proofreader.addProgram(p);
 			};
         }

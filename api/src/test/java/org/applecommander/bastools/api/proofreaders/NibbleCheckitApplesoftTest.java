@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  * Perform some rudimentary testing of the Nibble Checkit algorithm.
  * Note that some of the algorithm is replicated in the "perform" methods.
  */
-public class NibbleCheckitTest {
+public class NibbleCheckitApplesoftTest {
     @Test
     public void testLineChecksums() {
         assertEquals(0x37, performLineCalc("10 REM"));
@@ -44,8 +44,7 @@ public class NibbleCheckitTest {
 
     @Test
     public void testProgramChecksum() {
-        // Note: The value displayed is 1CB9, but the code prints low byte first...
-        assertEquals(0xb91c, performProgramCalc(10, 20, 30));
+        assertEquals(0x1cb9, performProgramCalc(10, 20, 30));
     }
 
     protected int performLineCalc(String text) {
@@ -53,9 +52,9 @@ public class NibbleCheckitTest {
                 .preserveNumbers(true)
                 .sourceFile(new File("test.bas"))
                 .build();
-        NibbleCheckit proofreader = new NibbleCheckit(config);
+        NibbleCheckitApplesoft proofreader = new NibbleCheckitApplesoft(config);
         proofreader.addLine(text);
-        return ( (proofreader.getLineChecksumValue() & 0xff) - (proofreader.getLineChecksumValue() >> 8) ) & 0xff;
+        return proofreader.getLineChecksumValue();
     }
 
     protected int performProgramCalc(int... lineNumbers) {
@@ -63,7 +62,7 @@ public class NibbleCheckitTest {
                 .preserveNumbers(true)
                 .sourceFile(new File("test.bas"))
                 .build();
-        NibbleCheckit proofreader = new NibbleCheckit(config);
+        NibbleCheckitApplesoft proofreader = new NibbleCheckitApplesoft(config);
         for (int lineNumber : lineNumbers) {
             // We ignore the line, but line also computes the program checksum
             proofreader.addLine(Integer.toString(lineNumber));
