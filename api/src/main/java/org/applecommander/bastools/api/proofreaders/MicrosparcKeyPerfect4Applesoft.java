@@ -99,10 +99,10 @@ import java.util.List;
  * </pre>
  * ('@' replaced with ']' since Javadoc uses '@' for other purposes.)
  */
-public class MicrosparcKeyPerfect4 implements ApplesoftTokenizedProofReader {
+public class MicrosparcKeyPerfect4Applesoft implements ApplesoftTokenizedProofReader {
     private final Configuration config;
 
-    public MicrosparcKeyPerfect4(Configuration config) {
+    public MicrosparcKeyPerfect4Applesoft(Configuration config) {
         this.config = config;
     }
 
@@ -119,7 +119,7 @@ public class MicrosparcKeyPerfect4 implements ApplesoftTokenizedProofReader {
         System.out.println("Line# - Line#   CODE-4.0");
         System.out.println("-------------   --------");
 
-        Checksum checksum = new Checksum();
+        MicrosparcKeyPerfect4Checksum checksum = new MicrosparcKeyPerfect4Checksum();
         int programChecksum = 0;    // (Mostly a byte counter)
         final List<Integer> lines = new ArrayList<>();
         while (code.hasRemaining()) {
@@ -155,7 +155,7 @@ public class MicrosparcKeyPerfect4 implements ApplesoftTokenizedProofReader {
         printLine("PROGRAM TOTAL", programChecksum);
     }
 
-    public void printLines(List<Integer> lines, Checksum checksum) {
+    public void printLines(List<Integer> lines, MicrosparcKeyPerfect4Checksum checksum) {
         int firstLine = lines.getFirst();
         int lastLine = lines.getLast();
         String text = String.format("%5d - %5d", firstLine, lastLine);
@@ -173,36 +173,5 @@ public class MicrosparcKeyPerfect4 implements ApplesoftTokenizedProofReader {
         }
         System.out.printf(fmt, checksum);
         System.out.println();
-    }
-
-    public static class Checksum implements ProofReaderChecksum {
-        private int lineChecksum = 0;       // low byte with has EOR, ROL, ADC
-        private int lineCounter = 0;        // high 2 bytes that just ADC on carry
-
-        @Override
-        public int value() {
-            return lineCounter << 8 | lineChecksum;
-        }
-
-        @Override
-        public void reset() {
-            lineChecksum = 0;
-            lineCounter = 0;
-        }
-
-        @Override
-        public void add(int code) {
-            int acc = lineChecksum ^ code;
-            acc <<= 1;
-            if (acc > 0xff) {
-                acc &= 0xff;
-                lineChecksum++;
-            }
-            lineChecksum += acc;
-            if (lineChecksum > 0xff) {
-                lineChecksum &= 0xff;
-                lineCounter++;
-            }
-        }
     }
 }

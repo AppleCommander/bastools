@@ -384,7 +384,7 @@ public class Main implements Callable<Integer> {
         @Option(names = { "--key-perfect-4", "--kp4" }, description = "Apply MicroSPARC Key Perfect V4 (ca 1981) to code")
         public void selectKeyPerfectV4(boolean flag) {
             this.proofReaderFn = (c,p) -> {
-				MicrosparcKeyPerfect4 proofreader = new MicrosparcKeyPerfect4(c);
+				MicrosparcKeyPerfect4Applesoft proofreader = new MicrosparcKeyPerfect4Applesoft(c);
 				proofreader.addProgram(p);
 			};
         }

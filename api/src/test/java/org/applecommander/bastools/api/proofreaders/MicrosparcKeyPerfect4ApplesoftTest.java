@@ -17,12 +17,11 @@
  */
 package org.applecommander.bastools.api.proofreaders;
 
-import org.applecommander.bastools.api.proofreaders.MicrosparcKeyPerfect4.Checksum;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class MicrosparcKeyPerfect4Test {
+public class MicrosparcKeyPerfect4ApplesoftTest {
     @Test
     public void testChecksum() {
         // This is "filtered" already so we are just testing the checksum
@@ -31,7 +30,7 @@ public class MicrosparcKeyPerfect4Test {
             0x14, 0x00, 0xBA, 0x22, 0x48, 0x45, 0x4C, 0x4C, 0x4F, 0x22,     // 20 PRINT "HELLO"
             0x1E, 0x00, 0x80                                                // 30 END
         };
-        Checksum checksum = new Checksum();
+        MicrosparcKeyPerfect4Checksum checksum = new MicrosparcKeyPerfect4Checksum();
         for (int b : code) {
             checksum.add(b);
         }
