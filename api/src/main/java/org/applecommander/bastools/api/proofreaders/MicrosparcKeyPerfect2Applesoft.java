@@ -58,10 +58,10 @@ import java.util.List;
  * 1710-   60          RTS
  * </pre>
  */
-public class MicrosparcKeyPerfect2 implements ApplesoftTokenizedProofReader {
+public class MicrosparcKeyPerfect2Applesoft implements ApplesoftTokenizedProofReader {
     private final Configuration config;
 
-    public MicrosparcKeyPerfect2(Configuration config) {
+    public MicrosparcKeyPerfect2Applesoft(Configuration config) {
         this.config = config;
     }
 

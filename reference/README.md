@@ -4,6 +4,8 @@
 
 Some summary notes and observations on the Apple II code checking tools.
 
+## Applesoft
+
 |                                | Includes REM contents | Includes spaces | Control Chars? | Other? | Case-sensitive? | Operation    | Grouping(s)                     | Checksum Size                       | Program Total                        |
 |--------------------------------|:----------------------|:----------------|:---------------|--------|:----------------|:-------------|:--------------------------------|:------------------------------------|:-------------------------------------|
 | Compute! Automatic Proofreader | Yes                   | No              | CTRL+D         | N/A    | Yes             | Input Buffer | Line                            | 1 byte                              | No                                   |
@@ -20,6 +22,20 @@ Some summary notes and observations on the Apple II code checking tools.
 * *Case-sensitive?* - is "A" and "a" handled differently?
 * *Operation* - if "Input Buffer" is specified, the checksums are displayed after a line of code has been entered; otherwise, the program must be completed and saved before running checksum.
 * *Groupings* - what, if any, groupings apply.
+
+## Binary
+
+|                                | Includes spaces | Other? |
+|--------------------------------|-----------------|--------|
+| Compute! Automatic Proofreader |                 |        |
+| Nibble Checkit                 | Yes             | Yes    | 
+| Nibble Apple Checker           | No              | N/A    |
+| MicroSPARC Key Perfect 2       | No              | N/A    | 
+| MicroSPARC Key Perfect 4       |                 |        | 
+| MicroSPARC Key Perfect 5       |                 |        |
+
+* *Includes spaces* - indicates if spaces are important. For instance, Nibble Checkit uses the input buffer and does not ignore spaces. Thus, if extra spaces are includes like "0300:A9<spc><spc>00", the checksum will be off.
+* *Other?* - Checkit does the program total against the program bytes, not the entered text. Only the line checksum uses the input buffer.
 
 ## References
 

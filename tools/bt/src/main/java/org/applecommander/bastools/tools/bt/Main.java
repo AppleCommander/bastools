@@ -376,7 +376,7 @@ public class Main implements Callable<Integer> {
         @Option(names = { "--key-perfect-2", "--kp2" }, description = "Apply MicroSPARC Key Perfect V2 (ca 1981) to code")
         public void selectKeyPerfectV2(boolean flag) {
             this.proofReaderFn = (c,p) -> {
-				MicrosparcKeyPerfect2 proofreader = new MicrosparcKeyPerfect2(c);
+				MicrosparcKeyPerfect2Applesoft proofreader = new MicrosparcKeyPerfect2Applesoft(c);
 				proofreader.addProgram(p);
 			};
         }
