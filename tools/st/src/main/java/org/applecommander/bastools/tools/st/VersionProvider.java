@@ -17,6 +17,7 @@
  */
 package org.applecommander.bastools.tools.st;
 
+import com.webcodepro.applecommander.ui.AppleCommander;
 import io.github.applecommander.applesingle.AppleSingle;
 import org.applecommander.bastools.api.BasTools;
 import picocli.CommandLine.IVersionProvider;
@@ -28,7 +29,8 @@ public class VersionProvider implements IVersionProvider {
                 String.format("%s: %s", Main.class.getPackage().getImplementationTitle(), 
                         Main.class.getPackage().getImplementationVersion()),
                 String.format("%s: %s", BasTools.TITLE, BasTools.VERSION),
-                String.format("AppleSingle API: %s", AppleSingle.VERSION)
+                String.format("AppleSingle API: %s", AppleSingle.VERSION),
+                String.format("AppleCommander API: %s", AppleCommander.VERSION)
 		};
     }
 }
