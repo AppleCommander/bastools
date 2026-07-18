@@ -59,12 +59,12 @@ jobs:
         run: ./scripts/run-clth-tests.sh
 
       - name: Upload 'bt' binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bt-${{ matrix.os }}-${{ matrix.arch }}
           path: tools/bt/build/native/nativeCompile/bt*
       - name: Upload 'st' binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: st-${{ matrix.os }}-${{ matrix.arch }}
           path: tools/st/build/native/nativeCompile/st*
