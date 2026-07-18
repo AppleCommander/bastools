@@ -17,31 +17,15 @@
  */
 package org.applecommander.bastools.tools.st;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.Callable;
-
 import com.webcodepro.applecommander.storage.DiskException;
+import com.webcodepro.applecommander.storage.Disks;
 import com.webcodepro.applecommander.storage.FileEntry;
 import com.webcodepro.applecommander.storage.FormattedDisk;
-import com.webcodepro.applecommander.storage.os.prodos.ProdosFormatDisk;
-import com.webcodepro.applecommander.storage.physical.ByteArrayImageLayout;
-import com.webcodepro.applecommander.storage.physical.ImageOrder;
-import com.webcodepro.applecommander.storage.physical.ProdosOrder;
-
 import io.github.applecommander.applesingle.AppleSingle;
 import io.github.applecommander.applesingle.Utilities;
 import org.applecommander.bastools.api.Configuration;
-import org.applecommander.bastools.api.Parser;
 import org.applecommander.bastools.api.ModernTokenReader;
+import org.applecommander.bastools.api.Parser;
 import org.applecommander.bastools.api.Visitors;
 import org.applecommander.bastools.api.model.Program;
 import org.applecommander.bastools.api.model.Token;
@@ -49,10 +33,20 @@ import org.applecommander.bastools.api.shapes.BitmapShape;
 import org.applecommander.bastools.api.shapes.Shape;
 import org.applecommander.bastools.api.shapes.ShapeGenerator;
 import org.applecommander.bastools.api.shapes.ShapeTable;
+import org.applecommander.source.DataBufferSource;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Visibility;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.Callable;
 
 @Command(name = "generate", description = { "Generate a shape table from source code" },
 		parameterListHeading = "%nParameters:%n",
@@ -170,13 +164,18 @@ public class GenerateCommand implements Callable<Void> {
         byte[] shapeTableBytes = shapeTableStream.toByteArray();
         
         // Copy template into AppleCommander. Note that there doesn't appear to be a load from stream capability.
-        byte[] templateBytes = Utilities.toByteArray(getClass().getResourceAsStream("/template.po"));
-        ByteArrayImageLayout layout = new ByteArrayImageLayout(templateBytes.length);
-        ImageOrder imageOrder = new ProdosOrder(layout);
-        FormattedDisk[] disks = ProdosFormatDisk.create("DELETEME", "GONESOON", imageOrder);
-        FormattedDisk template = disks[0];
-        template.getDiskImageManager().setDiskImage(templateBytes);
-        
+        byte[] templateBytes;
+        try (var inputStream = getClass().getResourceAsStream("/template.po")) {
+            Objects.requireNonNull(inputStream, "Unable to locate template file.");
+            templateBytes = inputStream.readAllBytes();
+        }
+        var dataBufferSource = DataBufferSource.create(templateBytes, "template.po").get();
+		var ctx = Disks.inspect(dataBufferSource);
+		if (ctx.disks.size() != 1) {
+			throw new IOException("Template disk did not load successfully!");
+		}
+        FormattedDisk template = ctx.disks.getFirst();
+
         // Copy in BASIC code.
         FileEntry basicFile = template.createFile();
         basicFile.setFilename("STARTUP");
@@ -191,6 +190,6 @@ public class GenerateCommand implements Callable<Void> {
         shapeFile.setAddress(0x6000);
         shapeFile.setFileData(shapeTableBytes);
         
-        return template.getDiskImageManager().getDiskImage();
+        return template.getSource().readAllBytes().asBytes();
 	}
 }
