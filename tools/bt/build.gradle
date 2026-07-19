@@ -31,6 +31,7 @@ processTestAot.configure {
 }
 
 bootJar {
+  archiveBaseName='bt'
   manifest {
     attributes(
       'Implementation-Title': 'BT CLI',

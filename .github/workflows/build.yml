@@ -1,4 +1,4 @@
-name: GraalVM Native Image builds
+name: Build, compile, and release both bt and st
 
 on:
   push:
@@ -7,13 +7,47 @@ on:
       - '*'
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  build-java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Collect artifacts
+        run: |
+          mkdir artifacts
+          cp $(find tools/[bs]t/ -name "[bs]t-*.jar") artifacts/
+      - name: Upload bt artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-artifacts
+          path: artifacts/bt*.jar
+          archive: false
+          if-no-files-found: error
+      - name: Upload st artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-artifacts
+          path: artifacts/st*.jar
+          archive: false
+          if-no-files-found: error
+
+  build-native:
     name: bt and st on ${{ matrix.os }}-${{ matrix.arch }}
+    needs: [build-java]
     runs-on: ${{ matrix.label }}
     strategy:
       matrix:
@@ -37,36 +71,51 @@ jobs:
             arch: arm64
     steps:
       - uses: actions/checkout@v7
-
       - uses: graalvm/setup-graalvm@v1
         with:
           java-version: '21'
           distribution: 'graalvm-community'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
-
-      # Note that Graal v21 builds to the current architecture, and "--target" is not functional.
-      # Therefore, we try to find runners that fit our targets (see above).
       - name: Build 'bt' and 'st'
         run: ./gradlew nativeCompile
         env:
           # Needed for Windows; not an issue for other OSes
           GRADLE_OPTS: -Djava.io.tmpdir=${{ runner.temp }}
-
       - name: Run CLTH tests
         if: ${{ matrix.os != 'windows' }}
         shell: bash
         run: ./scripts/run-clth-tests.sh
-
       - name: Upload 'bt' binary
         uses: actions/upload-artifact@v7
         with:
           name: bt-${{ matrix.os }}-${{ matrix.arch }}
           path: tools/bt/build/native/nativeCompile/bt*
           archive: false
+          if-no-files-found: error
       - name: Upload 'st' binary
         uses: actions/upload-artifact@v7
         with:
           name: st-${{ matrix.os }}-${{ matrix.arch }}
           path: tools/st/build/native/nativeCompile/st*
           archive: false
+          if-no-files-found: error
+
+  release:
+    name: Create draft release
+    if: github.ref_type == 'tag'
+    needs: [build-java, build-native]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          generate_release_notes: true
+          files: |
+            bt*
+            st*
