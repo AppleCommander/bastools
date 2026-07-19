@@ -63,8 +63,10 @@ jobs:
         with:
           name: bt-${{ matrix.os }}-${{ matrix.arch }}
           path: tools/bt/build/native/nativeCompile/bt*
+          archive: false
       - name: Upload 'st' binary
         uses: actions/upload-artifact@v7
         with:
           name: st-${{ matrix.os }}-${{ matrix.arch }}
           path: tools/st/build/native/nativeCompile/st*
+          archive: false
