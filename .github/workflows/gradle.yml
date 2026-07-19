@@ -38,9 +38,17 @@ jobs:
       run: |
         mkdir artifacts
         cp $(find tools/ -name "bastools-*.jar" -not -name "bastools-*-plain.jar") artifacts/
-    - name: Upload artifacts
+    - name: Upload bt artifact
       uses: actions/upload-artifact@v7  
       with:
         name: build-artifacts
-        path: artifacts/
+        path: artifacts/bastools-tools-bt*.jar
+        archive: false
+        if-no-files-found: error
+    - name: Upload st artifact
+      uses: actions/upload-artifact@v7  
+      with:
+        name: build-artifacts
+        path: artifacts/bastools-tools-st*.jar
+        archive: false
         if-no-files-found: error
