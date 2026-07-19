@@ -53,4 +53,7 @@ graalvmNative {
             imageName.set("bt-${osName}-${osArch}-${project.version}")
         }
     }
+    metadataRepository {
+        enabled = true 
+    }
 }
