@@ -45,9 +45,29 @@ jobs:
           archive: false
           if-no-files-found: error
 
+  # This is a crude license header check. The ones I tested were susceptible to whitespace differences
+  # and I never got them to work. My primary goal is to ensure the headers exist, so this suffices.
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Look for license phrase
+        run: |
+          outfile=$(mktemp)
+          find . -name "*.java" | xargs grep -L "GNU General Public License" > ${outfile}
+          if [ -s "${outfile}" ]
+          then
+            echo "License headers missing on the following files:"
+            cat ${outfile}
+            exit 1
+          else
+            echo "License headers appear to be valid!"
+          fi
+
   build-native:
     name: bt and st on ${{ matrix.os }}-${{ matrix.arch }}
-    needs: [build-java]
+    needs: [build-java, license-check]
     runs-on: ${{ matrix.label }}
     strategy:
       matrix:
@@ -82,6 +102,13 @@ jobs:
         env:
           # Needed for Windows; not an issue for other OSes
           GRADLE_OPTS: -Djava.io.tmpdir=${{ runner.temp }}
+      - name: Run UPX
+        uses: crazy-max/ghaction-upx@v4
+        if: runner.os == 'Windows' || runner.os == 'Linux'
+        with:
+          files: |
+            tools/bt/build/native/nativeCompile/bt*
+            tools/st/build/native/nativeCompile/st*
       - name: Run CLTH tests
         if: ${{ matrix.os != 'windows' }}
         shell: bash
