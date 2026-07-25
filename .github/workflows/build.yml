@@ -102,6 +102,12 @@ jobs:
         env:
           # Needed for Windows; not an issue for other OSes
           GRADLE_OPTS: -Djava.io.tmpdir=${{ runner.temp }}
+      - name: Run UPX
+        uses: crazy-max/ghaction-upx@v4
+        with:
+          files: |
+            tools/bt/build/native/nativeCompile/bt*
+            tools/st/build/native/nativeCompile/st*
       - name: Run CLTH tests
         if: ${{ matrix.os != 'windows' }}
         shell: bash
