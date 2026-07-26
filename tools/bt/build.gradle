@@ -52,6 +52,7 @@ graalvmNative {
     binaries {
         named("main") {
             imageName.set("bt-${osName}-${osArch}-${project.version}")
+            buildArgs.add('-Os')
         }
     }
 }
