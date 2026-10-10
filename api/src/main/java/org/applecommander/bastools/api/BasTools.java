@@ -25,8 +25,26 @@ public class BasTools {
 	public static final String VERSION;
 	public static final String TITLE;
 	static {
-		TITLE = BasTools.class.getPackage().getImplementationTitle();
-		VERSION = BasTools.class.getPackage().getImplementationVersion();
+		String title = BasTools.class.getPackage().getImplementationTitle();
+		if (title == null) {
+			title = "B/BAS Tools API";
+		}
+		TITLE = title;
+
+		String version = BasTools.class.getPackage().getImplementationVersion();
+		if (version == null && BasTools.class.getModule().getDescriptor() != null) {
+			// When run under the Java Module system (JPMS) we need to get it a different way.
+			version = BasTools.class.getModule()
+					.getDescriptor()
+					.version()
+					.map(Object::toString)
+					.orElse("Development Build");
+		}
+		// For unit tests, the descriptor (apparently) doesn't exist, so we skip it.
+		if (version == null) {
+			version = "Unit Testing";
+		}
+		VERSION = version;
 	}	
 	
 	private BasTools() {}

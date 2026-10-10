@@ -26,6 +26,11 @@ jar {
   }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['--module-path', classpath.asPath]
+    options.javaModuleVersion = project.version.toString()
+}
+
 javadoc {
     title = "bastools ${version}"
     source = sourceSets.main.allJava
